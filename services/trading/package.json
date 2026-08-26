@@ -1,0 +1,13 @@
+{
+  "name": "@syncnode/trading",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "dependencies": {
+    "@syncnode/common": "*",
+    "@syncnode/database": "*",
+    "@syncnode/ledger": "*",
+    "@syncnode/matching-engine": "*",
+    "@syncnode/risk": "*"
+  }
+}

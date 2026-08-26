@@ -1,0 +1,13 @@
+FROM node:22-alpine AS builder
+
+WORKDIR /app
+COPY package*.json ./
+COPY packages/ ./packages/
+COPY services/ ./services/
+COPY apps/ ./apps/
+
+RUN npm install
+RUN npm run build --if-present
+
+EXPOSE 4000
+CMD ["npm", "run", "start"]
