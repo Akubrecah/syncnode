@@ -329,7 +329,12 @@ app.post('/api/v1/auth/login', async (req: Request, res: Response) => {
       }
     }
 
-    const token = signToken({ userId, email: user.email, isTotpAuthenticated: true });
+    const token = signToken({
+      userId,
+      email: user.email,
+      role: user.adminRole,
+      isTotpAuthenticated: true
+    });
     res.json({
       success: true,
       token,
@@ -337,6 +342,8 @@ app.post('/api/v1/auth/login', async (req: Request, res: Response) => {
         id: user.id,
         email: user.email,
         fullName: user.fullName,
+        adminRole: user.adminRole,
+        role: user.adminRole,
         country: user.country,
         investmentGoals: user.investmentGoals,
         riskTolerance: user.riskTolerance,

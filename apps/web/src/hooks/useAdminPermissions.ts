@@ -6,6 +6,7 @@ export interface AdminSessionState {
   isAuthorized: boolean;
   error: string | null;
   session: { userId: string; email: string; role: AdminRole } | null;
+  refresh: () => Promise<void>;
 }
 
 /**
@@ -14,47 +15,50 @@ export interface AdminSessionState {
  * this only drives UI visibility.
  */
 export function useAdminSession(): AdminSessionState {
-  const [state, setState] = useState<AdminSessionState>({
+  const [state, setState] = useState<Omit<AdminSessionState, 'refresh'>>({
     loading: true,
     isAuthorized: false,
     error: null,
     session: null
   });
 
-  useEffect(() => {
-    let cancelled = false;
-    const run = async () => {
-      const token = localStorage.getItem('syncnode_token');
-      if (!token) {
-        if (!cancelled) setState({ loading: false, isAuthorized: false, error: 'Authentication required. Please sign in with an administrative account.', session: null });
+  const checkSession = async () => {
+    setState((prev) => ({ ...prev, loading: true }));
+    const token = localStorage.getItem('syncnode_token');
+    if (!token) {
+      setState({ loading: false, isAuthorized: false, error: 'Authentication required. Please sign in with an administrative account.', session: null });
+      return;
+    }
+    try {
+      const res = await fetch('/api/v1/admin/session', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.status === 403 || res.status === 401) {
+        setState({ loading: false, isAuthorized: false, error: 'Access denied: your account does not hold an administrative role.', session: null });
         return;
       }
-      try {
-        const res = await fetch('/api/v1/admin/session', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        if (res.status === 403 || res.status === 401) {
-          if (!cancelled) setState({ loading: false, isAuthorized: false, error: 'Access denied: your account does not hold an administrative role.', session: null });
-          return;
-        }
-        if (!res.ok) throw new Error(`Session check failed (HTTP ${res.status})`);
-        const json = await res.json();
-        if (!json?.success) throw new Error(json?.error || 'Session check failed');
-        if (!cancelled) setState({ loading: false, isAuthorized: true, error: null, session: json.session });
-      } catch (err) {
-        if (!cancelled) setState({
-          loading: false,
-          isAuthorized: false,
-          error: `Cannot reach the admin service: ${err instanceof Error ? err.message : String(err)}`,
-          session: null
-        });
-      }
-    };
-    run();
-    return () => { cancelled = true; };
+      if (!res.ok) throw new Error(`Session check failed (HTTP ${res.status})`);
+      const json = await res.json();
+      if (!json?.success) throw new Error(json?.error || 'Session check failed');
+      setState({ loading: false, isAuthorized: true, error: null, session: json.session });
+    } catch (err) {
+      setState({
+        loading: false,
+        isAuthorized: false,
+        error: `Cannot reach the admin service: ${err instanceof Error ? err.message : String(err)}`,
+        session: null
+      });
+    }
+  };
+
+  useEffect(() => {
+    checkSession();
   }, []);
 
-  return state;
+  return {
+    ...state,
+    refresh: checkSession
+  };
 }
 
 export interface PermissionsApi {

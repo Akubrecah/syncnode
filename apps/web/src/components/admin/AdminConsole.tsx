@@ -114,8 +114,85 @@ const renderSection = (
   }
 };
 
+const AdminInlineLogin: React.FC<{ onLoggedIn: () => void }> = ({ onLoggedIn }) => {
+  const [email, setEmail] = useState('poweldayck@gmail.com');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/v1/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim().toLowerCase(), password })
+      });
+      const data = await res.json();
+      if (!data.success) {
+        throw new Error(data.error || 'Authentication failed');
+      }
+      localStorage.setItem('syncnode_token', data.token);
+      onLoggedIn();
+    } catch (err: any) {
+      setError(err.message || 'Login failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div>
+      {error && (
+        <div style={{ background: 'rgba(246, 70, 93, 0.15)', border: '1px solid #f6465d', borderRadius: '8px', padding: '10px 14px', color: '#f6465d', fontSize: '13px', marginBottom: '16px' }}>
+          {error}
+        </div>
+      )}
+
+      <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div>
+          <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#848e9c', marginBottom: '6px' }}>Admin Email</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            style={{ width: '100%', background: '#181a20', border: '1px solid #2b313a', borderRadius: '8px', padding: '10px 12px', color: '#eaecef', fontSize: '14px', outline: 'none' }}
+          />
+        </div>
+
+        <div>
+          <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#848e9c', marginBottom: '6px' }}>Password</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Enter admin password"
+            required
+            style={{ width: '100%', background: '#181a20', border: '1px solid #2b313a', borderRadius: '8px', padding: '10px 12px', color: '#eaecef', fontSize: '14px', outline: 'none' }}
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          style={{ background: '#fcd535', color: '#181a20', border: 'none', borderRadius: '8px', padding: '12px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', marginTop: '8px', opacity: loading ? 0.7 : 1 }}
+        >
+          {loading ? 'Authenticating...' : 'Sign In to Admin Console'}
+        </button>
+
+        <a href="#/dashboard" style={{ textAlign: 'center', fontSize: '13px', color: '#848e9c', textDecoration: 'none', marginTop: '4px' }}>
+          Return to Platform Dashboard
+        </a>
+      </form>
+    </div>
+  );
+};
+
 export const AdminConsole: React.FC = () => {
-  const { session, loading, isAuthorized } = useAdminSession();
+  const { session, loading, isAuthorized, refresh } = useAdminSession();
   const [section, setSection] = useState<string>(() => {
     const parts = window.location.hash.replace(/^#\/?/, '').split('/');
     return parts[1] || 'dashboard';
@@ -158,15 +235,16 @@ export const AdminConsole: React.FC = () => {
 
   if (!isAuthorized || !session) {
     return (
-      <div className="admin-state-box admin-state-forbidden" role="status" style={{ margin: '60px auto', maxWidth: 520 }}>
-        Administrative Access Required
-        <small>
-          Your account is not recognized as an exchange administrator.
-          Sign in with an administrative account and try again.
-        </small>
-        <a href="#/dashboard" className="btn btn-secondary" style={{ marginTop: 12 }}>
-          Return to platform
-        </a>
+      <div style={{ maxWidth: '440px', margin: '60px auto', background: '#1e2329', border: '1px solid #2b313a', borderRadius: '16px', padding: '32px', boxShadow: '0 12px 32px rgba(0, 0, 0, 0.4)' }}>
+        <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+          <div style={{ width: '52px', height: '52px', borderRadius: '12px', background: 'rgba(252, 213, 53, 0.15)', border: '1px solid #fcd535', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
+            <PanelLeftOpen size={26} color="#fcd535" />
+          </div>
+          <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#eaecef', marginBottom: '6px' }}>Admin Console Access</h2>
+          <p style={{ fontSize: '13px', color: '#848e9c', margin: 0 }}>Sign in with an exchange administrator account to manage platform risk and operations.</p>
+        </div>
+
+        <AdminInlineLogin onLoggedIn={() => refresh()} />
       </div>
     );
   }

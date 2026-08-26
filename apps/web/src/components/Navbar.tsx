@@ -185,6 +185,24 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             Dashboard
           </button>
+
+          {/* 7. Admin Console */}
+          {(user?.adminRole || user?.role || user?.email === 'poweldayck@gmail.com' || activeTab === 'admin') && (
+            <button
+              className={`nav-item ${activeTab === 'admin' ? 'active' : ''}`}
+              onClick={() => setActiveTab('admin')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+                color: activeTab === 'admin' ? '#fcd535' : '#ec4899',
+                fontWeight: 700
+              }}
+            >
+              <ShieldCheck size={14} color={activeTab === 'admin' ? '#fcd535' : '#ec4899'} />
+              <span>Admin</span>
+            </button>
+          )}
         </nav>
       </div>
 
