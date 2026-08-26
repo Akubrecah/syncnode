@@ -401,14 +401,31 @@ export const WatchlistView: React.FC<WatchlistViewProps> = ({
           )}
 
           {watchlistMode === 'mini-charts' && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '12px', padding: '12px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px', padding: '16px' }}>
               {watchlistSymbols.slice(0, 8).map((sym) => (
                 <div
                   key={sym}
-                  style={{ background: '#12141c', border: '1px solid #1f232e', borderRadius: '8px', padding: '8px', cursor: 'pointer' }}
+                  style={{
+                    background: '#12141c',
+                    border: '1px solid #1f232e',
+                    borderRadius: '12px',
+                    padding: '10px',
+                    cursor: 'pointer',
+                    minHeight: '225px',
+                    transition: 'all 0.2s ease',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = '#fcd535';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = '#1f232e';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
                   onClick={() => onNavigateToStock && onNavigateToStock(sym)}
                 >
-                  <TradingViewMiniChart symbol={sym} theme="dark" height={135} dateRange="1D" />
+                  <TradingViewMiniChart symbol={sym} theme="dark" height={210} dateRange="1D" />
                 </div>
               ))}
             </div>

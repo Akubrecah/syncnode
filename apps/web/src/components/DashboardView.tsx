@@ -1628,20 +1628,31 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 Manage Watchlist
               </button>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
               {['BTC/USDT', 'ETH/USDT', 'SOL/USDT', 'NVDA'].map((sym) => (
                 <div
                   key={sym}
                   onClick={() => (sym.includes('/') ? navigateTo('spot', sym) : navigateTo('stock', sym))}
                   style={{
                     background: '#181a20',
-                    borderRadius: '8px',
-                    padding: '8px',
+                    borderRadius: '12px',
+                    padding: '10px',
                     border: '1px solid #2b313a',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    minHeight: '220px',
+                    transition: 'all 0.2s ease',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = '#fcd535';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = '#2b313a';
+                    e.currentTarget.style.transform = 'translateY(0)';
                   }}
                 >
-                  <TradingViewMiniChart symbol={sym} height={140} theme="dark" dateRange="1D" />
+                  <TradingViewMiniChart symbol={sym} height={210} theme="dark" dateRange="1D" />
                 </div>
               ))}
             </div>

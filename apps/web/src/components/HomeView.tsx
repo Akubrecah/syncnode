@@ -379,12 +379,12 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
 
             {/* Hero Right: 4-Grid of Live Mini-Chart Rounded Cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '14px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
               {[
-                { sym: 'BTCUSDT', pair: 'BTC/USDT', id: 'BTC' },
-                { sym: 'ETHUSDT', pair: 'ETH/USDT', id: 'ETH' },
-                { sym: 'SOLUSDT', pair: 'SOL/USDT', id: 'SOL' },
-                { sym: 'BNBUSDT', pair: 'BNB/USDT', id: 'BNB' }
+                { sym: 'BTCUSDT', pair: 'BTC/USDT', id: 'BTC', name: 'Bitcoin' },
+                { sym: 'ETHUSDT', pair: 'ETH/USDT', id: 'ETH', name: 'Ethereum' },
+                { sym: 'SOLUSDT', pair: 'SOL/USDT', id: 'SOL', name: 'Solana' },
+                { sym: 'BNBUSDT', pair: 'BNB/USDT', id: 'BNB', name: 'BNB' }
               ].map((item) => {
                 const live = livePrices[item.id];
                 const price = live ? live.price : (item.id === 'BTC' ? 96450 : 2785);
@@ -401,10 +401,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
                       background: '#181a20',
                       borderRadius: '16px',
                       border: '1px solid #2b313a',
-                      padding: '12px 14px',
+                      padding: '16px',
                       cursor: 'pointer',
                       transition: 'all 0.2s ease',
-                      boxShadow: '0 8px 16px rgba(0, 0, 0, 0.2)'
+                      boxShadow: '0 8px 20px rgba(0, 0, 0, 0.25)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      minHeight: '170px'
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.borderColor = '#fcd535';
@@ -415,26 +419,36 @@ export const HomeView: React.FC<HomeViewProps> = ({
                       e.currentTarget.style.transform = 'translateY(0)';
                     }}
                   >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                      <span style={{ fontSize: '13px', fontWeight: 700, color: '#eaecef' }}>{item.pair}</span>
-                      <span
-                        style={{
-                          fontSize: '11px',
-                          fontWeight: 700,
-                          color: isPos ? '#2ebd85' : '#f6465d',
-                          background: isPos ? 'rgba(46, 189, 133, 0.12)' : 'rgba(246, 70, 93, 0.12)',
-                          padding: '2px 6px',
-                          borderRadius: '4px'
-                        }}
-                      >
-                        {live ? (isPos ? `+${chg.toFixed(2)}%` : `${chg.toFixed(2)}%`) : '--'}
-                      </span>
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                        <div>
+                          <span style={{ fontSize: '14px', fontWeight: 700, color: '#eaecef' }}>{item.pair}</span>
+                          <span style={{ fontSize: '11px', color: '#848e9c', marginLeft: '6px' }}>{item.name}</span>
+                        </div>
+                        <span
+                          style={{
+                            fontSize: '11px',
+                            fontWeight: 700,
+                            color: isPos ? '#2ebd85' : '#f6465d',
+                            background: isPos ? 'rgba(46, 189, 133, 0.15)' : 'rgba(246, 70, 93, 0.15)',
+                            padding: '3px 8px',
+                            borderRadius: '6px'
+                          }}
+                        >
+                          {live ? (isPos ? `+${chg.toFixed(2)}%` : `${chg.toFixed(2)}%`) : '--'}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '18px', fontWeight: 800, color: '#eaecef', fontFamily: 'monospace', marginBottom: '4px' }}>
+                        {live ? `$${price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '$--'}
+                      </div>
+                      {live?.vol && (
+                        <div style={{ fontSize: '11px', color: '#848e9c', marginBottom: '8px' }}>
+                          24h Vol: <span style={{ color: '#eaecef' }}>{live.vol}</span>
+                        </div>
+                      )}
                     </div>
-                    <div style={{ fontSize: '16px', fontWeight: 800, color: '#eaecef', fontFamily: 'monospace', marginBottom: '6px' }}>
-                      {live ? `$${price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '$--'}
-                    </div>
-                    <div style={{ height: '70px', borderRadius: '8px', overflow: 'hidden' }}>
-                      <TradingViewMiniChart symbol={item.sym} height={70} theme="dark" dateRange="1D" />
+                    <div style={{ height: '75px', width: '100%', borderRadius: '8px', overflow: 'hidden' }}>
+                      <TradingViewMiniChart symbol={item.sym} height={75} theme="dark" dateRange="1D" chartOnly={true} noTimeScale={true} />
                     </div>
                   </div>
                 );
@@ -747,8 +761,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
           {/* Market Table */}
           {activeMarketTab === 'tradingview' ? (
-            <div style={{ background: '#181a20', border: '1px solid #2b313a', borderRadius: '16px', padding: '16px', overflow: 'hidden' }}>
-              <TradingViewMarketOverview height={480} theme="dark" />
+            <div style={{ background: '#181a20', border: '1px solid #2b313a', borderRadius: '16px', padding: '16px', overflow: 'hidden', minHeight: '580px' }}>
+              <TradingViewMarketOverview height={560} theme="dark" />
             </div>
           ) : (
             <div style={{ overflowX: 'auto' }}>

@@ -8,15 +8,19 @@ interface TradingViewMiniChartProps {
   height?: number | string;
   dateRange?: '1D' | '1M' | '3M' | '12M' | 'ALL';
   isTransparent?: boolean;
+  chartOnly?: boolean;
+  noTimeScale?: boolean;
 }
 
 export const TradingViewMiniChart: React.FC<TradingViewMiniChartProps> = memo(({
   symbol,
   theme = 'dark',
   width = '100%',
-  height = 140,
+  height = 220,
   dateRange = '1D',
-  isTransparent = false
+  isTransparent = false,
+  chartOnly = false,
+  noTimeScale = false
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -48,7 +52,9 @@ export const TradingViewMiniChart: React.FC<TradingViewMiniChartProps> = memo(({
       colorTheme: theme,
       isTransparent: isTransparent,
       autosize: true,
-      largeChartUrl: ''
+      largeChartUrl: '',
+      chartOnly: chartOnly,
+      noTimeScale: noTimeScale
     });
 
     container.appendChild(script);
@@ -58,13 +64,18 @@ export const TradingViewMiniChart: React.FC<TradingViewMiniChartProps> = memo(({
         container.innerHTML = '';
       }
     };
-  }, [symbol, theme, width, height, dateRange, isTransparent]);
+  }, [symbol, theme, width, height, dateRange, isTransparent, chartOnly, noTimeScale]);
 
   return (
     <div
       ref={containerRef}
       className="tradingview-widget-container"
-      style={{ width: '100%', height: typeof height === 'number' ? `${height}px` : height, minHeight: '120px' }}
+      style={{
+        width: '100%',
+        height: typeof height === 'number' ? `${height}px` : height,
+        minHeight: chartOnly ? '60px' : (typeof height === 'number' ? `${height}px` : '200px'),
+        overflow: 'hidden'
+      }}
     />
   );
 });
