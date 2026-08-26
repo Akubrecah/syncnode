@@ -18,6 +18,7 @@ import {
   ExternalLink,
   Lock,
   TrendingUp,
+  TrendingDown,
   Activity,
   Layers,
   Coins,
@@ -969,8 +970,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 Staking &amp; Savings
               </div>
             </div>
-          </div>
-        </div>
           </div>
         </div>
 
