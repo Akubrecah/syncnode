@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Search, Eye, Ban } from 'lucide-react';
+import { Search, Eye, Ban, Wallet, Plus } from 'lucide-react';
 import { useAdminQuery } from '../../../hooks/useAdminApi';
 import {
   AdminSectionHeader, AdminDataState, AdminPagination, PermissionGate
 } from '../shared/AdminPrimitives';
 import { UserDetailDrawer } from './UserDetail';
+import { AdjustBalanceModal } from './AdjustBalanceModal';
 import { AdminUser, KycStatusValue, KycTierValue } from '../../../types/admin';
 import { formatDateTime, classNames } from '../../../utils/adminHelpers';
 
@@ -42,6 +43,7 @@ export const UsersTable: React.FC<{
 
   const query = useAdminQuery<UsersResponse>(`/api/v1/admin/users?${params.toString()}`, { refreshInterval: 30000 });
   const [detailUser, setDetailUser] = useState<AdminUser | null>(null);
+  const [adjustingUser, setAdjustingUser] = useState<AdminUser | null>(null);
 
   return (
     <div className="admin-section">
@@ -95,7 +97,7 @@ export const UsersTable: React.FC<{
           <table className="bn-table admin-users-table">
             <thead>
               <tr>
-                <th>User</th><th>KYC</th><th>Security</th><th>Status</th><th>Registered</th><th></th>
+                <th>User</th><th>KYC</th><th>Security</th><th>Status</th><th>Registered</th><th style={{ textAlign: 'right' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -127,12 +129,24 @@ export const UsersTable: React.FC<{
                   </td>
                   <td className="admin-muted-cell">{formatDateTime(u.createdAt)}</td>
                   <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
-                    <button className="btn btn-secondary" style={{ padding: '4px 10px', fontSize: '12px' }} onClick={() => setDetailUser(u)}>
-                      <Eye size={12} /> Detail{canManageUsers ? '' : ''}
-                    </button>
-                    {canManageUsers && u.isSuspended && (
-                      <span title="Suspended account" style={{ marginLeft: 6 }}><Ban size={13} color="var(--sell-red)" /></span>
-                    )}
+                    <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end', alignItems: 'center' }}>
+                      {canManageUsers && (
+                        <button
+                          className="btn btn-secondary"
+                          style={{ padding: '4px 8px', fontSize: '11px', color: '#fcd535', borderColor: 'rgba(252, 213, 53, 0.3)' }}
+                          onClick={() => setAdjustingUser(u)}
+                          title="Add / Edit user balance"
+                        >
+                          <Wallet size={12} /> Balance
+                        </button>
+                      )}
+                      <button className="btn btn-secondary" style={{ padding: '4px 10px', fontSize: '12px' }} onClick={() => setDetailUser(u)}>
+                        <Eye size={12} /> Detail
+                      </button>
+                      {canManageUsers && u.isSuspended && (
+                        <span title="Suspended account" style={{ marginLeft: 4 }}><Ban size={13} color="var(--sell-red)" /></span>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -148,7 +162,25 @@ export const UsersTable: React.FC<{
       {detailUser && (
         <UserDetailDrawer
           userId={detailUser.id}
-          onClose={() => setDetailUser(null)}
+          canManageUsers={canManageUsers}
+          onClose={() => {
+            setDetailUser(null);
+            query.refresh();
+          }}
+        />
+      )}
+
+      {adjustingUser && (
+        <AdjustBalanceModal
+          userId={adjustingUser.id}
+          userEmail={adjustingUser.email}
+          userName={adjustingUser.fullName}
+          initialAsset="USDT"
+          onClose={() => setAdjustingUser(null)}
+          onSuccess={() => {
+            setAdjustingUser(null);
+            query.refresh();
+          }}
         />
       )}
     </div>

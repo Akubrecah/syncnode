@@ -13,6 +13,8 @@ export type AdminRole =
   | 'SUPPORT_AGENT'
   | 'READ_ONLY_AUDITOR';
 
+export type AssetSymbol = 'USDT' | 'BTC' | 'ETH' | 'SOL' | 'USDC';
+
 export interface AdminSession {
   userId: string;
   email: string;

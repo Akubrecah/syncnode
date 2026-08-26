@@ -45,6 +45,9 @@ import {
   P2PEscrowStatus,
   User,
   Decimal,
+  AccountType,
+  EntryDirection,
+  TransactionType,
   Logger,
   AppError
 } from '@syncnode/common';
@@ -1090,6 +1093,163 @@ app.post(
         after: { isWithdrawalSuspended: restricted }
       };
     });
+  }
+);
+
+// Admin Balance Addition, Deduction & Value Overrides
+app.post(
+  '/api/v1/admin/users/:id/adjust-balance',
+  authMiddleware,
+  requireAdminRole(AdminRole.SUPER_ADMIN, AdminRole.FINANCE_OFFICER, AdminRole.SECURITY_ADMIN),
+  (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const user = db.users.get(req.params.id as string);
+      if (!user) {
+        res.status(404).json({ success: false, error: 'User not found' });
+        return;
+      }
+
+      const { asset, operation, amount } = req.body;
+      if (!asset || !['USDT', 'BTC', 'ETH', 'SOL'].includes(asset)) {
+        res.status(400).json({ success: false, error: 'Invalid asset. Supported assets: USDT, BTC, ETH, SOL' });
+        return;
+      }
+
+      if (!operation || !['CREDIT', 'DEBIT', 'SET'].includes(operation)) {
+        res.status(400).json({ success: false, error: 'Invalid operation. Supported: CREDIT (Add), DEBIT (Deduct), SET (Exact)' });
+        return;
+      }
+
+      const numAmount = new Decimal(amount != null ? String(amount) : '0');
+      if (numAmount.isNegative()) {
+        res.status(400).json({ success: false, error: 'Amount cannot be negative' });
+        return;
+      }
+
+      const validReason = requireReason(req.body);
+      const userBalances = ledgerService.getUserBalances(user.id);
+      const currentAssetBal = userBalances.find((b) => b.asset === asset) || {
+        asset: asset as AssetSymbol,
+        available: '0',
+        locked: '0',
+        pendingWithdrawal: '0',
+        p2pEscrow: '0',
+        total: '0'
+      };
+
+      const currentAvailable = new Decimal(currentAssetBal.available);
+      let deltaAmount = Decimal.ZERO;
+      let actualOp: 'CREDIT' | 'DEBIT' | 'NONE' = 'NONE';
+
+      if (operation === 'CREDIT') {
+        if (!numAmount.isPositive()) {
+          res.status(400).json({ success: false, error: 'Credit amount must be greater than zero' });
+          return;
+        }
+        deltaAmount = numAmount;
+        actualOp = 'CREDIT';
+      } else if (operation === 'DEBIT') {
+        if (!numAmount.isPositive()) {
+          res.status(400).json({ success: false, error: 'Debit amount must be greater than zero' });
+          return;
+        }
+        if (currentAvailable.lt(numAmount)) {
+          res.status(400).json({
+            success: false,
+            error: `Insufficient user available balance to debit: user holds ${currentAvailable.toString()} ${asset}, requested debit ${numAmount.toString()}`
+          });
+          return;
+        }
+        deltaAmount = numAmount;
+        actualOp = 'DEBIT';
+      } else if (operation === 'SET') {
+        const diff = numAmount.minus(currentAvailable);
+        if (diff.gt(0)) {
+          deltaAmount = diff;
+          actualOp = 'CREDIT';
+        } else if (diff.lt(0)) {
+          deltaAmount = diff.abs();
+          actualOp = 'DEBIT';
+        } else {
+          actualOp = 'NONE';
+        }
+      }
+
+      if (actualOp === 'CREDIT') {
+        ledgerService.recordTransaction(
+          TransactionType.ADMIN_ADJUSTMENT,
+          `admin_adj_${user.id}_${Date.now()}`,
+          `adj_cred_${user.id}_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+          `Admin balance credit of ${deltaAmount.toString()} ${asset} for ${user.email} (${validReason})`,
+          [
+            {
+              accountType: AccountType.EXCHANGE_HOT_WALLET,
+              asset: asset as AssetSymbol,
+              direction: EntryDirection.DEBIT,
+              amount: deltaAmount.toString()
+            },
+            {
+              userId: user.id,
+              accountType: AccountType.USER_AVAILABLE,
+              asset: asset as AssetSymbol,
+              direction: EntryDirection.CREDIT,
+              amount: deltaAmount.toString()
+            }
+          ]
+        );
+      } else if (actualOp === 'DEBIT') {
+        ledgerService.recordTransaction(
+          TransactionType.ADMIN_ADJUSTMENT,
+          `admin_adj_${user.id}_${Date.now()}`,
+          `adj_deb_${user.id}_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+          `Admin balance debit of ${deltaAmount.toString()} ${asset} for ${user.email} (${validReason})`,
+          [
+            {
+              userId: user.id,
+              accountType: AccountType.USER_AVAILABLE,
+              asset: asset as AssetSymbol,
+              direction: EntryDirection.DEBIT,
+              amount: deltaAmount.toString()
+            },
+            {
+              accountType: AccountType.EXCHANGE_HOT_WALLET,
+              asset: asset as AssetSymbol,
+              direction: EntryDirection.CREDIT,
+              amount: deltaAmount.toString()
+            }
+          ]
+        );
+      }
+
+      const updatedBalances = ledgerService.getUserBalances(user.id);
+      const afterAssetBal = updatedBalances.find((b) => b.asset === asset)?.available || '0';
+
+      db.logAudit({
+        actorId: req.user!.userId,
+        actorType: 'ADMIN',
+        action: 'ADMIN_USER_BALANCE_ADJUSTMENT',
+        targetId: user.id,
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+        metadata: {
+          asset,
+          requestedOperation: operation,
+          appliedOperation: actualOp,
+          delta: deltaAmount.toString(),
+          before: currentAvailable.toString(),
+          after: afterAssetBal,
+          reason: validReason
+        }
+      });
+
+      res.json({
+        success: true,
+        message: `Successfully updated ${asset} balance for ${user.email} (${actualOp === 'NONE' ? 'No change' : `${actualOp} ${deltaAmount.toString()} ${asset}`})`,
+        balances: updatedBalances
+      });
+    } catch (err: any) {
+      res.status(err.statusCode || 400).json({ success: false, error: err.message });
+    }
   }
 );
 
