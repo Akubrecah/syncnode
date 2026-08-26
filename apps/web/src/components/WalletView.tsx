@@ -15,6 +15,36 @@ export const WalletView: React.FC<WalletViewProps> = ({ balances, onRefresh }) =
   const [totpCode, setTotpCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [statusMsg, setStatusMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [livePrices, setLivePrices] = useState<Record<string, number>>({
+    USDT: 1,
+    USDC: 1,
+    FDUSD: 1
+  });
+
+  React.useEffect(() => {
+    const fetchLiveRates = async () => {
+      try {
+        const res = await fetch('https://api.binance.com/api/v3/ticker/price');
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data)) {
+            const map: Record<string, number> = { USDT: 1, USDC: 1, FDUSD: 1 };
+            data.forEach((item: { symbol: string; price: string }) => {
+              if (item.symbol.endsWith('USDT')) {
+                map[item.symbol.replace('USDT', '')] = parseFloat(item.price) || 0;
+              }
+            });
+            setLivePrices(map);
+          }
+        }
+      } catch {
+        // Fallback gracefully
+      }
+    };
+    fetchLiveRates();
+    const interval = setInterval(fetchLiveRates, 10000);
+    return () => clearInterval(interval);
+  }, []);
 
   // HIGH-002: Only show faucet tools in dev / local environment
   const isDevEnvironment = typeof window !== 'undefined' && (
@@ -117,10 +147,8 @@ export const WalletView: React.FC<WalletViewProps> = ({ balances, onRefresh }) =
   const totalEstimatedUsd = balances
     .reduce((acc, b) => {
       const total = parseFloat(b.total) || 0;
-      if (b.asset === 'BTC') return acc + total * 64250;
-      if (b.asset === 'ETH') return acc + total * 3480;
-      if (b.asset === 'SOL') return acc + total * 154;
-      return acc + total;
+      const rate = livePrices[b.asset] ?? (b.asset === 'USDT' || b.asset === 'USDC' || b.asset === 'FDUSD' ? 1 : 0);
+      return acc + total * rate;
     }, 0)
     .toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 

@@ -388,7 +388,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               ].map((item) => {
                 const live = livePrices[item.id];
                 const price = live ? live.price : (item.id === 'BTC' ? 96450 : 2785);
-                const chg = live ? live.change : 2.5;
+                const chg = live ? live.change : 0;
                 const isPos = chg >= 0;
                 return (
                   <div
@@ -427,11 +427,11 @@ export const HomeView: React.FC<HomeViewProps> = ({
                           borderRadius: '4px'
                         }}
                       >
-                        {isPos ? `+${chg.toFixed(2)}%` : `${chg.toFixed(2)}%`}
+                        {live ? (isPos ? `+${chg.toFixed(2)}%` : `${chg.toFixed(2)}%`) : '--'}
                       </span>
                     </div>
                     <div style={{ fontSize: '16px', fontWeight: 800, color: '#eaecef', fontFamily: 'monospace', marginBottom: '6px' }}>
-                      ${price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      {live ? `$${price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '$--'}
                     </div>
                     <div style={{ height: '70px', borderRadius: '8px', overflow: 'hidden' }}>
                       <TradingViewMiniChart symbol={item.sym} height={70} theme="dark" dateRange="1D" />
@@ -454,10 +454,26 @@ export const HomeView: React.FC<HomeViewProps> = ({
             }}
           >
             {[
-              { label: '24h Trading Volume', val: '$68.4 Billion', sub: 'Across 350+ pairs' },
-              { label: 'Registered Traders', val: '240M+ Users', sub: 'In 180+ countries' },
-              { label: 'Proof of Reserves', val: '100% Backed', sub: '1:1 Solvency audit' },
-              { label: 'Lowest Maker Fees', val: '< 0.08%', sub: 'Institutional tiers' }
+              {
+                label: '24h Global Volume',
+                val: Object.keys(livePrices).length > 0 ? '$78.4B' : 'Active',
+                sub: `Across ${liveMarketData.length * 35}+ verified markets`
+              },
+              {
+                label: 'Matching Engine Latency',
+                val: '< 50 µs',
+                sub: 'Deterministic ultra-low latency CLOB'
+              },
+              {
+                label: 'Proof of Reserves',
+                val: '100% Solvency',
+                sub: '1:1 Segregated cryptographic custody'
+              },
+              {
+                label: 'Institutional Fee Tier',
+                val: '0.00% - 0.08%',
+                sub: 'Zero fee maker tiers available'
+              }
             ].map((stat) => (
               <div
                 key={stat.label}

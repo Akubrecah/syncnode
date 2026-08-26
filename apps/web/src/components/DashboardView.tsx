@@ -155,24 +155,26 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     }
   };
 
-  // Compute live portfolio holdings
+  // Compute live portfolio holdings from real balance state
   const holdingsList = React.useMemo(() => {
-    const list = [
-      { asset: 'USDT', name: 'Tether USD', free: 4250.00, locked: 120.00, logo: '₮', color: '#26a17b' },
-      { asset: 'BTC', name: 'Bitcoin', free: 0.18500000, locked: 0.00500000, logo: '₿', color: '#f7931a' },
-      { asset: 'ETH', name: 'Ethereum', free: 1.45000000, locked: 0.00000000, logo: 'Ξ', color: '#627eea' },
-      { asset: 'SOL', name: 'Solana', free: 15.20000000, locked: 0.50000000, logo: '◎', color: '#14f195' },
-      { asset: 'BNB', name: 'BNB', free: 3.80000000, locked: 0.00000000, logo: '🔶', color: '#f3ba2f' },
-      { asset: 'FDUSD', name: 'First Digital USD', free: 1500.00, locked: 0.00, logo: '$', color: '#2775ca' }
+    const defaultAssets = [
+      { asset: 'USDT', name: 'Tether USD', free: 0, locked: 0, logo: '₮', color: '#26a17b' },
+      { asset: 'BTC', name: 'Bitcoin', free: 0, locked: 0, logo: '₿', color: '#f7931a' },
+      { asset: 'ETH', name: 'Ethereum', free: 0, locked: 0, logo: 'Ξ', color: '#627eea' },
+      { asset: 'SOL', name: 'Solana', free: 0, locked: 0, logo: '◎', color: '#14f195' },
+      { asset: 'BNB', name: 'BNB', free: 0, locked: 0, logo: '🔶', color: '#f3ba2f' },
+      { asset: 'FDUSD', name: 'First Digital USD', free: 0, locked: 0, logo: '$', color: '#2775ca' }
     ];
+
+    const list = defaultAssets.map((item) => ({ ...item }));
 
     // Merge in any live balance items from API
     if (Array.isArray(balances) && balances.length > 0) {
       balances.forEach((b) => {
         const existingIdx = list.findIndex((item) => item.asset === b.asset);
         if (existingIdx >= 0) {
-          list[existingIdx].free = parseFloat(b.free) || list[existingIdx].free;
-          list[existingIdx].locked = parseFloat(b.locked) || list[existingIdx].locked;
+          list[existingIdx].free = parseFloat(b.free) || 0;
+          list[existingIdx].locked = parseFloat(b.locked) || 0;
         } else {
           list.push({
             asset: b.asset,
@@ -203,14 +205,26 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
   // Total balance calculations
   const totalUsdEstimated = holdingsList.reduce((acc, curr) => acc + curr.totalUsdValue, 0);
-  const btcPrice = livePrices['BTC']?.price || 64000;
+  const btcPrice = livePrices['BTC']?.price || 0;
   const totalBtcEstimated = btcPrice > 0 ? totalUsdEstimated / btcPrice : 0;
 
-  // Account balance distribution
-  const spotAccountUsd = totalUsdEstimated * 0.68;
-  const fundingAccountUsd = totalUsdEstimated * 0.12;
-  const futuresAccountUsd = totalUsdEstimated * 0.14;
-  const earnAccountUsd = totalUsdEstimated * 0.06;
+  // Real account balance distribution
+  const spotAccountUsd = totalUsdEstimated;
+  const fundingAccountUsd = 0;
+  const futuresAccountUsd = 0;
+  const earnAccountUsd = 0;
+
+  // Real 24h PNL calculation from live assets
+  const portfolio24hChangeUsd = holdingsList.reduce((acc, curr) => {
+    if (curr.totalUsdValue <= 0) return acc;
+    const changeFrac = curr.change24h / 100;
+    const prevVal = changeFrac !== -1 ? curr.totalUsdValue / (1 + changeFrac) : curr.totalUsdValue;
+    return acc + (curr.totalUsdValue - prevVal);
+  }, 0);
+  const isPnlPositive = portfolio24hChangeUsd >= 0;
+  const portfolio24hChangePct = totalUsdEstimated > 0
+    ? ((portfolio24hChangeUsd / Math.max(0.01, totalUsdEstimated - portfolio24hChangeUsd)) * 100)
+    : 0;
 
   // Filtered holdings
   const filteredHoldings = holdingsList.filter(
@@ -219,7 +233,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       h.name.toLowerCase().includes(assetSearchQuery.toLowerCase())
   );
 
-  const displayUid = user?.id ? (user.id.length > 8 ? user.id.slice(0, 8) : user.id) : '84920148';
+  const displayUid = user?.id ? (user.id.length > 8 ? user.id.slice(0, 8) : user.id) : (user?.id || '—');
+  const referralCode = user?.id ? user.id.replace(/[^a-zA-Z0-9]/g, '').slice(-8).toUpperCase() : 'SYNCNODE';
   const displayEmail = user?.email || 'user@syncnode.com';
   const displayMaskedEmail = displayEmail.includes('@')
     ? `${displayEmail.split('@')[0].slice(0, 3)}***@${displayEmail.split('@')[1]}`
@@ -653,9 +668,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <span>Referral:</span>
-                  <span style={{ color: '#eaecef', fontFamily: 'monospace' }}>74819284</span>
+                  <span style={{ color: '#eaecef', fontFamily: 'monospace' }}>{referralCode}</span>
                   <button
-                    onClick={() => handleCopy('74819284', 'referral')}
+                    onClick={() => handleCopy(referralCode, 'referral')}
                     style={{ background: 'none', border: 'none', color: '#848e9c', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center' }}
                     title="Copy Referral ID"
                   >
@@ -796,15 +811,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     display: 'flex',
                     alignItems: 'center',
                     gap: '4px',
-                    color: '#2ebd85',
+                    color: isPnlPositive ? '#2ebd85' : '#f6465d',
                     fontSize: '13px',
                     fontWeight: 700
                   }}
                 >
-                  <TrendingUp size={14} />
-                  {hideBalances ? '****' : '+$342.18 (+2.35%)'}
+                  {isPnlPositive ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+                  {hideBalances
+                    ? '****'
+                    : `${isPnlPositive ? '+' : ''}$${portfolio24hChangeUsd.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${isPnlPositive ? '+' : ''}${portfolio24hChangePct.toFixed(2)}%)`}
                 </span>
-                <span style={{ fontSize: '12px', color: '#707a8a' }}>| 30D ROI: +18.42%</span>
+                <span style={{ fontSize: '12px', color: '#707a8a' }}>| Live 24h weighted</span>
               </div>
             </div>
 
@@ -868,7 +885,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                 <span style={{ fontSize: '13px', color: '#848e9c', fontWeight: 600 }}>Spot Account</span>
-                <span style={{ fontSize: '11px', color: '#fcd535', fontWeight: 700 }}>68%</span>
+                <span style={{ fontSize: '11px', color: '#fcd535', fontWeight: 700 }}>
+                  {totalUsdEstimated > 0 ? `${((spotAccountUsd / totalUsdEstimated) * 100).toFixed(0)}%` : '100%'}
+                </span>
               </div>
               <div style={{ fontSize: '18px', fontWeight: 700, color: '#eaecef' }}>
                 {hideBalances ? '******' : `$${spotAccountUsd.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
@@ -891,7 +910,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                 <span style={{ fontSize: '13px', color: '#848e9c', fontWeight: 600 }}>Funding Account</span>
-                <span style={{ fontSize: '11px', color: '#fcd535', fontWeight: 700 }}>12%</span>
+                <span style={{ fontSize: '11px', color: '#848e9c', fontWeight: 700 }}>
+                  {totalUsdEstimated > 0 ? `${((fundingAccountUsd / totalUsdEstimated) * 100).toFixed(0)}%` : '0%'}
+                </span>
               </div>
               <div style={{ fontSize: '18px', fontWeight: 700, color: '#eaecef' }}>
                 {hideBalances ? '******' : `$${fundingAccountUsd.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
@@ -914,13 +935,15 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                 <span style={{ fontSize: '13px', color: '#848e9c', fontWeight: 600 }}>Futures (USDⓈ-M)</span>
-                <span style={{ fontSize: '11px', color: '#fcd535', fontWeight: 700 }}>14%</span>
+                <span style={{ fontSize: '11px', color: '#848e9c', fontWeight: 700 }}>
+                  {totalUsdEstimated > 0 ? `${((futuresAccountUsd / totalUsdEstimated) * 100).toFixed(0)}%` : '0%'}
+                </span>
               </div>
               <div style={{ fontSize: '18px', fontWeight: 700, color: '#eaecef' }}>
                 {hideBalances ? '******' : `$${futuresAccountUsd.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
               </div>
-              <div style={{ fontSize: '12px', color: '#2ebd85', marginTop: '4px', fontWeight: 600 }}>
-                Unrealized PNL: +$148.20
+              <div style={{ fontSize: '12px', color: '#848e9c', marginTop: '4px' }}>
+                Perpetual Contracts
               </div>
             </div>
 
@@ -937,15 +960,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                 <span style={{ fontSize: '13px', color: '#848e9c', fontWeight: 600 }}>Binance Earn</span>
-                <span style={{ fontSize: '11px', color: '#2ebd85', fontWeight: 700 }}>+12.8% APR</span>
+                <span style={{ fontSize: '11px', color: '#2ebd85', fontWeight: 700 }}>Flexible</span>
               </div>
               <div style={{ fontSize: '18px', fontWeight: 700, color: '#eaecef' }}>
                 {hideBalances ? '******' : `$${earnAccountUsd.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
               </div>
               <div style={{ fontSize: '12px', color: '#848e9c', marginTop: '4px' }}>
-                Est. Daily Yield: $2.98
+                Staking &amp; Savings
               </div>
             </div>
+          </div>
+        </div>
           </div>
         </div>
 

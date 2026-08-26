@@ -84,6 +84,66 @@ export const WatchlistView: React.FC<WatchlistViewProps> = ({
     { symbol: 'ADBE', name: 'Adobe Inc.', price: '$254.45', change: '+1.78%', isPositive: true, marketCap: '$265.1B', peRatio: '58.9' }
   ]);
 
+  // Continuously sync with live market ticker feeds
+  React.useEffect(() => {
+    const fetchLiveQuotes = async () => {
+      try {
+        const res = await fetch('https://api.binance.com/api/v3/ticker/24hr');
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data)) {
+            const map: Record<string, { price: string; change: string; isPositive: boolean }> = {};
+            data.forEach((item: any) => {
+              if (item.symbol && item.symbol.endsWith('USDT')) {
+                const base = item.symbol.replace('USDT', '');
+                const numPrice = parseFloat(item.lastPrice) || 0;
+                const numChg = parseFloat(item.priceChangePercent) || 0;
+                map[base] = {
+                  price: numPrice > 1 ? `$${numPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : `$${numPrice.toFixed(4)}`,
+                  change: `${numChg >= 0 ? '+' : ''}${numChg.toFixed(2)}%`,
+                  isPositive: numChg >= 0
+                };
+              }
+            });
+
+            setStocks((prev) =>
+              prev.map((s) => {
+                if (map[s.symbol]) {
+                  return {
+                    ...s,
+                    price: map[s.symbol].price,
+                    change: map[s.symbol].change,
+                    isPositive: map[s.symbol].isPositive
+                  };
+                }
+                return s;
+              })
+            );
+
+            setAlerts((prev) =>
+              prev.map((a) => {
+                if (map[a.symbol]) {
+                  return {
+                    ...a,
+                    currentPrice: map[a.symbol].price,
+                    change: map[a.symbol].change,
+                    isPositive: map[a.symbol].isPositive
+                  };
+                }
+                return a;
+              })
+            );
+          }
+        }
+      } catch {
+        // Silent fallback
+      }
+    };
+    fetchLiveQuotes();
+    const interval = setInterval(fetchLiveQuotes, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   // Active Alerts List matching screenshot
   const [alerts, setAlerts] = useState<StockAlert[]>([
     {
