@@ -45,7 +45,8 @@ export const TradingViewTickerTape: React.FC<TradingViewTickerTapeProps> = memo(
       isTransparent: isTransparent,
       displayMode: displayMode,
       colorTheme: theme,
-      locale: 'en'
+      locale: 'en',
+      largeChartUrl: '#'
     });
 
     container.appendChild(script);
@@ -59,10 +60,32 @@ export const TradingViewTickerTape: React.FC<TradingViewTickerTapeProps> = memo(
 
   return (
     <div
-      ref={containerRef}
-      className="tradingview-widget-container"
-      style={{ width: '100%', height: '46px', overflow: 'hidden' }}
-    />
+      style={{
+        position: 'relative',
+        width: '100%',
+        height: '46px',
+        overflow: 'hidden',
+        cursor: 'pointer'
+      }}
+      onClick={() => {
+        window.location.hash = '#/spot';
+      }}
+    >
+      <div
+        ref={containerRef}
+        className="tradingview-widget-container"
+        style={{ width: '100%', height: '46px', pointerEvents: 'none' }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          zIndex: 10,
+          background: 'transparent'
+        }}
+        title="Open Live Spot Exchange on Syncnode"
+      />
+    </div>
   );
 });
 

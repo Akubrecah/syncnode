@@ -219,11 +219,40 @@ export const App: React.FC = () => {
       }
     };
 
+    // Global link interceptor: Prevent external redirects from widgets or chart links
+    const handleGlobalClick = (e: MouseEvent) => {
+      const anchor = (e.target as HTMLElement)?.closest('a');
+      if (anchor) {
+        const href = anchor.getAttribute('href') || anchor.href || '';
+        if (
+          href.includes('tradingview.com') ||
+          href.includes('tradeview')
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
+          const match = href.match(/symbols\/([a-zA-Z0-9_\-:]+)/i);
+          if (match && match[1]) {
+            const raw = match[1].toUpperCase().replace(/^.*:/, '').replace('/', '-');
+            if (raw.endsWith('USDT') || raw.includes('BTC') || raw.includes('ETH') || raw.includes('SOL') || raw.includes('BNB')) {
+              setActiveTab('spot', raw.replace('-', '/'));
+            } else {
+              setActiveTab('stock', raw);
+            }
+          } else {
+            setActiveTab('spot');
+          }
+        }
+      }
+    };
+
     window.addEventListener('hashchange', handleHashChange);
     window.addEventListener('popstate', handleHashChange);
+    document.addEventListener('click', handleGlobalClick, true);
+
     return () => {
       window.removeEventListener('hashchange', handleHashChange);
       window.removeEventListener('popstate', handleHashChange);
+      document.removeEventListener('click', handleGlobalClick, true);
     };
   }, []);
 

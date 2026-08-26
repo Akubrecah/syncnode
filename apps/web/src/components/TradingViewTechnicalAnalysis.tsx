@@ -46,7 +46,8 @@ export const TradingViewTechnicalAnalysis: React.FC<TradingViewTechnicalAnalysis
       showIntervalTabs: true,
       displayMode: 'single',
       locale: 'en',
-      colorTheme: theme
+      colorTheme: theme,
+      largeChartUrl: '#'
     });
 
     container.appendChild(script);

@@ -39,12 +39,13 @@ export const TradingViewHeatmap: React.FC<TradingViewHeatmapProps> = memo(({
       blockSize: 'market_cap_basic',
       blockColor: 'change',
       locale: 'en',
-      symbolUrl: '',
+      symbolUrl: '#',
       colorTheme: theme,
       hasTopBar: false,
       isDataSetEnabled: false,
       isZoomEnabled: true,
       hasSymbolTooltip: true,
+      largeChartUrl: '#',
       width: width,
       height: height
     });

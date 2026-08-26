@@ -53,6 +53,7 @@ export const TradingViewSymbolOverview: React.FC<TradingViewSymbolOverviewProps>
       locale: 'en',
       colorTheme: theme,
       autosize: true,
+      largeChartUrl: '#',
       showVolume: true,
       showMA: false,
       hideDateRanges: false,

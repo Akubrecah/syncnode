@@ -37,7 +37,7 @@ export const TradingViewFinancials: React.FC<TradingViewFinancialsProps> = memo(
 
     script.innerHTML = JSON.stringify({
       isTransparent: false,
-      largeChartUrl: '',
+      largeChartUrl: '#',
       displayMode: 'regular',
       width: width,
       height: height,

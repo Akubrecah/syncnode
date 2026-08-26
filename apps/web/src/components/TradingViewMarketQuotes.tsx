@@ -99,7 +99,8 @@ export const TradingViewMarketQuotes: React.FC<TradingViewMarketQuotesProps> = m
       showSymbolLogo: true,
       isTransparent: false,
       colorTheme: theme,
-      locale: 'en'
+      locale: 'en',
+      largeChartUrl: '#'
     });
 
     container.appendChild(script);

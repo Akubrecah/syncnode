@@ -37,7 +37,7 @@ export const TradingViewMarketOverview: React.FC<TradingViewMarketOverviewProps>
       locale: 'en',
       width: width,
       height: height,
-      largeChartUrl: '',
+      largeChartUrl: '#',
       isTransparent: false,
       showSymbolLogo: true,
       showFloatingTooltip: true,

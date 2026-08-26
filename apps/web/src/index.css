@@ -5270,3 +5270,22 @@ body {
   .admin-two-col { grid-template-columns: 1fr; }
   .admin-section-header { flex-direction: column; align-items: flex-start; }
 }
+
+/* =========================================================================
+   TradingView Internal Navigation & Anti-Redirection Protection
+   ========================================================================= */
+.tradingview-widget-copyright,
+.tradingview-widget-container a[href*="tradingview.com"],
+.tradingview-widget-container a[href*="tradeview"],
+a[href*="tradingview.com"] {
+  display: none !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  position: absolute !important;
+  left: -9999px !important;
+}
+
+.tradingview-widget-container iframe {
+  border: none !important;
+}

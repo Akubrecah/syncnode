@@ -39,7 +39,8 @@ export const TradingViewTimeline: React.FC<TradingViewTimelineProps> = memo(({
       width: width,
       height: height,
       colorTheme: theme,
-      locale: 'en'
+      locale: 'en',
+      largeChartUrl: '#'
     });
 
     container.appendChild(script);

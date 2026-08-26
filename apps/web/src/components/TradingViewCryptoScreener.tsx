@@ -41,7 +41,8 @@ export const TradingViewCryptoScreener: React.FC<TradingViewCryptoScreenerProps>
       colorTheme: colorTheme,
       locale: 'en',
       isTransparent: true,
-      showToolbar: true
+      showToolbar: true,
+      largeChartUrl: '#'
     });
 
     containerRef.current.appendChild(widgetContainer);

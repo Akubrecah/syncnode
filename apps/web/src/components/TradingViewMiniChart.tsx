@@ -10,6 +10,8 @@ interface TradingViewMiniChartProps {
   isTransparent?: boolean;
   chartOnly?: boolean;
   noTimeScale?: boolean;
+  onClick?: () => void;
+  disableExternalLink?: boolean;
 }
 
 export const TradingViewMiniChart: React.FC<TradingViewMiniChartProps> = memo(({
@@ -20,7 +22,9 @@ export const TradingViewMiniChart: React.FC<TradingViewMiniChartProps> = memo(({
   dateRange = '1D',
   isTransparent = false,
   chartOnly = false,
-  noTimeScale = false
+  noTimeScale = false,
+  onClick,
+  disableExternalLink = true
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -52,7 +56,7 @@ export const TradingViewMiniChart: React.FC<TradingViewMiniChartProps> = memo(({
       colorTheme: theme,
       isTransparent: isTransparent,
       autosize: true,
-      largeChartUrl: '',
+      largeChartUrl: '#',
       chartOnly: chartOnly,
       noTimeScale: noTimeScale
     });
@@ -66,17 +70,57 @@ export const TradingViewMiniChart: React.FC<TradingViewMiniChartProps> = memo(({
     };
   }, [symbol, theme, width, height, dateRange, isTransparent, chartOnly, noTimeScale]);
 
+  const handleClick = (e: React.MouseEvent) => {
+    if (onClick) {
+      e.stopPropagation();
+      onClick();
+      return;
+    }
+    if (disableExternalLink) {
+      e.stopPropagation();
+      const clean = symbol.toUpperCase().replace('/', '').replace('-', '');
+      const isCrypto = clean.endsWith('USDT') || clean.endsWith('USD') || ['BTC', 'ETH', 'SOL', 'BNB', 'XRP', 'DOGE', 'ADA', 'AVAX', 'SUI', 'NEAR'].includes(clean);
+      if (isCrypto) {
+        window.location.hash = `#/spot`;
+      } else {
+        window.location.hash = `#/stock/${clean}`;
+      }
+    }
+  };
+
   return (
     <div
-      ref={containerRef}
-      className="tradingview-widget-container"
       style={{
+        position: 'relative',
         width: '100%',
         height: typeof height === 'number' ? `${height}px` : height,
         minHeight: chartOnly ? '60px' : (typeof height === 'number' ? `${height}px` : '200px'),
         overflow: 'hidden'
       }}
-    />
+      onClick={handleClick}
+    >
+      <div
+        ref={containerRef}
+        className="tradingview-widget-container"
+        style={{
+          width: '100%',
+          height: '100%',
+          pointerEvents: disableExternalLink || onClick ? 'none' : 'auto'
+        }}
+      />
+      {(disableExternalLink || onClick) && (
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 10,
+            cursor: 'pointer',
+            background: 'transparent'
+          }}
+          title={`View ${symbol} on Syncnode`}
+        />
+      )}
+    </div>
   );
 });
 

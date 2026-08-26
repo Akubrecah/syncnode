@@ -41,7 +41,8 @@ export const TradingViewSymbolProfile: React.FC<TradingViewSymbolProfileProps> =
       colorTheme: theme,
       isTransparent: false,
       symbol: tvSymbol,
-      locale: 'en'
+      locale: 'en',
+      largeChartUrl: '#'
     });
 
     container.appendChild(script);
