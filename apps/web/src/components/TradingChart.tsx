@@ -230,7 +230,7 @@ export const TradingChart: React.FC<TradingChartProps> = ({ symbol }) => {
         </div>
       </div>
 
-      <div className="trading-chart-viewport" style={{ flex: 1, width: '100%', minHeight: '440px', position: 'relative', overflow: 'hidden' }}>
+      <div className="trading-chart-viewport" style={{ flex: 1, width: '100%', minHeight: '520px', position: 'relative', overflow: 'hidden' }}>
         {chartEngine === 'tradingview' ? (
           <TradingViewWidget symbol={symbol} interval={interval} />
         ) : (

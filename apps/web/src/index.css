@@ -5651,15 +5651,20 @@ a[href*="tradingview.com"] {
 
   .spot-col-chart.mobile-active {
     display: flex !important;
-    min-height: calc(100vh - 180px) !important;
-    height: calc(100vh - 180px) !important;
+    min-height: calc(100vh - 170px) !important;
+    height: calc(100vh - 170px) !important;
     width: 100% !important;
   }
 
   .spot-col-chart.mobile-active .trading-chart-panel,
-  .spot-col-chart.mobile-active .trading-chart-viewport {
+  .spot-col-chart.mobile-active .trading-chart-viewport,
+  .spot-col-chart.mobile-active .tradingview-widget-container,
+  .spot-col-chart.mobile-active .tradingview-widget-container__widget,
+  .spot-col-chart.mobile-active .tradingview-widget-container iframe {
     height: 100% !important;
-    min-height: calc(100vh - 220px) !important;
+    width: 100% !important;
+    min-height: calc(100vh - 215px) !important;
+    display: block !important;
   }
 
   .spot-header-tags {

@@ -240,7 +240,7 @@ export const TradingViewWidget: React.FC<TradingViewWidgetProps> = memo(({
     <div
       ref={containerRef}
       className="tradingview-widget-container"
-      style={{ height: '100%', width: '100%', minHeight: '380px', position: 'relative' }}
+      style={{ height: '100%', width: '100%', minHeight: '520px', position: 'relative' }}
     />
   );
 });
