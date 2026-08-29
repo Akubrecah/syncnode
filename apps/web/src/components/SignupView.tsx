@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useClerk, useSignIn, useSignUp } from '@clerk/clerk-react';
 import {
   TrendingUp,
   Eye,
@@ -89,6 +90,10 @@ export const SignupView: React.FC<SignupViewProps> = ({
   onSuccess,
   onNavigateHome
 }) => {
+  const clerk = useClerk();
+  const { isLoaded: isSignInLoaded, signIn, setActive } = useSignIn();
+  const { isLoaded: isSignUpLoaded, signUp } = useSignUp();
+
   const [mode, setMode] = useState<'signup' | 'login'>(initialMode);
   const [step, setStep] = useState<'FORM' | 'VERIFY_OTP'>('FORM');
   const [fullName, setFullName] = useState('');
@@ -458,62 +463,39 @@ export const SignupView: React.FC<SignupViewProps> = ({
     setLoading(true);
     setError(null);
 
-    const clerk = (window as any).Clerk;
-    if (clerk && clerk.loaded) {
-      try {
-        const strategyMap: Record<string, string> = {
-          google: 'oauth_google',
-          github: 'oauth_github',
-          apple: 'oauth_apple'
-        };
-        await clerk.authenticateWithRedirect({
-          strategy: strategyMap[provider] || 'oauth_google',
+    const strategyMap: Record<string, 'oauth_google' | 'oauth_github' | 'oauth_apple'> = {
+      google: 'oauth_google',
+      github: 'oauth_github',
+      apple: 'oauth_apple'
+    };
+    const strategy = strategyMap[provider] || 'oauth_google';
+
+    try {
+      if (signIn) {
+        await signIn.authenticateWithRedirect({
+          strategy,
           redirectUrl: `${window.location.origin}/`,
           redirectUrlComplete: `${window.location.origin}/#/dashboard`
         });
         return;
-      } catch (err: any) {
-        console.warn('Clerk OAuth error:', err);
       }
-    }
 
-    if (provider === 'google') {
-      handleGoogleSignIn();
-      return;
-    }
-
-    setError(`${provider.toUpperCase()} login requires Clerk to be loaded.`);
-    setLoading(false);
-  };
-
-  const handleGoogleSignIn = () => {
-    setLoading(true);
-    setError(null);
-
-    const clientId = (import.meta as any).env?.VITE_GOOGLE_CLIENT_ID || (window as any).VITE_GOOGLE_CLIENT_ID;
-    if (!clientId || clientId === 'YOUR_CLIENT_ID_HERE.apps.googleusercontent.com') {
-      setError('Google Client ID is not configured. Set VITE_GOOGLE_CLIENT_ID in your .env file.');
+      if (clerk && clerk.authenticateWithRedirect) {
+        await clerk.authenticateWithRedirect({
+          strategy,
+          redirectUrl: `${window.location.origin}/`,
+          redirectUrlComplete: `${window.location.origin}/#/dashboard`
+        });
+        return;
+      }
+    } catch (err: any) {
+      setError(err.errors?.[0]?.message || err.message || `${provider} login failed`);
       setLoading(false);
       return;
     }
 
-    // Build the Google OAuth 2.0 authorization URL (full-page redirect flow)
-    const redirectUri = `${window.location.origin}/`;
-    const scope = 'openid email profile';
-    const state = btoa(JSON.stringify({ returnTo: window.location.hash || '#/dashboard' }));
-
-    sessionStorage.setItem('syncnode_oauth_state', state);
-
-    const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
-    authUrl.searchParams.set('client_id', clientId);
-    authUrl.searchParams.set('redirect_uri', redirectUri);
-    authUrl.searchParams.set('response_type', 'id_token');
-    authUrl.searchParams.set('scope', scope);
-    authUrl.searchParams.set('state', state);
-    authUrl.searchParams.set('nonce', crypto.randomUUID());
-    authUrl.searchParams.set('prompt', 'select_account');
-
-    window.location.href = authUrl.toString();
+    setError('Authentication system is initializing. Please try again.');
+    setLoading(false);
   };
 
   // Digit input handling for 6-box OTP

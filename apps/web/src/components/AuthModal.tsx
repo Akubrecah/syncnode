@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Lock, Mail, ShieldAlert, Sparkles, ExternalLink } from 'lucide-react';
+import { useClerk, useSignIn, useSignUp } from '@clerk/clerk-react';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -14,6 +15,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   onSuccess,
   onOpenFullSignup
 }) => {
+  const clerk = useClerk();
+  const { isLoaded: isSignInLoaded, signIn, setActive } = useSignIn();
+  const { isLoaded: isSignUpLoaded, signUp } = useSignUp();
+
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -30,81 +35,78 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setLoading(true);
     setError(null);
 
-    const clerk = (window as any).Clerk;
-    if (clerk && clerk.loaded) {
-      if (mode === 'login' && clerk.client?.signIn) {
-        try {
-          const res = await clerk.client.signIn.create({
-            identifier: email.trim().toLowerCase(),
-            password
-          });
-          if (res.status === 'complete') {
-            if (clerk.setActive) {
-              await clerk.setActive({ session: res.createdSessionId });
-            }
-            const syncRes = await fetch('/api/v1/auth/clerk', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                clerkId: res.createdUserId || `usr_${Date.now()}`,
-                email: email.trim().toLowerCase(),
-                fullName: email.split('@')[0],
-                provider: 'clerk_password'
-              })
-            });
-            const syncJson = await syncRes.json();
-            if (syncJson.success && syncJson.token) {
-              localStorage.setItem('syncnode_token', syncJson.token);
-              onSuccess(syncJson.user, syncJson.token);
-              onClose();
-              return;
-            }
+    if (mode === 'login' && isSignInLoaded && signIn) {
+      try {
+        const res = await signIn.create({
+          identifier: email.trim().toLowerCase(),
+          password
+        });
+        if (res.status === 'complete') {
+          if (setActive) {
+            await setActive({ session: res.createdSessionId });
           }
-        } catch (clerkErr: any) {
-          if (clerkErr?.errors?.[0]?.message) {
-            setError(clerkErr.errors[0].message);
-            setLoading(false);
+          const syncRes = await fetch('/api/v1/auth/clerk', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              clerkId: res.createdUserId || `usr_${Date.now()}`,
+              email: email.trim().toLowerCase(),
+              fullName: email.split('@')[0],
+              provider: 'clerk_password'
+            })
+          });
+          const syncJson = await syncRes.json();
+          if (syncJson.success && syncJson.token) {
+            localStorage.setItem('syncnode_token', syncJson.token);
+            onSuccess(syncJson.user, syncJson.token);
+            onClose();
             return;
           }
-          console.warn('Clerk login modal fallback:', clerkErr);
         }
-      } else if (mode === 'register' && clerk.client?.signUp) {
-        try {
-          const res = await clerk.client.signUp.create({
-            emailAddress: email.trim().toLowerCase(),
-            password: password,
-            firstName: fullName.trim() || undefined
-          });
-          if (res.status === 'complete') {
-            if (clerk.setActive) {
-              await clerk.setActive({ session: res.createdSessionId });
-            }
-            const syncRes = await fetch('/api/v1/auth/clerk', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                clerkId: res.createdUserId || `usr_${Date.now()}`,
-                email: email.trim().toLowerCase(),
-                fullName: fullName.trim(),
-                provider: 'clerk_password'
-              })
-            });
-            const syncJson = await syncRes.json();
-            if (syncJson.success && syncJson.token) {
-              localStorage.setItem('syncnode_token', syncJson.token);
-              onSuccess(syncJson.user, syncJson.token);
-              onClose();
-              return;
-            }
+      } catch (clerkErr: any) {
+        if (clerkErr?.errors?.[0]?.message) {
+          setError(clerkErr.errors[0].message);
+          setLoading(false);
+          return;
+        }
+        console.warn('Clerk login modal fallback:', clerkErr);
+      }
+    } else if (mode === 'register' && isSignUpLoaded && signUp) {
+      try {
+        const res = await signUp.create({
+          emailAddress: email.trim().toLowerCase(),
+          password: password,
+          firstName: fullName.trim() || undefined
+        });
+        if (res.status === 'complete') {
+          if (setActive) {
+            await setActive({ session: res.createdSessionId });
           }
-        } catch (clerkErr: any) {
-          if (clerkErr?.errors?.[0]?.message) {
-            setError(clerkErr.errors[0].message);
-            setLoading(false);
+          const syncRes = await fetch('/api/v1/auth/clerk', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              clerkId: res.createdUserId || `usr_${Date.now()}`,
+              email: email.trim().toLowerCase(),
+              fullName: fullName.trim(),
+              provider: 'clerk_password'
+            })
+          });
+          const syncJson = await syncRes.json();
+          if (syncJson.success && syncJson.token) {
+            localStorage.setItem('syncnode_token', syncJson.token);
+            onSuccess(syncJson.user, syncJson.token);
+            onClose();
             return;
           }
-          console.warn('Clerk register modal fallback:', clerkErr);
         }
+      } catch (clerkErr: any) {
+        if (clerkErr?.errors?.[0]?.message) {
+          setError(clerkErr.errors[0].message);
+          setLoading(false);
+          return;
+        }
+        console.warn('Clerk register modal fallback:', clerkErr);
       }
     }
 
@@ -155,26 +157,38 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const handleSocialSignIn = async (provider: 'google' | 'github' | 'apple') => {
     setLoading(true);
     setError(null);
-    const clerk = (window as any).Clerk;
-    if (clerk) {
-      try {
-        const strategyMap: Record<string, string> = {
-          google: 'oauth_google',
-          github: 'oauth_github',
-          apple: 'oauth_apple'
-        };
-        await clerk.authenticateWithRedirect({
-          strategy: strategyMap[provider] || 'oauth_google',
+
+    const strategyMap: Record<string, 'oauth_google' | 'oauth_github' | 'oauth_apple'> = {
+      google: 'oauth_google',
+      github: 'oauth_github',
+      apple: 'oauth_apple'
+    };
+    const strategy = strategyMap[provider] || 'oauth_google';
+
+    try {
+      if (signIn) {
+        await signIn.authenticateWithRedirect({
+          strategy,
           redirectUrl: `${window.location.origin}/`,
           redirectUrlComplete: `${window.location.origin}/#/dashboard`
         });
         return;
-      } catch (err: any) {
-        setError(err.message || `${provider} login failed`);
-        setLoading(false);
+      }
+
+      if (clerk && clerk.authenticateWithRedirect) {
+        await clerk.authenticateWithRedirect({
+          strategy,
+          redirectUrl: `${window.location.origin}/`,
+          redirectUrlComplete: `${window.location.origin}/#/dashboard`
+        });
         return;
       }
+    } catch (err: any) {
+      setError(err.errors?.[0]?.message || err.message || `${provider} login failed`);
+      setLoading(false);
+      return;
     }
+
     setError('Authentication system is initializing. Please try again.');
     setLoading(false);
   };
