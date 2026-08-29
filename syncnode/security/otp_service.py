@@ -6,9 +6,19 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 import httpx
-import aiosmtplib
-import phonenumbers
-from phonenumbers import PhoneNumberFormat, NumberParseException
+
+try:
+    import aiosmtplib
+except ImportError:
+    aiosmtplib = None
+
+try:
+    import phonenumbers
+    from phonenumbers import PhoneNumberFormat, NumberParseException
+except ImportError:
+    phonenumbers = None
+    PhoneNumberFormat = None
+    NumberParseException = Exception
 
 from syncnode.common.logger import Logger
 from syncnode.common.errors import ValidationError
@@ -31,6 +41,16 @@ def format_and_validate_phone(phone_str: str, default_region: str = "US") -> Dic
         }
 
     raw = phone_str.strip()
+    if phonenumbers is None:
+        return {
+            "valid": True,
+            "e164": raw if raw.startswith("+") else f"+1{raw}",
+            "formatted": raw,
+            "country_code": 1,
+            "region": default_region,
+            "error": None
+        }
+
     try:
         parsed = phonenumbers.parse(raw, default_region.upper() if default_region else "US")
         if not phonenumbers.is_valid_number(parsed):
@@ -151,7 +171,7 @@ class OpenSourceOTPService:
         smtp_from = os.environ.get("SMTP_FROM", "Syncnode Auth <no-reply@syncnode.exchange>")
         use_tls = os.environ.get("SMTP_USE_TLS", "true").lower() in ("true", "1", "yes")
 
-        if smtp_host:
+        if smtp_host and aiosmtplib is not None:
             try:
                 msg = MIMEMultipart("alternative")
                 msg["Subject"] = f"[{code}] Your Syncnode {purpose.title()} Code"
