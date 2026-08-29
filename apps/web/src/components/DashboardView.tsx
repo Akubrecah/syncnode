@@ -234,19 +234,19 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     ? ((portfolio24hChangeUsd / Math.max(0.01, totalUsdEstimated - portfolio24hChangeUsd)) * 100)
     : 0;
 
-  // Filtered holdings
-  const filteredHoldings = holdingsList.filter(
+  // Filtered holdings (Null-safe)
+  const filteredHoldings = (holdingsList || []).filter(
     (h) =>
-      h.asset.toLowerCase().includes(assetSearchQuery.toLowerCase()) ||
-      h.name.toLowerCase().includes(assetSearchQuery.toLowerCase())
+      (h?.asset || '').toLowerCase().includes((assetSearchQuery || '').toLowerCase()) ||
+      (h?.name || '').toLowerCase().includes((assetSearchQuery || '').toLowerCase())
   );
 
-  const displayUid = user?.id ? (user.id.length > 8 ? user.id.slice(0, 8) : user.id) : (user?.id || '—');
-  const referralCode = user?.id ? user.id.replace(/[^a-zA-Z0-9]/g, '').slice(-8).toUpperCase() : 'SYNCNODE';
+  const displayUid = user?.id ? (String(user.id).length > 8 ? String(user.id).slice(0, 8) : String(user.id)) : '—';
+  const referralCode = user?.id ? String(user.id).replace(/[^a-zA-Z0-9]/g, '').slice(-8).toUpperCase() : 'SYNCNODE';
   const displayEmail = user?.email || 'user@syncnode.com';
-  const displayMaskedEmail = displayEmail.includes('@')
+  const displayMaskedEmail = typeof displayEmail === 'string' && displayEmail.includes('@')
     ? `${displayEmail.split('@')[0].slice(0, 3)}***@${displayEmail.split('@')[1]}`
-    : displayEmail;
+    : String(displayEmail);
 
   return (
     <div className="dashboard-layout-container" style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 64px)', background: '#181a20', color: '#eaecef' }}>
