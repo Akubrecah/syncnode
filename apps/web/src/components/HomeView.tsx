@@ -216,11 +216,12 @@ export const HomeView: React.FC<HomeViewProps> = ({
         <TradingViewTickerTape theme="dark" />
       </div>
 
-      <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '32px 24px' }}>
+      <div className="home-main-wrapper" style={{ maxWidth: '1440px', margin: '0 auto', padding: '32px 24px' }}>
         {/* =========================================================================
             1. HERO SECTION (CLEAN INSTITUTIONAL FLAT SURFACE)
             ========================================================================= */}
         <section
+          className="hero-section-card"
           style={{
             background: '#181a20',
             borderRadius: '20px',
@@ -230,7 +231,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             position: 'relative'
           }}
         >
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '36px', alignItems: 'center' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: '36px', alignItems: 'center' }}>
             {/* Hero Left Content */}
             <div>
               <div
@@ -495,7 +496,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 160px), 1fr))',
               gap: '16px',
               marginTop: '36px',
               paddingTop: '28px',
@@ -544,7 +545,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
         {/* =========================================================================
             2. TOP TRENDING & GAINERS (4 ROUNDED RECTANGLE SHOWCASE CARDS)
             ========================================================================= */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px', marginBottom: '32px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '20px', marginBottom: '32px' }}>
           {/* Card 1: Hot Coins */}
           <div
             style={{
@@ -913,7 +914,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
         <section
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))',
             gap: '24px',
             marginBottom: '32px'
           }}
@@ -1127,7 +1128,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))',
               gap: '20px'
             }}
           >
@@ -1279,7 +1280,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))', gap: '16px' }}>
             {[
               { title: 'Cold Vault Segregation', desc: 'Over 95% of digital assets are stored in air-gapped, geographically distributed cold hardware vaults.' },
               { title: '1:1 Proof of Reserves', desc: 'Cryptographically verified on-chain reserve backing ensures all customer balances are available on demand.' },
