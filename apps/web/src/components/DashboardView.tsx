@@ -245,11 +245,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     : displayEmail;
 
   return (
-    <div style={{ display: 'flex', minHeight: 'calc(100vh - 64px)', background: '#181a20', color: '#eaecef' }}>
+    <div className="dashboard-layout-container" style={{ display: 'flex', minHeight: 'calc(100vh - 64px)', background: '#181a20', color: '#eaecef' }}>
       {/* =========================================================================
           1. LEFT SIDEBAR NAVIGATION (Binance User Center Sidebar)
           ========================================================================= */}
       <aside
+        className="dashboard-sidebar-nav"
         style={{
           width: '248px',
           minWidth: '248px',
@@ -585,7 +586,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {/* =========================================================================
           2. MAIN CONTENT AREA (#__APP / dashboard-v3-wrap)
           ========================================================================= */}
-      <main style={{ flex: 1, minWidth: 0, padding: '32px 36px', maxWidth: '1400px', margin: '0 auto', overflowY: 'auto' }}>
+      <main className="dashboard-main-content" style={{ flex: 1, minWidth: 0, padding: '32px 36px', maxWidth: '1400px', margin: '0 auto', overflowY: 'auto' }}>
         {/* TOP USER PROFILE & STATUS HEADER */}
         <div
           style={{
@@ -868,7 +869,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))',
               gap: '16px',
               marginTop: '28px',
               paddingTop: '24px',
@@ -988,7 +989,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))',
               gap: '16px'
             }}
           >
@@ -1520,7 +1521,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </span>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))', gap: '16px' }}>
             {[
               {
                 title: 'Authenticator App (2FA)',
@@ -1582,7 +1583,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         {/* =========================================================================
             MARKET OVERVIEW & REAL-TIME NEWS STREAM
             ========================================================================= */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '20px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: '20px' }}>
           {/* Top Markets Screener */}
           <div
             style={{
@@ -1630,7 +1631,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 Manage Watchlist
               </button>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))', gap: '16px' }}>
               {['BTC/USDT', 'ETH/USDT', 'SOL/USDT', 'NVDA'].map((sym) => (
                 <div
                   key={sym}
