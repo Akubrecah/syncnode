@@ -808,7 +808,7 @@ export const App: React.FC = () => {
       />
 
       {/* 1. DASHBOARD / ASSETS / DEPOSIT / WITHDRAW / TRANSFERS / ORDERS / SECURITY / KYC / API KEYS / SESSIONS / SETTINGS */}
-      {PROTECTED_TABS.has(activeTab) && (user || localStorage.getItem('syncnode_token')) && (
+      {PROTECTED_TABS.has(activeTab) && (
         <DashboardView
           user={user || { id: 'usr_active', email: '', fullName: 'Trader', kyc_tier: 1 }}
           balances={balances}
@@ -861,14 +861,6 @@ export const App: React.FC = () => {
           onNavigateToTab={(tab, sym) => {
             setActiveTab(tab as any, sym);
           }}
-        />
-      )}
-
-      {PROTECTED_TABS.has(activeTab) && !user && !localStorage.getItem('syncnode_token') && !loadingUser && (
-        <SignupView
-          initialMode="login"
-          onSuccess={handleAuthSuccess}
-          onNavigateHome={() => setActiveTab('home')}
         />
       )}
 

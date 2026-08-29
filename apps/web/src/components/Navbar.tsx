@@ -320,15 +320,13 @@ export const Navbar: React.FC<NavbarProps> = ({
             </span>
           </button>
 
-          {/* 4. Stocks & Commodities - Only visible when logged in */}
-          {user && (
-            <button
-              className={`nav-item ${activeTab === 'stock' ? 'active' : ''}`}
-              onClick={() => setActiveTab('stock')}
-            >
-              Stocks
-            </button>
-          )}
+          {/* 4. Stocks & Commodities */}
+          <button
+            className={`nav-item ${activeTab === 'stock' ? 'active' : ''}`}
+            onClick={() => setActiveTab('stock')}
+          >
+            Stocks
+          </button>
 
           {/* 5. Market News */}
           <button
@@ -339,14 +337,12 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
 
           {/* 6. Dashboard / Portfolio */}
-          {user && (
-            <button
-              className={`nav-item ${activeTab === 'dashboard' && !isSearchOpen ? 'active' : ''}`}
-              onClick={() => setActiveTab('dashboard')}
-            >
-              Dashboard
-            </button>
-          )}
+          <button
+            className={`nav-item ${activeTab === 'dashboard' && !isSearchOpen ? 'active' : ''}`}
+            onClick={() => setActiveTab('dashboard')}
+          >
+            Dashboard
+          </button>
 
           {/* 7. Admin Console */}
           {user?.admin_roles && user.admin_roles.length > 0 && (
