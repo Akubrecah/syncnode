@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   TrendingUp,
   Eye,
@@ -14,8 +14,12 @@ import {
   Sparkles,
   Lock,
   Mail,
+  Phone,
   User as UserIcon,
-  Globe
+  Globe,
+  ArrowLeft,
+  RefreshCw,
+  Check
 } from 'lucide-react';
 
 interface SignupViewProps {
@@ -27,206 +31,57 @@ interface SignupViewProps {
 interface CountryOption {
   code: string;
   name: string;
-  flag: string;
+  dial: string;
 }
 
 const COUNTRIES: CountryOption[] = [
-  { code: 'AF', name: 'Afghanistan', flag: '🇦🇫' },
-  { code: 'AL', name: 'Albania', flag: '🇦🇱' },
-  { code: 'DZ', name: 'Algeria', flag: '🇩🇿' },
-  { code: 'AD', name: 'Andorra', flag: '🇦🇩' },
-  { code: 'AO', name: 'Angola', flag: '🇦🇴' },
-  { code: 'AG', name: 'Antigua and Barbuda', flag: '🇦🇬' },
-  { code: 'AR', name: 'Argentina', flag: '🇦🇷' },
-  { code: 'AM', name: 'Armenia', flag: '🇦🇲' },
-  { code: 'AU', name: 'Australia', flag: '🇦🇺' },
-  { code: 'AT', name: 'Austria', flag: '🇦🇹' },
-  { code: 'AZ', name: 'Azerbaijan', flag: '🇦🇿' },
-  { code: 'BS', name: 'Bahamas', flag: '🇧🇸' },
-  { code: 'BH', name: 'Bahrain', flag: '🇧🇭' },
-  { code: 'BD', name: 'Bangladesh', flag: '🇧🇩' },
-  { code: 'BB', name: 'Barbados', flag: '🇧🇧' },
-  { code: 'BY', name: 'Belarus', flag: '🇧🇾' },
-  { code: 'BE', name: 'Belgium', flag: '🇧🇪' },
-  { code: 'BZ', name: 'Belize', flag: '🇧🇿' },
-  { code: 'BJ', name: 'Benin', flag: '🇧🇯' },
-  { code: 'BT', name: 'Bhutan', flag: '🇧🇹' },
-  { code: 'BO', name: 'Bolivia', flag: '🇧🇴' },
-  { code: 'BA', name: 'Bosnia and Herzegovina', flag: '🇧🇦' },
-  { code: 'BW', name: 'Botswana', flag: '🇧🇼' },
-  { code: 'BR', name: 'Brazil', flag: '🇧🇷' },
-  { code: 'BN', name: 'Brunei', flag: '🇧🇳' },
-  { code: 'BG', name: 'Bulgaria', flag: '🇧🇬' },
-  { code: 'BF', name: 'Burkina Faso', flag: '🇧🇫' },
-  { code: 'BI', name: 'Burundi', flag: '🇧🇮' },
-  { code: 'CV', name: 'Cabo Verde', flag: '🇨🇻' },
-  { code: 'KH', name: 'Cambodia', flag: '🇰🇭' },
-  { code: 'CM', name: 'Cameroon', flag: '🇨🇲' },
-  { code: 'CA', name: 'Canada', flag: '🇨🇦' },
-  { code: 'CF', name: 'Central African Republic', flag: '🇨🇫' },
-  { code: 'TD', name: 'Chad', flag: '🇹🇩' },
-  { code: 'CL', name: 'Chile', flag: '🇨🇱' },
-  { code: 'CN', name: 'China', flag: '🇨🇳' },
-  { code: 'CO', name: 'Colombia', flag: '🇨🇴' },
-  { code: 'KM', name: 'Comoros', flag: '🇰🇲' },
-  { code: 'CG', name: 'Congo', flag: '🇨🇬' },
-  { code: 'CD', name: 'Congo (DRC)', flag: '🇨🇩' },
-  { code: 'CR', name: 'Costa Rica', flag: '🇨🇷' },
-  { code: 'HR', name: 'Croatia', flag: '🇭🇷' },
-  { code: 'CU', name: 'Cuba', flag: '🇨🇺' },
-  { code: 'CY', name: 'Cyprus', flag: '🇨🇾' },
-  { code: 'CZ', name: 'Czech Republic', flag: '🇨🇿' },
-  { code: 'DK', name: 'Denmark', flag: '🇩🇰' },
-  { code: 'DJ', name: 'Djibouti', flag: '🇩🇯' },
-  { code: 'DM', name: 'Dominica', flag: '🇩🇲' },
-  { code: 'DO', name: 'Dominican Republic', flag: '🇩🇴' },
-  { code: 'EC', name: 'Ecuador', flag: '🇪🇨' },
-  { code: 'EG', name: 'Egypt', flag: '🇪🇬' },
-  { code: 'SV', name: 'El Salvador', flag: '🇸🇻' },
-  { code: 'GQ', name: 'Equatorial Guinea', flag: '🇬🇶' },
-  { code: 'ER', name: 'Eritrea', flag: '🇪🇷' },
-  { code: 'EE', name: 'Estonia', flag: '🇪🇪' },
-  { code: 'SZ', name: 'Eswatini', flag: '🇸🇿' },
-  { code: 'ET', name: 'Ethiopia', flag: '🇪🇹' },
-  { code: 'FJ', name: 'Fiji', flag: '🇫🇯' },
-  { code: 'FI', name: 'Finland', flag: '🇫🇮' },
-  { code: 'FR', name: 'France', flag: '🇫🇷' },
-  { code: 'GA', name: 'Gabon', flag: '🇬🇦' },
-  { code: 'GM', name: 'Gambia', flag: '🇬🇲' },
-  { code: 'GE', name: 'Georgia', flag: '🇬🇪' },
-  { code: 'DE', name: 'Germany', flag: '🇩🇪' },
-  { code: 'GH', name: 'Ghana', flag: '🇬🇭' },
-  { code: 'GR', name: 'Greece', flag: '🇬🇷' },
-  { code: 'GD', name: 'Grenada', flag: '🇬🇩' },
-  { code: 'GT', name: 'Guatemala', flag: '🇬🇹' },
-  { code: 'GN', name: 'Guinea', flag: '🇬🇳' },
-  { code: 'GW', name: 'Guinea-Bissau', flag: '🇬🇼' },
-  { code: 'GY', name: 'Guyana', flag: '🇬🇾' },
-  { code: 'HT', name: 'Haiti', flag: '🇭🇹' },
-  { code: 'HN', name: 'Honduras', flag: '🇭🇳' },
-  { code: 'HK', name: 'Hong Kong', flag: '🇭🇰' },
-  { code: 'HU', name: 'Hungary', flag: '🇭🇺' },
-  { code: 'IS', name: 'Iceland', flag: '🇮🇸' },
-  { code: 'IN', name: 'India', flag: '🇮🇳' },
-  { code: 'ID', name: 'Indonesia', flag: '🇮🇩' },
-  { code: 'IR', name: 'Iran', flag: '🇮🇷' },
-  { code: 'IQ', name: 'Iraq', flag: '🇮🇶' },
-  { code: 'IE', name: 'Ireland', flag: '🇮🇪' },
-  { code: 'IL', name: 'Israel', flag: '🇮🇱' },
-  { code: 'IT', name: 'Italy', flag: '🇮🇹' },
-  { code: 'JM', name: 'Jamaica', flag: '🇯🇲' },
-  { code: 'JP', name: 'Japan', flag: '🇯🇵' },
-  { code: 'JO', name: 'Jordan', flag: '🇯🇴' },
-  { code: 'KZ', name: 'Kazakhstan', flag: '🇰🇿' },
-  { code: 'KE', name: 'Kenya', flag: '🇰🇪' },
-  { code: 'KI', name: 'Kiribati', flag: '🇰🇮' },
-  { code: 'KW', name: 'Kuwait', flag: '🇰🇼' },
-  { code: 'KG', name: 'Kyrgyzstan', flag: '🇰🇬' },
-  { code: 'LA', name: 'Laos', flag: '🇱🇦' },
-  { code: 'LV', name: 'Latvia', flag: '🇱🇻' },
-  { code: 'LB', name: 'Lebanon', flag: '🇱🇧' },
-  { code: 'LS', name: 'Lesotho', flag: '🇱🇸' },
-  { code: 'LR', name: 'Liberia', flag: '🇱🇷' },
-  { code: 'LY', name: 'Libya', flag: '🇱🇾' },
-  { code: 'LI', name: 'Liechtenstein', flag: '🇱🇮' },
-  { code: 'LT', name: 'Lithuania', flag: '🇱🇹' },
-  { code: 'LU', name: 'Luxembourg', flag: '🇱🇺' },
-  { code: 'MO', name: 'Macao', flag: '🇲🇴' },
-  { code: 'MG', name: 'Madagascar', flag: '🇲🇬' },
-  { code: 'MW', name: 'Malawi', flag: '🇲🇼' },
-  { code: 'MY', name: 'Malaysia', flag: '🇲🇾' },
-  { code: 'MV', name: 'Maldives', flag: '🇲🇻' },
-  { code: 'ML', name: 'Mali', flag: '🇲🇱' },
-  { code: 'MT', name: 'Malta', flag: '🇲🇹' },
-  { code: 'MH', name: 'Marshall Islands', flag: '🇲🇭' },
-  { code: 'MR', name: 'Mauritania', flag: '🇲🇷' },
-  { code: 'MU', name: 'Mauritius', flag: '🇲🇺' },
-  { code: 'MX', name: 'Mexico', flag: '🇲🇽' },
-  { code: 'FM', name: 'Micronesia', flag: '🇫🇲' },
-  { code: 'MD', name: 'Moldova', flag: '🇲🇩' },
-  { code: 'MC', name: 'Monaco', flag: '🇲🇨' },
-  { code: 'MN', name: 'Mongolia', flag: '🇲🇳' },
-  { code: 'ME', name: 'Montenegro', flag: '🇲🇪' },
-  { code: 'MA', name: 'Morocco', flag: '🇲🇦' },
-  { code: 'MZ', name: 'Mozambique', flag: '🇲🇿' },
-  { code: 'MM', name: 'Myanmar', flag: '🇲🇲' },
-  { code: 'NA', name: 'Namibia', flag: '🇳🇦' },
-  { code: 'NR', name: 'Nauru', flag: '🇳🇷' },
-  { code: 'NP', name: 'Nepal', flag: '🇳🇵' },
-  { code: 'NL', name: 'Netherlands', flag: '🇳🇱' },
-  { code: 'NZ', name: 'New Zealand', flag: '🇳🇿' },
-  { code: 'NI', name: 'Nicaragua', flag: '🇳🇮' },
-  { code: 'NE', name: 'Niger', flag: '🇳🇪' },
-  { code: 'NG', name: 'Nigeria', flag: '🇳🇬' },
-  { code: 'MK', name: 'North Macedonia', flag: '🇲🇰' },
-  { code: 'NO', name: 'Norway', flag: '🇳🇴' },
-  { code: 'OM', name: 'Oman', flag: '🇴🇲' },
-  { code: 'PK', name: 'Pakistan', flag: '🇵🇰' },
-  { code: 'PW', name: 'Palau', flag: '🇵🇼' },
-  { code: 'PS', name: 'Palestine', flag: '🇵🇸' },
-  { code: 'PA', name: 'Panama', flag: '🇵🇦' },
-  { code: 'PG', name: 'Papua New Guinea', flag: '🇵🇬' },
-  { code: 'PY', name: 'Paraguay', flag: '🇵🇾' },
-  { code: 'PE', name: 'Peru', flag: '🇵🇪' },
-  { code: 'PH', name: 'Philippines', flag: '🇵🇭' },
-  { code: 'PL', name: 'Poland', flag: '🇵🇱' },
-  { code: 'PT', name: 'Portugal', flag: '🇵🇹' },
-  { code: 'QA', name: 'Qatar', flag: '🇶🇦' },
-  { code: 'RO', name: 'Romania', flag: '🇷🇴' },
-  { code: 'RU', name: 'Russia', flag: '🇷🇺' },
-  { code: 'RW', name: 'Rwanda', flag: '🇷🇼' },
-  { code: 'KN', name: 'Saint Kitts and Nevis', flag: '🇰🇳' },
-  { code: 'LC', name: 'Saint Lucia', flag: '🇱🇨' },
-  { code: 'VC', name: 'Saint Vincent and the Grenadines', flag: '🇻🇨' },
-  { code: 'WS', name: 'Samoa', flag: '🇼🇸' },
-  { code: 'SM', name: 'San Marino', flag: '🇸🇲' },
-  { code: 'ST', name: 'Sao Tome and Principe', flag: '🇸🇹' },
-  { code: 'SA', name: 'Saudi Arabia', flag: '🇸🇦' },
-  { code: 'SN', name: 'Senegal', flag: '🇸🇳' },
-  { code: 'RS', name: 'Serbia', flag: '🇷🇸' },
-  { code: 'SC', name: 'Seychelles', flag: '🇸🇨' },
-  { code: 'SL', name: 'Sierra Leone', flag: '🇸🇱' },
-  { code: 'SG', name: 'Singapore', flag: '🇸🇬' },
-  { code: 'SK', name: 'Slovakia', flag: '🇸🇰' },
-  { code: 'SI', name: 'Slovenia', flag: '🇸🇮' },
-  { code: 'SB', name: 'Solomon Islands', flag: '🇸🇧' },
-  { code: 'SO', name: 'Somalia', flag: '🇸🇴' },
-  { code: 'ZA', name: 'South Africa', flag: '🇿🇦' },
-  { code: 'KR', name: 'South Korea', flag: '🇰🇷' },
-  { code: 'SS', name: 'South Sudan', flag: '🇸🇸' },
-  { code: 'ES', name: 'Spain', flag: '🇪🇸' },
-  { code: 'LK', name: 'Sri Lanka', flag: '🇱🇰' },
-  { code: 'SD', name: 'Sudan', flag: '🇸🇩' },
-  { code: 'SR', name: 'Suriname', flag: '🇸🇷' },
-  { code: 'SE', name: 'Sweden', flag: '🇸🇪' },
-  { code: 'CH', name: 'Switzerland', flag: '🇨🇭' },
-  { code: 'SY', name: 'Syria', flag: '🇸🇾' },
-  { code: 'TW', name: 'Taiwan', flag: '🇹🇼' },
-  { code: 'TJ', name: 'Tajikistan', flag: '🇹🇯' },
-  { code: 'TZ', name: 'Tanzania', flag: '🇹🇿' },
-  { code: 'TH', name: 'Thailand', flag: '🇹🇭' },
-  { code: 'TL', name: 'Timor-Leste', flag: '🇹🇱' },
-  { code: 'TG', name: 'Togo', flag: '🇹🇬' },
-  { code: 'TO', name: 'Tonga', flag: '🇹🇴' },
-  { code: 'TT', name: 'Trinidad and Tobago', flag: '🇹🇹' },
-  { code: 'TN', name: 'Tunisia', flag: '🇹🇳' },
-  { code: 'TR', name: 'Turkey', flag: '🇹🇷' },
-  { code: 'TM', name: 'Turkmenistan', flag: '🇹🇲' },
-  { code: 'TV', name: 'Tuvalu', flag: '🇹🇻' },
-  { code: 'UG', name: 'Uganda', flag: '🇺🇬' },
-  { code: 'UA', name: 'Ukraine', flag: '🇺🇦' },
-  { code: 'AE', name: 'United Arab Emirates', flag: '🇦🇪' },
-  { code: 'GB', name: 'United Kingdom', flag: '🇬🇧' },
-  { code: 'US', name: 'United States', flag: '🇺🇸' },
-  { code: 'UY', name: 'Uruguay', flag: '🇺🇾' },
-  { code: 'UZ', name: 'Uzbekistan', flag: '🇺🇿' },
-  { code: 'VU', name: 'Vanuatu', flag: '🇻🇺' },
-  { code: 'VA', name: 'Vatican City', flag: '🇻🇦' },
-  { code: 'VE', name: 'Venezuela', flag: '🇻🇪' },
-  { code: 'VN', name: 'Vietnam', flag: '🇻🇳' },
-  { code: 'YE', name: 'Yemen', flag: '🇾🇪' },
-  { code: 'ZM', name: 'Zambia', flag: '🇿🇲' },
-  { code: 'ZW', name: 'Zimbabwe', flag: '🇿🇼' }
+  { code: 'US', name: 'United States', dial: '+1' },
+  { code: 'GB', name: 'United Kingdom', dial: '+44' },
+  { code: 'AU', name: 'Australia', dial: '+61' },
+  { code: 'CA', name: 'Canada', dial: '+1' },
+  { code: 'DE', name: 'Germany', dial: '+49' },
+  { code: 'FR', name: 'France', dial: '+33' },
+  { code: 'IN', name: 'India', dial: '+91' },
+  { code: 'KE', name: 'Kenya', dial: '+254' },
+  { code: 'NG', name: 'Nigeria', dial: '+234' },
+  { code: 'ZA', name: 'South Africa', dial: '+27' },
+  { code: 'AE', name: 'United Arab Emirates', dial: '+971' },
+  { code: 'SG', name: 'Singapore', dial: '+65' },
+  { code: 'JP', name: 'Japan', dial: '+81' },
+  { code: 'CH', name: 'Switzerland', dial: '+41' },
+  { code: 'NL', name: 'Netherlands', dial: '+31' },
+  { code: 'BR', name: 'Brazil', dial: '+55' },
+  { code: 'MX', name: 'Mexico', dial: '+52' },
+  { code: 'ES', name: 'Spain', dial: '+34' },
+  { code: 'IT', name: 'Italy', dial: '+39' },
+  { code: 'SE', name: 'Sweden', dial: '+46' },
+  { code: 'NO', name: 'Norway', dial: '+47' },
+  { code: 'DK', name: 'Denmark', dial: '+45' },
+  { code: 'FI', name: 'Finland', dial: '+358' },
+  { code: 'PL', name: 'Poland', dial: '+48' },
+  { code: 'TR', name: 'Turkey', dial: '+90' },
+  { code: 'SA', name: 'Saudi Arabia', dial: '+966' },
+  { code: 'KR', name: 'South Korea', dial: '+82' },
+  { code: 'HK', name: 'Hong Kong', dial: '+852' },
+  { code: 'NZ', name: 'New Zealand', dial: '+64' },
+  { code: 'IE', name: 'Ireland', dial: '+353' },
+  { code: 'AT', name: 'Austria', dial: '+43' },
+  { code: 'BE', name: 'Belgium', dial: '+32' },
+  { code: 'PT', name: 'Portugal', dial: '+351' },
+  { code: 'GR', name: 'Greece', dial: '+30' },
+  { code: 'AR', name: 'Argentina', dial: '+54' },
+  { code: 'CL', name: 'Chile', dial: '+56' },
+  { code: 'CO', name: 'Colombia', dial: '+57' },
+  { code: 'EG', name: 'Egypt', dial: '+20' },
+  { code: 'GH', name: 'Ghana', dial: '+233' },
+  { code: 'ID', name: 'Indonesia', dial: '+62' },
+  { code: 'MY', name: 'Malaysia', dial: '+60' },
+  { code: 'PH', name: 'Philippines', dial: '+63' },
+  { code: 'TH', name: 'Thailand', dial: '+66' },
+  { code: 'VN', name: 'Vietnam', dial: '+84' },
+  { code: 'IL', name: 'Israel', dial: '+972' },
+  { code: 'QA', name: 'Qatar', dial: '+974' },
+  { code: 'KW', name: 'Kuwait', dial: '+965' }
 ];
 
 export const SignupView: React.FC<SignupViewProps> = ({
@@ -235,23 +90,56 @@ export const SignupView: React.FC<SignupViewProps> = ({
   onNavigateHome
 }) => {
   const [mode, setMode] = useState<'signup' | 'login'>(initialMode);
-  const [fullName, setFullName] = useState('Adrian Hajdin');
+  const [step, setStep] = useState<'FORM' | 'VERIFY_OTP'>('FORM');
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [selectedCountry, setSelectedCountry] = useState('AU');
+  const [selectedCountry, setSelectedCountry] = useState('US');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [dialCode, setDialCode] = useState('+1');
   const [investmentGoal, setInvestmentGoal] = useState('Growth');
-  const [riskTolerance, setRiskTolerance] = useState('');
-  const [preferredIndustry, setPreferredIndustry] = useState('');
-  const [totpCode, setTotpCode] = useState('');
+  const [riskTolerance, setRiskTolerance] = useState('Moderate');
+  const [preferredIndustry, setPreferredIndustry] = useState('Technology & AI');
+  
+  // OTP Verification state
+  const [otpChannel, setOtpChannel] = useState<'email' | 'sms'>('email');
+  const [otpCode, setOtpCode] = useState('');
+  const [otpDigits, setOtpDigits] = useState<string[]>(['', '', '', '', '', '']);
+  const [otpCooldown, setOtpCooldown] = useState(0);
+  const [devOtpNotice, setDevOtpNotice] = useState<string | null>(null);
   const [requires2fa, setRequires2fa] = useState(false);
+  const [totpLoginCode, setTotpLoginCode] = useState('');
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  React.useEffect(() => {
+  const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  useEffect(() => {
     setMode(initialMode);
+    setStep('FORM');
     setError(null);
+    setSuccessMessage(null);
   }, [initialMode]);
+
+  // Sync Dial Code when country changes
+  useEffect(() => {
+    const c = COUNTRIES.find((item) => item.code === selectedCountry);
+    if (c) {
+      setDialCode(c.dial);
+    }
+  }, [selectedCountry]);
+
+  // Cooldown countdown timer
+  useEffect(() => {
+    if (otpCooldown <= 0) return;
+    const timer = setInterval(() => {
+      setOtpCooldown((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [otpCooldown]);
 
   // Right mockup interactive state
   const [mockupFilter, setMockupFilter] = useState<'Indices' | 'Stocks' | 'Crypto' | 'Forex' | 'Bonds' | 'ETFs'>('Indices');
@@ -262,61 +150,257 @@ export const SignupView: React.FC<SignupViewProps> = ({
     setWatchlistStars((prev) => ({ ...prev, [sym]: !prev[sym] }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const getFullPhoneNumber = () => {
+    if (!phoneNumber) return '';
+    const cleanNumber = phoneNumber.trim().replace(/^0+/, '');
+    return `${dialCode}${cleanNumber}`;
+  };
+
+  // Step 1 Submit: Send OTP if signing up, or execute login
+  const handleInitiateSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setSuccessMessage(null);
+
+    if (mode === 'login') {
+      await executeLogin();
+      return;
+    }
+
+    // Basic Validations for signup
+    if (!email || !email.includes('@')) {
+      setError('Please enter a valid email address.');
+      setLoading(false);
+      return;
+    }
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters long.');
+      setLoading(false);
+      return;
+    }
+    if (otpChannel === 'sms' && !phoneNumber) {
+      setError('Please provide a phone number to receive the verification SMS.');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const target = otpChannel === 'sms' ? getFullPhoneNumber() : email.trim().toLowerCase();
+      const res = await fetch('/api/v1/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          target,
+          channel: otpChannel,
+          purpose: 'REGISTRATION',
+          countryCode: selectedCountry
+        })
+      });
+
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json?.detail || json?.error || 'Failed to dispatch verification code');
+      }
+
+      setStep('VERIFY_OTP');
+      setOtpCooldown(json.cooldownSeconds || 45);
+      if (json.otp) {
+        setDevOtpNotice(json.otp);
+      }
+      setSuccessMessage(`Verification code dispatched via open-source ${otpChannel.toUpperCase()} engine.`);
+      
+      // Auto focus first OTP input digit
+      setTimeout(() => {
+        otpInputRefs.current[0]?.focus();
+      }, 100);
+    } catch (err: any) {
+      setError(err.message || 'Error sending verification code');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Resend OTP code
+  const handleResendOtp = async (channelOverride?: 'email' | 'sms') => {
+    if (otpCooldown > 0 && !channelOverride) return;
+    setLoading(true);
+    setError(null);
+    setSuccessMessage(null);
+
+    const activeChannel = channelOverride || otpChannel;
+    if (channelOverride) {
+      setOtpChannel(channelOverride);
+    }
+
+    try {
+      const target = activeChannel === 'sms' ? getFullPhoneNumber() : email.trim().toLowerCase();
+      const res = await fetch('/api/v1/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          target,
+          channel: activeChannel,
+          purpose: 'REGISTRATION',
+          countryCode: selectedCountry
+        })
+      });
+
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json?.detail || json?.error || 'Failed to resend verification code');
+      }
+
+      setOtpCooldown(json.cooldownSeconds || 45);
+      if (json.otp) {
+        setDevOtpNotice(json.otp);
+      }
+      setSuccessMessage(`New verification code dispatched to ${target}.`);
+    } catch (err: any) {
+      setError(err.message || 'Error resending code');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Step 2 Submit: Finalize registration with OTP
+  const handleFinalizeRegistration = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-    const endpoint = mode === 'signup' ? '/api/v1/auth/register' : '/api/v1/auth/login';
-    const payload = mode === 'signup'
-      ? {
-          email,
-          password,
-          fullName,
-          country: COUNTRIES.find((c) => c.code === selectedCountry)?.name || selectedCountry,
-          investmentGoals: investmentGoal,
-          riskTolerance: riskTolerance || 'Moderate',
-          preferredIndustry: preferredIndustry || 'Technology & AI'
-        }
-      : {
-          email,
-          password,
-          totpCode: totpCode || undefined
-        };
+    const combinedCode = otpDigits.join('').trim();
+    if (combinedCode.length !== 6) {
+      setError('Please enter all 6 digits of your verification code.');
+      setLoading(false);
+      return;
+    }
+
+    const payload = {
+      email: email.trim().toLowerCase(),
+      password,
+      fullName: fullName.trim(),
+      country: COUNTRIES.find((c) => c.code === selectedCountry)?.name || selectedCountry,
+      phoneNumber: phoneNumber ? getFullPhoneNumber() : undefined,
+      investmentGoals: investmentGoal,
+      riskTolerance: riskTolerance || 'Moderate',
+      preferredIndustry: preferredIndustry || 'Technology & AI',
+      otpCode: combinedCode,
+      otpChannel
+    };
 
     try {
-      const res = await fetch(endpoint, {
+      const res = await fetch('/api/v1/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
 
-      let json: any;
-      try {
-        const text = await res.text();
-        json = text ? JSON.parse(text) : null;
-      } catch {
-        throw new Error(
-          res.ok
-            ? 'Invalid response received from server'
-            : `API Gateway unreachable or returned HTTP ${res.status}. Ensure the backend server is running.`
-        );
-      }
-
-      if (!json || !json.success) {
-        if (json?.requires2FA) {
-          setRequires2fa(true);
-          throw new Error('Please provide your 6-digit TOTP code');
-        }
-        throw new Error(json?.error || `Authentication failed (HTTP ${res.status})`);
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json?.detail || json?.error || 'Registration failed');
       }
 
       localStorage.setItem('syncnode_token', json.token);
       onSuccess(json.user, json.token);
     } catch (err: any) {
-      setError(err.message || 'Authentication error');
+      setError(err.message || 'Registration verification failed');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Login handler
+  const executeLogin = async () => {
+    try {
+      const res = await fetch('/api/v1/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email.trim().toLowerCase(),
+          password,
+          totpCode: totpLoginCode || undefined
+        })
+      });
+
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        if (json?.requires2FA) {
+          setRequires2fa(true);
+          throw new Error('Please enter your 6-digit TOTP authenticator code');
+        }
+        throw new Error(json?.detail || json?.error || 'Invalid credentials');
+      }
+
+      localStorage.setItem('syncnode_token', json.token);
+      onSuccess(json.user, json.token);
+    } catch (err: any) {
+      setError(err.message || 'Login error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = () => {
+    setLoading(true);
+    setError(null);
+
+    const clientId = (import.meta as any).env?.VITE_GOOGLE_CLIENT_ID || (window as any).VITE_GOOGLE_CLIENT_ID;
+    if (!clientId || clientId === 'YOUR_CLIENT_ID_HERE.apps.googleusercontent.com') {
+      setError('Google Client ID is not configured. Set VITE_GOOGLE_CLIENT_ID in your .env file.');
+      setLoading(false);
+      return;
+    }
+
+    // Build the Google OAuth 2.0 authorization URL (full-page redirect flow)
+    const redirectUri = `${window.location.origin}/`;
+    const scope = 'openid email profile';
+    const state = btoa(JSON.stringify({ returnTo: window.location.hash || '#/dashboard' }));
+
+    // Store state for CSRF verification when Google redirects back
+    sessionStorage.setItem('syncnode_oauth_state', state);
+
+    const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+    authUrl.searchParams.set('client_id', clientId);
+    authUrl.searchParams.set('redirect_uri', redirectUri);
+    authUrl.searchParams.set('response_type', 'id_token');
+    authUrl.searchParams.set('scope', scope);
+    authUrl.searchParams.set('state', state);
+    authUrl.searchParams.set('nonce', crypto.randomUUID());
+    authUrl.searchParams.set('prompt', 'select_account');
+
+    // Redirect to Google's full sign-in page
+    window.location.href = authUrl.toString();
+  };
+
+  // Digit input handling for 6-box OTP
+
+  const handleDigitChange = (index: number, value: string) => {
+    const char = value.slice(-1);
+    if (value && !/^\d+$/.test(char)) return;
+
+    const newDigits = [...otpDigits];
+    newDigits[index] = char;
+    setOtpDigits(newDigits);
+
+    if (char && index < 5) {
+      otpInputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleDigitKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace' && !otpDigits[index] && index > 0) {
+      otpInputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handleDigitPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData('text').trim();
+    if (/^\d{6}$/.test(pasted)) {
+      const digits = pasted.split('');
+      setOtpDigits(digits);
+      otpInputRefs.current[5]?.focus();
     }
   };
 
@@ -332,13 +416,54 @@ export const SignupView: React.FC<SignupViewProps> = ({
               <path d="M4 19L9.5 13.5L13.5 17.5L20 10.5" stroke="#fcd535" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
-          <span className="signup-brand-title">Signalist</span>
-          <span className="signup-brand-badge">SYNCNODE</span>
+          <span className="signup-brand-title">CryptoBridge</span>
+          <span className="signup-brand-badge">INSTITUTIONAL</span>
         </div>
+
+        {/* Step Indicator (Only during signup) */}
+        {mode === 'signup' && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              fontSize: '11px',
+              fontWeight: 700,
+              color: step === 'FORM' ? '#fcd535' : '#0ecb81',
+              background: step === 'FORM' ? 'rgba(252, 213, 53, 0.1)' : 'rgba(14, 203, 129, 0.1)',
+              border: `1px solid ${step === 'FORM' ? 'rgba(252, 213, 53, 0.3)' : 'rgba(14, 203, 129, 0.3)'}`,
+              padding: '4px 10px',
+              borderRadius: '4px'
+            }}>
+              {step === 'VERIFY_OTP' ? <Check size={12} /> : <span>1</span>}
+              <span>Account Details</span>
+            </div>
+            <span style={{ color: '#434c5a' }}>→</span>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              fontSize: '11px',
+              fontWeight: 700,
+              color: step === 'VERIFY_OTP' ? '#fcd535' : '#5e6673',
+              background: step === 'VERIFY_OTP' ? 'rgba(252, 213, 53, 0.1)' : 'rgba(32, 38, 48, 0.5)',
+              border: `1px solid ${step === 'VERIFY_OTP' ? 'rgba(252, 213, 53, 0.3)' : '#2b313a'}`,
+              padding: '4px 10px',
+              borderRadius: '4px'
+            }}>
+              <span>2</span>
+              <span>Open-Source OTP Verify</span>
+            </div>
+          </div>
+        )}
 
         {/* Form Title */}
         <h1 className="signup-heading">
-          {mode === 'signup' ? 'Sign Up & Personalize' : 'Log In Your Account'}
+          {mode === 'login'
+            ? 'Log In Your Account'
+            : step === 'FORM'
+            ? 'Sign Up & Personalize'
+            : 'Security Verification'}
         </h1>
 
         {error && (
@@ -347,556 +472,672 @@ export const SignupView: React.FC<SignupViewProps> = ({
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="signup-form-body">
-          {mode === 'signup' && (
-            <>
-              {/* Full Name */}
-              <div className="signup-field-group">
-                <label className="signup-label">Full Name</label>
-                <div className="signup-input-wrapper is-focused-gold">
-                  <input
-                    type="text"
-                    className="signup-input"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    placeholder="Adrian Hajdin"
-                    required
-                  />
-                </div>
-              </div>
+        {successMessage && (
+          <div style={{
+            background: 'rgba(14, 203, 129, 0.12)',
+            border: '1px solid rgba(14, 203, 129, 0.4)',
+            color: '#0ecb81',
+            padding: '10px 14px',
+            borderRadius: '6px',
+            fontSize: '13px',
+            marginBottom: '18px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}>
+            <CheckCircle size={15} />
+            <span>{successMessage}</span>
+          </div>
+        )}
 
-              {/* Email */}
-              <div className="signup-field-group">
-                <label className="signup-label">Email</label>
-                <div className="signup-input-wrapper">
-                  <input
-                    type="email"
-                    className="signup-input"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email"
-                    required
-                  />
-                </div>
-              </div>
+        {/* Dev OTP Snippet for fast testing */}
+        {devOtpNotice && step === 'VERIFY_OTP' && (
+          <div style={{
+            background: 'rgba(252, 213, 53, 0.08)',
+            border: '1px dashed rgba(252, 213, 53, 0.4)',
+            color: '#fcd535',
+            padding: '10px 14px',
+            borderRadius: '6px',
+            fontSize: '12px',
+            marginBottom: '18px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}>
+            <span><strong>Dev Mode Code:</strong> <span style={{ fontFamily: 'monospace', fontSize: '14px', letterSpacing: '2px', fontWeight: 800 }}>{devOtpNotice}</span></span>
+            <button
+              type="button"
+              onClick={() => {
+                setOtpDigits(devOtpNotice.split(''));
+              }}
+              style={{
+                background: '#fcd535',
+                color: '#0b0e11',
+                border: 'none',
+                padding: '3px 8px',
+                borderRadius: '4px',
+                fontSize: '11px',
+                fontWeight: 700,
+                cursor: 'pointer'
+              }}
+            >
+              Auto-Fill
+            </button>
+          </div>
+        )}
 
-              {/* Country */}
-              <div className="signup-field-group">
-                <label className="signup-label">Country</label>
-                <div className="signup-select-wrapper">
-                  <select
-                    className="signup-select"
-                    value={selectedCountry}
-                    onChange={(e) => setSelectedCountry(e.target.value)}
-                  >
-                    {COUNTRIES.map((c) => (
-                      <option key={c.code} value={c.code}>
-                        {c.flag} {c.name}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="signup-select-arrow" size={16} />
-                </div>
-                <div className="signup-subtext">
-                  Helps us show market data and news relevant to you.
-                </div>
-              </div>
+        {/* ============================================================ */}
+        {/* STEP 1: FORM (SIGNUP OR LOGIN) */}
+        {/* ============================================================ */}
+        {step === 'FORM' && (
+          <form onSubmit={handleInitiateSignup} className="signup-form-body">
+            {/* Social Google OAuth Button */}
+            <button
+              type="button"
+              disabled={loading}
+              onClick={handleGoogleSignIn}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px',
+                background: '#202630',
+                border: '1px solid #2b313a',
+                color: '#eaecef',
+                padding: '12px 16px',
+                borderRadius: '8px',
+                fontSize: '13.5px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+                width: '100%',
+                marginBottom: '6px'
+              }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+              </svg>
+              <span>Continue with Google</span>
+            </button>
 
-              {/* Password */}
-              <div className="signup-field-group">
-                <label className="signup-label">Password</label>
-                <div className="signup-input-wrapper">
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    className="signup-input"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter a strong password"
-                    required
-                    minLength={8}
-                  />
-                  <button
-                    type="button"
-                    className="signup-password-toggle"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
-                </div>
-              </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: '4px 0 10px' }}>
+              <div style={{ flex: 1, height: '1px', background: '#2b313a' }} />
+              <span style={{ fontSize: '11px', color: '#848e9c', textTransform: 'uppercase', letterSpacing: '0.05em' }}>OR</span>
+              <div style={{ flex: 1, height: '1px', background: '#2b313a' }} />
+            </div>
 
-              {/* Investment Goals */}
-              <div className="signup-field-group">
-                <label className="signup-label">Investment Goals</label>
-                <div className="signup-select-wrapper">
-                  <select
-                    className="signup-select"
-                    value={investmentGoal}
-                    onChange={(e) => setInvestmentGoal(e.target.value)}
-                  >
-                    <option value="Growth">Growth</option>
-                    <option value="Income & Staking">Income & Staking</option>
-                    <option value="Capital Preservation">Capital Preservation</option>
-                    <option value="High-Frequency Trading">High-Frequency Trading</option>
-                    <option value="Speculation & Momentum">Speculation & Momentum</option>
-                    <option value="Long-term HODL">Long-term HODL</option>
-                  </select>
-                  <ChevronDown className="signup-select-arrow" size={16} />
-                </div>
-              </div>
+            {mode === 'signup' && (
+              <>
 
-              {/* Risk Tolerance */}
-              <div className="signup-field-group">
-                <label className="signup-label">Risk Tolerance</label>
-                <div className="signup-select-wrapper">
-                  <select
-                    className="signup-select"
-                    value={riskTolerance}
-                    onChange={(e) => setRiskTolerance(e.target.value)}
-                  >
-                    <option value="">Select your risk level</option>
-                    <option value="Low">Low (Capital Preservation)</option>
-                    <option value="Moderate">Moderate (Balanced Growth)</option>
-                    <option value="High">High (Aggressive Alpha)</option>
-                    <option value="Ultra">Ultra (High Volatility Speculation)</option>
-                  </select>
-                  <ChevronDown className="signup-select-arrow" size={16} />
-                </div>
-              </div>
-
-              {/* Preferred Industry */}
-              <div className="signup-field-group">
-                <label className="signup-label">Preferred Industry</label>
-                <div className="signup-select-wrapper">
-                  <select
-                    className="signup-select"
-                    value={preferredIndustry}
-                    onChange={(e) => setPreferredIndustry(e.target.value)}
-                  >
-                    <option value="">Select your preferred industry</option>
-                    <option value="Technology & AI">Technology & AI</option>
-                    <option value="DeFi & Digital Assets">DeFi & Digital Assets</option>
-                    <option value="Layer 1 & 2 Blockchains">Layer 1 & 2 Blockchains</option>
-                    <option value="Energy & Commodities">Energy & Commodities</option>
-                    <option value="Healthcare & Biotech">Healthcare & Biotech</option>
-                    <option value="Finance & Real-World Assets">Finance & Real-World Assets</option>
-                  </select>
-                  <ChevronDown className="signup-select-arrow" size={16} />
-                </div>
-              </div>
-            </>
-          )}
-
-          {mode === 'login' && (
-            <>
-              {/* Email */}
-              <div className="signup-field-group">
-                <label className="signup-label">Email</label>
-                <div className="signup-input-wrapper">
-                  <input
-                    type="email"
-                    className="signup-input"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email"
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* Password */}
-              <div className="signup-field-group">
-                <label className="signup-label">Password</label>
-                <div className="signup-input-wrapper">
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    className="signup-input"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter a strong password"
-                    required
-                  />
-                  <button
-                    type="button"
-                    className="signup-password-toggle"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
-                </div>
-              </div>
-
-              {/* 2FA Code if triggered */}
-              {requires2fa && (
+                {/* Full Name */}
                 <div className="signup-field-group">
-                  <label className="signup-label">2FA TOTP Code</label>
-                  <div className="signup-input-wrapper">
+                  <label className="signup-label">Full Name</label>
+                  <div className="signup-input-wrapper is-focused-gold">
                     <input
                       type="text"
-                      className="signup-input mono"
-                      value={totpCode}
-                      onChange={(e) => setTotpCode(e.target.value)}
-                      placeholder="6-digit authentication code"
-                      maxLength={6}
+                      className="signup-input"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      placeholder="Enter your full name"
                       required
                     />
                   </div>
                 </div>
-              )}
-            </>
-          )}
 
-          {/* Submit CTA Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="signup-submit-btn"
-          >
-            {loading
-              ? 'Processing...'
-              : mode === 'signup'
-              ? 'Start Your Investing Journey'
-              : 'Log In'}
-          </button>
-        </form>
+                {/* Email Address */}
+                <div className="signup-field-group">
+                  <label className="signup-label">Email Address</label>
+                  <div className="signup-input-wrapper">
+                    <input
+                      type="email"
+                      className="signup-input"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Enter your email address"
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Country */}
+                <div className="signup-field-group">
+                  <label className="signup-label">Country of Residence</label>
+                  <div className="signup-select-wrapper">
+                    <select
+                      className="signup-select"
+                      value={selectedCountry}
+                      onChange={(e) => setSelectedCountry(e.target.value)}
+                    >
+                      {COUNTRIES.map((c) => (
+                        <option key={c.code} value={c.code}>
+                          {c.name} ({c.dial})
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="signup-select-arrow" size={16} />
+                  </div>
+                </div>
+
+                {/* Phone Number (Open-Source International Formatter) */}
+                <div className="signup-field-group">
+                  <label className="signup-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span>Phone Number</span>
+                    <span style={{ fontSize: '11px', color: '#848e9c', fontWeight: 400 }}>E.164 validated</span>
+                  </label>
+                  <div style={{ display: 'grid', gridTemplateColumns: '95px 1fr', gap: '8px' }}>
+                    <div className="signup-select-wrapper">
+                      <select
+                        className="signup-select"
+                        value={dialCode}
+                        onChange={(e) => setDialCode(e.target.value)}
+                        style={{ fontFamily: 'monospace', fontWeight: 600 }}
+                      >
+                        {COUNTRIES.map((c) => (
+                          <option key={`${c.code}-${c.dial}`} value={c.dial}>
+                            {c.code} {c.dial}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown className="signup-select-arrow" size={14} />
+                    </div>
+                    <div className="signup-input-wrapper">
+                      <input
+                        type="tel"
+                        className="signup-input"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        placeholder="415 555 2671"
+                        style={{ fontFamily: 'monospace' }}
+                      />
+                    </div>
+                  </div>
+                  <div className="signup-subtext">
+                    Validated via Google <code style={{ color: '#fcd535' }}>libphonenumber</code> for multi-factor security alerts.
+                  </div>
+                </div>
+
+                {/* OTP Delivery Preference Selector */}
+                <div className="signup-field-group" style={{ marginTop: '2px' }}>
+                  <label className="signup-label">Send Registration OTP via</label>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                    <button
+                      type="button"
+                      onClick={() => setOtpChannel('email')}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        padding: '10px',
+                        borderRadius: '6px',
+                        background: otpChannel === 'email' ? 'rgba(252, 213, 53, 0.1)' : '#181a20',
+                        border: `1px solid ${otpChannel === 'email' ? '#fcd535' : '#2b313a'}`,
+                        color: otpChannel === 'email' ? '#fcd535' : '#848e9c',
+                        fontSize: '12.5px',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      <Mail size={15} />
+                      <span>Email Code</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setOtpChannel('sms')}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        padding: '10px',
+                        borderRadius: '6px',
+                        background: otpChannel === 'sms' ? 'rgba(252, 213, 53, 0.1)' : '#181a20',
+                        border: `1px solid ${otpChannel === 'sms' ? '#fcd535' : '#2b313a'}`,
+                        color: otpChannel === 'sms' ? '#fcd535' : '#848e9c',
+                        fontSize: '12.5px',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      <Phone size={15} />
+                      <span>SMS / Phone</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Password */}
+                <div className="signup-field-group">
+                  <label className="signup-label">Password</label>
+                  <div className="signup-input-wrapper">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      className="signup-input"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Min. 8 characters"
+                      required
+                      minLength={8}
+                    />
+                    <button
+                      type="button"
+                      className="signup-password-toggle"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Investment Goals */}
+                <div className="signup-field-group">
+                  <label className="signup-label">Investment Strategy</label>
+                  <div className="signup-select-wrapper">
+                    <select
+                      className="signup-select"
+                      value={investmentGoal}
+                      onChange={(e) => setInvestmentGoal(e.target.value)}
+                    >
+                      <option value="Growth">Balanced Growth</option>
+                      <option value="Income & Staking">Income & Staking</option>
+                      <option value="Capital Preservation">Capital Preservation</option>
+                      <option value="High-Frequency Trading">High-Frequency Trading</option>
+                      <option value="Speculation & Momentum">Speculation & Momentum</option>
+                      <option value="Long-term HODL">Long-term HODL</option>
+                    </select>
+                    <ChevronDown className="signup-select-arrow" size={16} />
+                  </div>
+                </div>
+              </>
+            )}
+
+            {mode === 'login' && (
+              <>
+                {/* Email */}
+                <div className="signup-field-group">
+                  <label className="signup-label">Email</label>
+                  <div className="signup-input-wrapper">
+                    <input
+                      type="email"
+                      className="signup-input"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="trader@institution.com"
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Password */}
+                <div className="signup-field-group">
+                  <label className="signup-label">Password</label>
+                  <div className="signup-input-wrapper">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      className="signup-input"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Enter your password"
+                      required
+                    />
+                    <button
+                      type="button"
+                      className="signup-password-toggle"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* 2FA Code if triggered */}
+                {requires2fa && (
+                  <div className="signup-field-group">
+                    <label className="signup-label">2FA TOTP Code</label>
+                    <div className="signup-input-wrapper">
+                      <input
+                        type="text"
+                        className="signup-input mono"
+                        value={totpLoginCode}
+                        onChange={(e) => setTotpLoginCode(e.target.value)}
+                        placeholder="6-digit authentication code"
+                        maxLength={6}
+                        required
+                      />
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* Submit CTA Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="signup-submit-btn"
+              style={{ marginTop: '8px' }}
+            >
+              {loading
+                ? 'Processing...'
+                : mode === 'signup'
+                ? 'Continue to Verification →'
+                : 'Sign In to Terminal'}
+            </button>
+          </form>
+        )}
+
+        {/* ============================================================ */}
+        {/* STEP 2: OPEN-SOURCE 6-DIGIT OTP VERIFICATION */}
+        {/* ============================================================ */}
+        {step === 'VERIFY_OTP' && (
+          <form onSubmit={handleFinalizeRegistration} className="signup-form-body">
+            <div style={{
+              background: '#181a20',
+              border: '1px solid #2b313a',
+              borderRadius: '8px',
+              padding: '16px',
+              marginBottom: '10px'
+            }}>
+              <div style={{ fontSize: '13px', color: '#848e9c', marginBottom: '4px' }}>
+                Verification code dispatched to:
+              </div>
+              <div style={{
+                fontSize: '15px',
+                fontWeight: 700,
+                color: '#ffffff',
+                fontFamily: 'monospace',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                {otpChannel === 'sms' ? <Phone size={16} color="#fcd535" /> : <Mail size={16} color="#fcd535" />}
+                <span>{otpChannel === 'sms' ? getFullPhoneNumber() : email}</span>
+              </div>
+            </div>
+
+            {/* 6-box tactile OTP inputs */}
+            <div className="signup-field-group">
+              <label className="signup-label" style={{ textAlign: 'center', marginBottom: '6px' }}>
+                Enter 6-Digit One-Time Password
+              </label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px' }}>
+                {otpDigits.map((digit, idx) => (
+                  <input
+                    key={idx}
+                    ref={(el) => (otpInputRefs.current[idx] = el)}
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={1}
+                    value={digit}
+                    onChange={(e) => handleDigitChange(idx, e.target.value)}
+                    onKeyDown={(e) => handleDigitKeyDown(idx, e)}
+                    onPaste={handleDigitPaste}
+                    style={{
+                      width: '46px',
+                      height: '52px',
+                      fontSize: '22px',
+                      fontWeight: 800,
+                      textAlign: 'center',
+                      fontFamily: "'JetBrains Mono', monospace",
+                      background: digit ? 'rgba(252, 213, 53, 0.08)' : '#181a20',
+                      color: '#ffffff',
+                      border: digit ? '1px solid #fcd535' : '1px solid #2b313a',
+                      borderRadius: '8px',
+                      outline: 'none',
+                      transition: 'border-color 0.15s ease'
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Resend Cooldown & Switch Channel Options */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px', marginTop: '6px' }}>
+              <button
+                type="button"
+                disabled={otpCooldown > 0 || loading}
+                onClick={() => handleResendOtp()}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: otpCooldown > 0 ? '#5e6673' : '#fcd535',
+                  cursor: otpCooldown > 0 ? 'not-allowed' : 'pointer',
+                  fontWeight: 600,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}
+              >
+                <RefreshCw size={13} className={loading ? 'spin' : ''} />
+                <span>{otpCooldown > 0 ? `Resend in ${otpCooldown}s` : 'Resend code'}</span>
+              </button>
+
+              {/* Alternate Channel Switch */}
+              {otpChannel === 'email' && phoneNumber && (
+                <button
+                  type="button"
+                  onClick={() => handleResendOtp('sms')}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#848e9c',
+                    cursor: 'pointer',
+                    textDecoration: 'underline'
+                  }}
+                >
+                  Send via SMS instead
+                </button>
+              )}
+              {otpChannel === 'sms' && (
+                <button
+                  type="button"
+                  onClick={() => handleResendOtp('email')}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#848e9c',
+                    cursor: 'pointer',
+                    textDecoration: 'underline'
+                  }}
+                >
+                  Send via Email instead
+                </button>
+              )}
+            </div>
+
+            {/* Confirm Registration Button */}
+            <button
+              type="submit"
+              disabled={loading || otpDigits.join('').length !== 6}
+              className="signup-submit-btn"
+              style={{
+                marginTop: '16px',
+                opacity: otpDigits.join('').length === 6 ? 1 : 0.6
+              }}
+            >
+              {loading ? 'Verifying...' : 'Verify & Launch Terminal →'}
+            </button>
+
+            {/* Back Button */}
+            <button
+              type="button"
+              onClick={() => {
+                setStep('FORM');
+                setError(null);
+                setSuccessMessage(null);
+              }}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: '#848e9c',
+                fontSize: '12.5px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                marginTop: '4px'
+              }}
+            >
+              <ArrowLeft size={14} />
+              <span>Back to edit account details</span>
+            </button>
+          </form>
+        )}
 
         {/* Switcher Footer */}
-        <div className="signup-footer-text">
-          {mode === 'signup' ? (
-            <>
-              Already have an account?{' '}
-              <button
-                type="button"
-                className="signup-switch-link"
-                onClick={() => {
-                  setMode('login');
-                  setError(null);
-                  window.location.hash = '#/login';
-                }}
-              >
-                Log In
-              </button>
-            </>
-          ) : (
-            <>
-              Don't have an account?{' '}
-              <button
-                type="button"
-                className="signup-switch-link"
-                onClick={() => {
-                  setMode('signup');
-                  setError(null);
-                  window.location.hash = '#/signup';
-                }}
-              >
-                Sign Up
-              </button>
-            </>
-          )}
-        </div>
+        {step === 'FORM' && (
+          <div className="signup-footer-text">
+            {mode === 'signup' ? (
+              <>
+                Already have an account?{' '}
+                <button
+                  type="button"
+                  className="signup-switch-link"
+                  onClick={() => {
+                    setMode('login');
+                    setError(null);
+                    setSuccessMessage(null);
+                    window.location.hash = '#/login';
+                  }}
+                >
+                  Log In
+                </button>
+              </>
+            ) : (
+              <>
+                Don't have an account?{' '}
+                <button
+                  type="button"
+                  className="signup-switch-link"
+                  onClick={() => {
+                    setMode('signup');
+                    setError(null);
+                    setSuccessMessage(null);
+                    window.location.hash = '#/signup';
+                  }}
+                >
+                  Sign Up
+                </button>
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       {/* RIGHT COLUMN: SOCIAL PROOF & LIVE APP PREVIEW */}
       <div className="signup-preview-column">
         {/* Testimonial Quote */}
         <div className="signup-testimonial-card">
+          <div className="signup-stars-row">
+            {[...Array(5)].map((_, i) => (
+              <Star key={i} size={15} fill="#fcd535" color="#fcd535" />
+            ))}
+          </div>
           <p className="signup-testimonial-quote">
-            Signalist turned my watchlist into a winning list. The alerts are spot-on, and I feel more confident making moves in the market
+            "Syncnode's sub-millisecond execution matching, zero-fee internal transfers, and institutional open-source security standards are unmatched in crypto finance."
           </p>
-          <div className="signup-testimonial-meta">
-            <div>
-              <div className="signup-testimonial-author">— Ethan R.</div>
-              <div className="signup-testimonial-role">Retail Investor</div>
-            </div>
-            <div className="signup-stars-row">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} size={15} className="signup-star-icon" fill="#fcd535" color="#fcd535" />
-              ))}
+          <div className="signup-author-row">
+            <div className="signup-author-avatar">CB</div>
+            <div className="signup-author-meta">
+              <div className="signup-author-name">Institutional Liquidity Desk</div>
+              <div className="signup-author-title">Tier-1 Digital Asset Prime Brokerage</div>
             </div>
           </div>
         </div>
 
-        {/* Dashboard Mockup Frame */}
-        <div className="signup-mockup-frame">
-          {/* Mockup Top Navigation */}
-          <div className="mockup-header-bar">
-            <div className="mockup-brand">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path d="M4 14.5L9.5 9L13.5 13L20 6" stroke="#00e599" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M4 19L9.5 13.5L13.5 17.5L20 10.5" stroke="#fcd535" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              <span>Signalist</span>
+        {/* Interactive TradingView Mockup Panel */}
+        <div className="signup-mockup-panel">
+          <div className="signup-mockup-header">
+            <div className="signup-mockup-tabs">
+              {(['Indices', 'Stocks', 'Crypto', 'Forex', 'Bonds', 'ETFs'] as const).map((tab) => (
+                <button
+                  key={tab}
+                  type="button"
+                  className={`signup-mockup-tab ${mockupFilter === tab ? 'active' : ''}`}
+                  onClick={() => setMockupFilter(tab)}
+                >
+                  {tab}
+                </button>
+              ))}
             </div>
-            <div className="mockup-nav-links">
-              <span className="mockup-nav-item active">Dashboard</span>
-              <span className="mockup-nav-item">Search</span>
-              <span className="mockup-nav-item">Watchlist</span>
-              <span className="mockup-nav-item">News</span>
+
+            <div className="signup-timeframe-row">
+              {(['1m', '5m', '15m', '30m', '1h', '2h', '4h', 'D', 'W', 'M'] as const).map((tf) => (
+                <button
+                  key={tf}
+                  type="button"
+                  className={`signup-tf-btn ${mockupTimeframe === tf ? 'active' : ''}`}
+                  onClick={() => setMockupTimeframe(tf)}
+                >
+                  {tf}
+                </button>
+              ))}
             </div>
           </div>
 
-          <div className="mockup-content-grid">
-            {/* Left Area: Market Summary Chart + Top Stocks */}
-            <div className="mockup-main-area">
-              {/* Market Summary Card */}
-              <div className="mockup-panel mockup-market-summary">
-                <div className="mockup-section-title">Market Summary</div>
-
-                {/* Filter Tabs */}
-                <div className="mockup-filter-pills">
-                  {(['Indices', 'Stocks', 'Crypto', 'Forex', 'Bonds', 'ETFs'] as const).map((tab) => (
-                    <button
-                      key={tab}
-                      type="button"
-                      className={`mockup-pill ${mockupFilter === tab ? 'active' : ''}`}
-                      onClick={() => setMockupFilter(tab)}
-                    >
-                      {tab}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Glowing Chart Visual */}
-                <div className="mockup-chart-container">
-                  <div className="mockup-chart-svg-wrap">
-                    <svg className="mockup-chart-svg" viewBox="0 0 450 140" preserveAspectRatio="none">
-                      <defs>
-                        <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#00e599" stopOpacity="0.35"/>
-                          <stop offset="100%" stopColor="#00e599" stopOpacity="0.0"/>
-                        </linearGradient>
-                      </defs>
-                      {/* Area Fill */}
-                      <path
-                        d="M 0,95 Q 30,110 60,85 T 120,60 T 180,40 T 240,65 T 300,50 T 360,95 T 410,50 L 450,45 L 450,140 L 0,140 Z"
-                        fill="url(#chartGradient)"
-                      />
-                      {/* Line Stroke */}
-                      <path
-                        d="M 0,95 Q 30,110 60,85 T 120,60 T 180,40 T 240,65 T 300,50 T 360,95 T 410,50 L 450,45"
-                        fill="none"
-                        stroke="#00e599"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-
-                    {/* Price Y-Axis Labels */}
-                    <div className="mockup-chart-y-axis">
-                      <span>5,600</span>
-                      <span>5,550</span>
-                      <span>5,500</span>
-                      <span>5,400</span>
-                    </div>
-                  </div>
-
-                  {/* Timeframe selector */}
-                  <div className="mockup-timeframe-row">
-                    {(['1m', '5m', '15m', '30m', '1h', '2h', '4h', 'D', 'W', 'M'] as const).map((tf) => (
-                      <button
-                        key={tf}
-                        type="button"
-                        className={`mockup-tf-btn ${mockupTimeframe === tf ? 'active' : ''}`}
-                        onClick={() => setMockupTimeframe(tf)}
-                      >
-                        {tf}
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Ticker Badges Bar */}
-                  <div className="mockup-index-badges">
-                    <div className="mockup-index-card">
-                      <div className="mockup-index-header">
-                        <span className="mockup-index-name">S&P 500</span>
-                        <span className="mockup-index-tag tag-red">500</span>
-                      </div>
-                      <div className="mockup-index-values">
-                        <span className="mockup-index-price">$5,603.24</span>
-                        <span className="mockup-index-chg positive">+1.4%</span>
-                      </div>
-                    </div>
-
-                    <div className="mockup-index-card">
-                      <div className="mockup-index-header">
-                        <span className="mockup-index-name">Nasdaq 100</span>
-                        <span className="mockup-index-tag tag-blue">100</span>
-                      </div>
-                      <div className="mockup-index-values">
-                        <span className="mockup-index-price">$23,453.86</span>
-                        <span className="mockup-index-chg positive">+1.5%</span>
-                      </div>
-                    </div>
-
-                    <div className="mockup-index-card">
-                      <div className="mockup-index-header">
-                        <span className="mockup-index-name">Dow 30</span>
-                        <span className="mockup-index-tag tag-blue">30</span>
-                      </div>
-                      <div className="mockup-index-values">
-                        <span className="mockup-index-price">$44,425.52</span>
-                        <span className="mockup-index-chg positive">+1.4%</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+          <div className="signup-mockup-content">
+            <div className="signup-mockup-top-metrics">
+              <div className="signup-metric-box">
+                <div className="signup-metric-label">S&P 500</div>
+                <div className="signup-metric-val is-green">5,864.67 (+1.12%)</div>
               </div>
-
-              {/* Today's Top Stocks Table */}
-              <div className="mockup-panel mockup-top-stocks">
-                <div className="mockup-section-header">
-                  <div className="mockup-section-title">Today's Top Stocks</div>
-                  <span className="mockup-view-all">View all</span>
-                </div>
-
-                <div className="mockup-table-wrap">
-                  <table className="mockup-table">
-                    <thead>
-                      <tr>
-                        <th>Company</th>
-                        <th>Symbol</th>
-                        <th>Price</th>
-                        <th>Change</th>
-                        <th>Market Cap</th>
-                        <th>P/E Ratio</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>Apple Inc</td>
-                        <td className="mono text-muted">AAPL</td>
-                        <td className="mono">$233.16</td>
-                        <td><span className="table-badge badge-pos">+1.54%</span></td>
-                        <td className="mono">$3.56T</td>
-                        <td className="mono">35.5</td>
-                      </tr>
-                      <tr>
-                        <td>Microsoft Corp</td>
-                        <td className="mono text-muted">MSFT</td>
-                        <td className="mono">$520.42</td>
-                        <td><span className="table-badge badge-neg">-0.24%</span></td>
-                        <td className="mono">$3.75T</td>
-                        <td className="mono">32.6</td>
-                      </tr>
-                      <tr>
-                        <td>Alphabet Inc</td>
-                        <td className="mono text-muted">GOOGL</td>
-                        <td className="mono">$201.56</td>
-                        <td><span className="table-badge badge-pos">+2.65%</span></td>
-                        <td className="mono">$2.52T</td>
-                        <td className="mono">21.5</td>
-                      </tr>
-                      <tr>
-                        <td>Amazon.com Inc</td>
-                        <td className="mono text-muted">AMZN</td>
-                        <td className="mono">$244.16</td>
-                        <td><span className="table-badge badge-neg">-1.53%</span></td>
-                        <td className="mono">$1.45T</td>
-                        <td className="mono">33.5</td>
-                      </tr>
-                      <tr>
-                        <td>Tesla Inc</td>
-                        <td className="mono text-muted">TSLA</td>
-                        <td className="mono">$339.62</td>
-                        <td><span className="table-badge badge-pos">+1.72%</span></td>
-                        <td className="mono">$1.56T</td>
-                        <td className="mono">161.2</td>
-                      </tr>
-                      <tr>
-                        <td>Meta Platforms Inc</td>
-                        <td className="mono text-muted">META</td>
-                        <td className="mono">$762.96</td>
-                        <td><span className="table-badge badge-neg">-2.54%</span></td>
-                        <td className="mono">$2.63T</td>
-                        <td className="mono">45.6</td>
-                      </tr>
-                      <tr>
-                        <td>NVIDIA Corp</td>
-                        <td className="mono text-muted">NVDA</td>
-                        <td className="mono">$181.46</td>
-                        <td><span className="table-badge badge-pos">+2.21%</span></td>
-                        <td className="mono">$1.36T</td>
-                        <td className="mono">16.8</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+              <div className="signup-metric-box">
+                <div className="signup-metric-label">BTC / USD</div>
+                <div className="signup-metric-val is-gold">$96,480.00 (+3.45%)</div>
+              </div>
+              <div className="signup-metric-box">
+                <div className="signup-metric-label">MATCH ENGINE</div>
+                <div className="signup-metric-val is-green">0.12ms Low-Latency</div>
               </div>
             </div>
 
-            {/* Right Area: Watchlist + News */}
-            <div className="mockup-sidebar-area">
-              {/* Watchlist Section */}
-              <div className="mockup-panel mockup-watchlist-panel">
-                <div className="mockup-section-title">Your Watchlist</div>
-
-                <div className="mockup-watchlist-cards">
-                  {/* Amazon Card */}
-                  <div className="mockup-wl-card">
-                    <div className="mockup-wl-left">
-                      <div className="mockup-corp-icon icon-amzn">a</div>
-                      <div>
-                        <div className="mockup-wl-name">Amazon.com</div>
-                        <div className="mockup-wl-price mono">$224.42</div>
-                        <div className="mockup-wl-sub positive">432.0 (+1.4%)</div>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      className={`mockup-star-btn ${watchlistStars.AMZN ? 'starred' : ''}`}
-                      onClick={() => toggleWatchlist('AMZN')}
-                    >
-                      <Star size={14} fill={watchlistStars.AMZN ? '#fcd535' : 'none'} color={watchlistStars.AMZN ? '#fcd535' : '#848e9c'} />
-                    </button>
-                  </div>
-
-                  {/* Netflix Card */}
-                  <div className="mockup-wl-card">
-                    <div className="mockup-wl-left">
-                      <div className="mockup-corp-icon icon-nflx">N</div>
-                      <div>
-                        <div className="mockup-wl-name">Netflix, Inc</div>
-                        <div className="mockup-wl-price mono">$1,220.48</div>
-                        <div className="mockup-wl-sub positive">432.0 (+1.4%)</div>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      className={`mockup-star-btn ${watchlistStars.NFLX ? 'starred' : ''}`}
-                      onClick={() => toggleWatchlist('NFLX')}
-                    >
-                      <Star size={14} fill={watchlistStars.NFLX ? '#fcd535' : 'none'} color={watchlistStars.NFLX ? '#fcd535' : '#848e9c'} />
-                    </button>
-                  </div>
-                </div>
+            <div className="signup-watchlist-preview-table">
+              <div className="signup-table-row signup-table-header">
+                <span>ASSET</span>
+                <span>PRICE</span>
+                <span>24H CHG</span>
+                <span>WATCH</span>
               </div>
-
-              {/* Financial News Section */}
-              <div className="mockup-panel mockup-news-panel">
-                <div className="mockup-section-title">Today's Financial News</div>
-
-                <div className="mockup-news-tabs">
-                  <span className="mockup-news-tab active">Top stories</span>
-                  <span className="mockup-news-tab">Local market</span>
-                </div>
-
-                <div className="mockup-news-list">
-                  <div className="mockup-news-item">
-                    <div className="mockup-news-meta">The Wall Street Journal • 37 minutes ago</div>
-                    <div className="mockup-news-headline">
-                      Exclusive | Walmart's New Era of Workers' Grocery Bills
-                    </div>
-                    <div className="mockup-news-tag tag-neg">WMT ▼ 1.74%</div>
-                  </div>
-
-                  <div className="mockup-news-item">
-                    <div className="mockup-news-meta">Yahoo Finance • 34 minutes ago</div>
-                    <div className="mockup-news-headline">
-                      Stock market today: Dow pops as Fed rate cut bets surge
-                    </div>
-                    <div className="mockup-news-tag tag-pos">NDAQ ▲ 0.93%</div>
-                  </div>
-                </div>
+              <div className="signup-table-row">
+                <span className="mono bold">BTC / USDT</span>
+                <span className="mono bold is-green">$96,450.00</span>
+                <span className="is-green">+3.42%</span>
+                <Star
+                  size={14}
+                  className="signup-star-toggle"
+                  fill={watchlistStars['BTC'] ? '#fcd535' : 'none'}
+                  color={watchlistStars['BTC'] ? '#fcd535' : '#848e9c'}
+                  onClick={() => toggleWatchlist('BTC')}
+                />
+              </div>
+              <div className="signup-table-row">
+                <span className="mono bold">ETH / USDT</span>
+                <span className="mono bold is-green">$2,780.50</span>
+                <span className="is-green">+2.15%</span>
+                <Star
+                  size={14}
+                  className="signup-star-toggle"
+                  fill={watchlistStars['ETH'] ? '#fcd535' : 'none'}
+                  color={watchlistStars['ETH'] ? '#fcd535' : '#848e9c'}
+                  onClick={() => toggleWatchlist('ETH')}
+                />
+              </div>
+              <div className="signup-table-row">
+                <span className="mono bold">SOL / USDT</span>
+                <span className="mono bold is-gold">$194.20</span>
+                <span className="is-green">+5.80%</span>
+                <Star
+                  size={14}
+                  className="signup-star-toggle"
+                  fill={watchlistStars['SOL'] ? '#fcd535' : 'none'}
+                  color={watchlistStars['SOL'] ? '#fcd535' : '#848e9c'}
+                  onClick={() => toggleWatchlist('SOL')}
+                />
               </div>
             </div>
           </div>

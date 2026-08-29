@@ -1,10 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
 import { Navbar, TabType } from './components/Navbar';
 import { DashboardView } from './components/DashboardView';
-import { WatchlistView } from './components/WatchlistView';
 import { NewsView } from './components/NewsView';
-import { StockDetailView } from './components/StockDetailView';
-import { EmailTemplatesView } from './components/EmailTemplatesView';
 import { SearchModal } from './components/SearchModal';
 import { HomeView } from './components/HomeView';
 import { TickerBar } from './components/TickerBar';
@@ -13,13 +10,26 @@ import { OrderBook } from './components/OrderBook';
 import { RecentTrades } from './components/RecentTrades';
 import { OrderEntryForm } from './components/OrderEntryForm';
 import { UserOrdersTable } from './components/UserOrdersTable';
-import { WalletView } from './components/WalletView';
-import { P2PView } from './components/P2PView';
-import { SecurityView } from './components/SecurityView';
 import { MarketsOverviewView } from './components/MarketsOverviewView';
-import { EarnView } from './components/EarnView';
-import { AdminConsole } from './components/admin/AdminConsole';
 import { SignupView } from './components/SignupView';
+import { SpotTradeView } from './components/SpotTradeView';
+
+const WatchlistView = lazy(() => import('./components/WatchlistView').then(m => ({ default: m.WatchlistView })));
+const StockDetailView = lazy(() => import('./components/StockDetailView').then(m => ({ default: m.StockDetailView })));
+const EmailTemplatesView = lazy(() => import('./components/EmailTemplatesView').then(m => ({ default: m.EmailTemplatesView })));
+const P2PView = lazy(() => import('./components/P2PView').then(m => ({ default: m.P2PView })));
+const InvestmentView = lazy(() => import('./components/InvestmentView').then(m => ({ default: m.InvestmentView })));
+const AdminConsole = lazy(() => import('./components/admin/AdminConsole').then(m => ({ default: m.AdminConsole })));
+
+const ViewFallback = () => (
+  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', color: '#848e9c' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+      <div style={{ width: '28px', height: '28px', border: '3px solid #2b313a', borderTopColor: '#fcd535', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+      <span style={{ fontSize: '13px', fontWeight: 600 }}>Loading Terminal...</span>
+    </div>
+  </div>
+);
+
 
 function parseUrlHash(): { tab: TabType; symbol: string; stockSymbol: string; isSearch: boolean } {
   const defaultSymbol = localStorage.getItem('syncnode_active_symbol') || 'BTC/USDT';
@@ -35,6 +45,11 @@ function parseUrlHash(): { tab: TabType; symbol: string; stockSymbol: string; is
   // Filter out any corrupted widget event strings
   if (raw.includes('TV-WIDGET') || raw.includes('LOAD')) {
     raw = 'stock';
+  }
+
+  // Handle OAuth callback fragments
+  if (raw.includes('id_token=') || raw.includes('access_token=')) {
+    return { tab: 'dashboard', symbol: defaultSymbol, stockSymbol: defaultStock, isSearch: false };
   }
 
   if (!raw || raw === 'home') {
@@ -71,18 +86,93 @@ function parseUrlHash(): { tab: TabType; symbol: string; stockSymbol: string; is
   }
 
   if (
+    raw === 'futures' ||
+    raw === 'futures-wallet' ||
+    raw === 'usds-m' ||
+    raw === 'coin-m' ||
+    raw === 'features'
+  ) {
+    return { tab: 'futures', symbol: defaultSymbol, stockSymbol: defaultStock, isSearch: false };
+  }
+
+  if (
+    raw === 'funding' ||
+    raw === 'funding-wallet' ||
+    raw === 'pay' ||
+    raw === 'binance-pay'
+  ) {
+    return { tab: 'funding', symbol: defaultSymbol, stockSymbol: defaultStock, isSearch: false };
+  }
+
+  if (
     raw === 'markets' ||
     raw.startsWith('markets') ||
-    raw === 'futures' ||
-    raw.startsWith('futures') ||
-    raw === 'coin-m' ||
-    raw.startsWith('coin-m') ||
     raw.includes('quarterly')
   ) {
     return { tab: 'markets', symbol: defaultSymbol, stockSymbol: defaultStock, isSearch: false };
   }
 
-  if (raw === 'dashboard') {
+  if (raw === 'deposit') {
+    return { tab: 'deposit', symbol: defaultSymbol, stockSymbol: defaultStock, isSearch: false };
+  }
+  if (raw === 'withdraw') {
+    return { tab: 'withdraw', symbol: defaultSymbol, stockSymbol: defaultStock, isSearch: false };
+  }
+  if (raw === 'assets' || raw === 'wallet' || raw === 'balances') {
+    return { tab: 'assets', symbol: defaultSymbol, stockSymbol: defaultStock, isSearch: false };
+  }
+  if (raw === 'margin' || raw === 'cross-margin' || raw === 'isolated-margin') {
+    return { tab: 'margin', symbol: defaultSymbol, stockSymbol: defaultStock, isSearch: false };
+  }
+  if (raw === 'transfers' || raw === 'transfer') {
+    return { tab: 'transfers', symbol: defaultSymbol, stockSymbol: defaultStock, isSearch: false };
+  }
+  if (
+    raw === 'orders' ||
+    raw === 'trades' ||
+    raw === 'order-history' ||
+    raw.startsWith('orders/') ||
+    raw.startsWith('orders-') ||
+    raw === 'orders/exchange' ||
+    raw === 'orders/futures' ||
+    raw === 'orders/p2p' ||
+    raw === 'orders/convert' ||
+    raw === 'orders/payment'
+  ) {
+    return { tab: 'orders', symbol: defaultSymbol, stockSymbol: defaultStock, isSearch: false };
+  }
+  if (raw === 'security' || raw === '2fa') {
+    return { tab: 'security', symbol: defaultSymbol, stockSymbol: defaultStock, isSearch: false };
+  }
+  if (raw === 'kyc' || raw === 'identity' || raw === 'verification') {
+    return { tab: 'kyc', symbol: defaultSymbol, stockSymbol: defaultStock, isSearch: false };
+  }
+  if (raw === 'api-keys' || raw === 'apikeys' || raw === 'api') {
+    return { tab: 'apikeys', symbol: defaultSymbol, stockSymbol: defaultStock, isSearch: false };
+  }
+  if (raw === 'sessions' || raw === 'devices') {
+    return { tab: 'sessions', symbol: defaultSymbol, stockSymbol: defaultStock, isSearch: false };
+  }
+  if (raw === 'settings' || raw === 'preferences' || raw === 'profile') {
+    return { tab: 'settings', symbol: defaultSymbol, stockSymbol: defaultStock, isSearch: false };
+  }
+  if (
+    raw === 'history' ||
+    raw === 'tx-history' ||
+    raw === 'assets-history' ||
+    raw === 'wallet/history' ||
+    raw === 'wallet/history/overview'
+  ) {
+    return { tab: 'history', symbol: defaultSymbol, stockSymbol: defaultStock, isSearch: false };
+  }
+  if (raw === 'emails' || raw === 'templates') {
+    return { tab: 'emails', symbol: defaultSymbol, stockSymbol: defaultStock, isSearch: false };
+  }
+  if (raw === 'p2p' || raw.startsWith('p2p')) {
+    return { tab: 'p2p', symbol: defaultSymbol, stockSymbol: defaultStock, isSearch: false };
+  }
+
+  if (raw === 'dashboard' || raw === 'overview') {
     return { tab: 'dashboard', symbol: defaultSymbol, stockSymbol: defaultStock, isSearch: false };
   }
 
@@ -102,57 +192,128 @@ function parseUrlHash(): { tab: TabType; symbol: string; stockSymbol: string; is
     return { tab: 'admin', symbol: defaultSymbol, stockSymbol: defaultStock, isSearch: false };
   }
 
-  if (raw === 'earn' || raw.startsWith('earn')) {
+  if (raw === 'earn' || raw.startsWith('earn') || raw === 'invest' || raw.startsWith('invest') || raw === 'staking') {
     return { tab: 'earn', symbol: defaultSymbol, stockSymbol: defaultStock, isSearch: false };
   }
 
-  if (['home', 'dashboard', 'watchlist', 'news', 'stock', 'spot', 'earn', 'p2p', 'wallet', 'security', 'admin', 'signup', 'login'].includes(raw)) {
+  if (['home', 'dashboard', 'watchlist', 'news', 'stock', 'spot', 'earn', 'p2p', 'wallet', 'assets', 'margin', 'futures', 'funding', 'deposit', 'withdraw', 'transfers', 'orders', 'history', 'security', 'kyc', 'apikeys', 'sessions', 'settings', 'admin', 'emails', 'signup', 'login'].includes(raw)) {
     return { tab: raw as TabType, symbol: defaultSymbol, stockSymbol: defaultStock, isSearch: false };
   }
 
   return { tab: 'home', symbol: defaultSymbol, stockSymbol: defaultStock, isSearch: false };
 }
 
+// Centralized Protected and Administrative Route Definitions
+const PROTECTED_TABS: Set<TabType> = new Set([
+  'dashboard',
+  'wallet',
+  'assets',
+  'margin',
+  'futures',
+  'funding',
+  'deposit',
+  'withdraw',
+  'transfers',
+  'orders',
+  'history',
+  'stock',
+  'security',
+  'kyc',
+  'apikeys',
+  'sessions',
+  'settings'
+]);
+
+const UNAUTH_ONLY_TABS: Set<TabType> = new Set([
+  'signup',
+  'login'
+]);
+
+const ADMIN_TABS: Set<TabType> = new Set([
+  'admin',
+  'emails'
+]);
+
 export const App: React.FC = () => {
   const initialRoute = parseUrlHash();
+
   const [activeTab, setActiveTabState] = useState<TabType>(initialRoute.tab);
   const [symbol, setSymbolState] = useState<string>(initialRoute.symbol);
   const [stockSymbol, setStockSymbolState] = useState<string>(initialRoute.stockSymbol);
   const [isSearchOpen, setIsSearchOpen] = useState(initialRoute.isSearch);
-  const [watchlist, setWatchlist] = useState<string[]>(() => {
-    try {
-      const saved = localStorage.getItem('syncnode_watchlist');
-      return saved ? JSON.parse(saved) : ['AAPL', 'NVDA', 'GOOGL', 'MSFT', 'AMZN', 'TSLA', 'META'];
-    } catch {
-      return ['AAPL', 'NVDA', 'GOOGL', 'MSFT', 'AMZN', 'TSLA', 'META'];
-    }
-  });
 
+  // Market and Data state
   const [markets, setMarkets] = useState<any[]>([]);
   const [ticker, setTicker] = useState<any | null>(null);
-  const [depth, setDepth] = useState<any>({ bids: [], asks: [] });
+  const [depth, setDepth] = useState<any | null>(null);
   const [recentTrades, setRecentTrades] = useState<any[]>([]);
   const [selectedPrice, setSelectedPrice] = useState<string | undefined>(undefined);
 
+  // User and Auth State
+  const [user, setUser] = useState<any | null>(null);
+  const [loadingUser, setLoadingUser] = useState<boolean>(true);
+  const [balances, setBalances] = useState<any[]>([]);
+  const [orders, setOrders] = useState<any[]>([]);
+  const [userTrades, setUserTrades] = useState<any[]>([]);
+  const [transactions, setTransactions] = useState<any[]>([]);
+  const [circuitBreakers, setCircuitBreakers] = useState<any>(null);
+  const [isWsConnected, setIsWsConnected] = useState(false);
+
+
+  const wsRef = useRef<WebSocket | null>(null);
+
+  // Watchlist state stored in localStorage
+  const [watchlist, setWatchlist] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('syncnode_watchlist');
+      return saved ? JSON.parse(saved) : ['AAPL', 'NVDA', 'MSFT', 'AMZN', 'TSLA', 'BTC', 'ETH', 'SOL'];
+    } catch {
+      return ['AAPL', 'NVDA', 'MSFT', 'AMZN', 'TSLA', 'BTC', 'ETH', 'SOL'];
+    }
+  });
+
   const toggleWatchlist = (sym: string) => {
+    const upper = sym.toUpperCase();
     setWatchlist((prev) => {
-      const next = prev.includes(sym) ? prev.filter((s) => s !== sym) : [...prev, sym];
+      const exists = prev.includes(upper);
+      const next = exists ? prev.filter((s) => s !== upper) : [...prev, upper];
       localStorage.setItem('syncnode_watchlist', JSON.stringify(next));
       return next;
     });
   };
 
-  const setActiveTab = (tab: TabType, targetSymbol?: string) => {
+  const setActiveTab = (tab: TabType, extraParam?: string) => {
+    // Unauthenticated-only route guard: If already logged in, redirect away from signup / login to dashboard
+    if (UNAUTH_ONLY_TABS.has(tab) && user && !loadingUser) {
+      setActiveTabState('dashboard');
+      window.location.hash = '#/dashboard';
+      return;
+    }
+
+    // Client-side authentication & permission check before tab transition
+    if (PROTECTED_TABS.has(tab) && !user && !loadingUser) {
+      setActiveTabState('signup');
+      window.location.hash = '#/signup';
+      return;
+    }
+    if (ADMIN_TABS.has(tab)) {
+      const hasAdmin = user?.admin_roles && user.admin_roles.length > 0;
+      if (!hasAdmin && !loadingUser) {
+        setActiveTabState('home');
+        window.location.hash = '#/home';
+        return;
+      }
+    }
+
     setActiveTabState(tab);
     localStorage.setItem('syncnode_active_tab', tab);
+
     if (tab === 'spot') {
-      const sym = targetSymbol || symbol;
+      const sym = extraParam || symbol;
       window.location.hash = `#/trade/${sym.replace('/', '-')}`;
     } else if (tab === 'stock') {
-      const sym = targetSymbol || stockSymbol;
-      setStockSymbolState(sym);
-      localStorage.setItem('syncnode_active_stock', sym);
-      window.location.hash = `#/stock/${sym}`;
+      const stockSym = extraParam || stockSymbol;
+      window.location.hash = `#/stock/${stockSym}`;
     } else {
       window.location.hash = `#/${tab}`;
     }
@@ -204,6 +365,11 @@ export const App: React.FC = () => {
 
     const handleHashChange = () => {
       const route = parseUrlHash();
+      if (UNAUTH_ONLY_TABS.has(route.tab) && user && !loadingUser) {
+        setActiveTabState('dashboard');
+        window.location.hash = '#/dashboard';
+        return;
+      }
       setActiveTabState(route.tab);
       localStorage.setItem('syncnode_active_tab', route.tab);
       if (route.symbol) {
@@ -256,16 +422,6 @@ export const App: React.FC = () => {
     };
   }, []);
 
-  // User and Auth State
-  const [user, setUser] = useState<any | null>(null);
-  const [balances, setBalances] = useState<any[]>([]);
-  const [orders, setOrders] = useState<any[]>([]);
-  const [userTrades, setUserTrades] = useState<any[]>([]);
-  const [circuitBreakers, setCircuitBreakers] = useState<any>(null);
-  const [isWsConnected, setIsWsConnected] = useState(false);
-
-  const wsRef = useRef<WebSocket | null>(null);
-
   const fetchMarkets = async () => {
     try {
       const res = await fetch('/api/v1/markets');
@@ -310,16 +466,54 @@ export const App: React.FC = () => {
     const token = localStorage.getItem('syncnode_token');
     if (!token) {
       setUser(null);
+      setLoadingUser(false);
       return;
     }
 
     try {
-      const [meRes, balRes, ordRes, trdRes, cbRes] = await Promise.all([
-        fetch('/api/v1/auth/me', { headers: { Authorization: `Bearer ${token}` } }),
+      const meRes = await fetch('/api/v1/auth/me', { headers: { Authorization: `Bearer ${token}` } });
+      
+      // Token expiration / 401 handling with automatic refresh token rotation
+      if (meRes.status === 401) {
+        const refreshToken = localStorage.getItem('syncnode_refresh_token');
+        if (refreshToken) {
+          try {
+            const refreshRes = await fetch('/api/v1/auth/refresh', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ refreshToken })
+            });
+            const refreshJson = await refreshRes.json();
+            if (refreshJson.success && refreshJson.token) {
+              localStorage.setItem('syncnode_token', refreshJson.token);
+              if (refreshJson.refreshToken) {
+                localStorage.setItem('syncnode_refresh_token', refreshJson.refreshToken);
+              }
+              return fetchUserData();
+            }
+          } catch (refErr) {
+            console.warn('Token refresh failed:', refErr);
+          }
+        }
+
+        // Stale token cleanup
+        localStorage.removeItem('syncnode_token');
+        localStorage.removeItem('syncnode_refresh_token');
+        setUser(null);
+        setBalances([]);
+        setOrders([]);
+        setUserTrades([]);
+        setTransactions([]);
+        setLoadingUser(false);
+        return;
+      }
+
+      const [balRes, ordRes, trdRes, cbRes, txRes] = await Promise.all([
         fetch('/api/v1/balances', { headers: { Authorization: `Bearer ${token}` } }),
         fetch('/api/v1/orders', { headers: { Authorization: `Bearer ${token}` } }),
         fetch('/api/v1/trades/my', { headers: { Authorization: `Bearer ${token}` } }),
-        fetch('/api/v1/admin/circuit-breakers', { headers: { Authorization: `Bearer ${token}` } })
+        fetch('/api/v1/admin/circuit-breakers', { headers: { Authorization: `Bearer ${token}` } }),
+        fetch('/api/v1/wallet/transactions', { headers: { Authorization: `Bearer ${token}` } })
       ]);
 
       const meJson = await meRes.json();
@@ -327,21 +521,92 @@ export const App: React.FC = () => {
       const ordJson = await ordRes.json();
       const trdJson = await trdRes.json();
       const cbJson = await cbRes.json();
+      const txJson = await txRes.json();
 
       if (meJson.success) setUser(meJson.user);
       if (balJson.success) setBalances(balJson.balances);
       if (ordJson.success) setOrders(ordJson.orders);
       if (trdJson.success) setUserTrades(trdJson.trades);
       if (cbJson.success) setCircuitBreakers(cbJson.circuitBreakers);
+      if (txJson.success && Array.isArray(txJson.transactions)) setTransactions(txJson.transactions);
     } catch (e: any) {
       console.warn('Failed to fetch user data:', e?.message || e);
+    } finally {
+      setLoadingUser(false);
     }
   };
 
-  // Initialize data
+
+  // Auth & Permissions Guard Interceptor
+  useEffect(() => {
+    if (loadingUser) return;
+
+    if (PROTECTED_TABS.has(activeTab) && !user) {
+      setActiveTabState('signup');
+      window.location.hash = '#/signup';
+    } else if (UNAUTH_ONLY_TABS.has(activeTab) && user) {
+      setActiveTabState('dashboard');
+      window.location.hash = '#/dashboard';
+    } else if (ADMIN_TABS.has(activeTab)) {
+      const hasAdmin = user?.admin_roles && user.admin_roles.length > 0;
+      if (!hasAdmin) {
+        setActiveTabState('home');
+        window.location.hash = '#/home';
+      }
+    }
+  }, [activeTab, user, loadingUser]);
+
+  // Initialize data and process potential OAuth redirect callbacks
   useEffect(() => {
     fetchMarkets();
-    fetchUserData();
+
+    const processOAuthRedirect = async () => {
+      if (typeof window === 'undefined') return;
+      const rawHash = window.location.hash.replace(/^#\/?/, '');
+      const rawSearch = window.location.search.replace(/^\?/, '');
+      const params = new URLSearchParams(rawHash.includes('id_token') ? rawHash : rawSearch);
+      const idToken = params.get('id_token');
+      const stateParam = params.get('state');
+
+      if (idToken) {
+        try {
+          setLoadingUser(true);
+          const res = await fetch('/api/v1/auth/google', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ credential: idToken })
+          });
+          const data = await res.json();
+          if (data.success && data.token) {
+            localStorage.setItem('syncnode_token', data.token);
+            if (data.refreshToken) localStorage.setItem('syncnode_refresh_token', data.refreshToken);
+            setUser(data.user);
+
+            // Restore targeted return page or default to dashboard
+            let targetHash = '#/dashboard';
+            if (stateParam) {
+              try {
+                const parsedState = JSON.parse(atob(stateParam));
+                if (parsedState.returnTo) targetHash = parsedState.returnTo;
+              } catch (_) {}
+            }
+            window.history.replaceState(null, '', targetHash);
+            const nextRoute = parseUrlHash();
+            setActiveTabState(nextRoute.tab);
+            fetchUserData();
+            return;
+          }
+        } catch (err) {
+          console.warn('OAuth redirect exchange failed:', err);
+        } finally {
+          setLoadingUser(false);
+        }
+      }
+
+      fetchUserData();
+    };
+
+    processOAuthRedirect();
   }, []);
 
   // Poll market state every 1.5 seconds
@@ -383,7 +648,16 @@ export const App: React.FC = () => {
     ws.onmessage = (event) => {
       try {
         const msg = JSON.parse(event.data);
-        if (msg.channel === `depth@${symbol}`) {
+        if (msg.type === 'BALANCE_UPDATE') {
+          if (msg.balances) {
+            setBalances(msg.balances);
+          }
+          if (localStorage.getItem('syncnode_token')) {
+            fetchUserData();
+          }
+        } else if (msg.type === 'ORDER_UPDATE' || msg.type === 'TRADE_UPDATE') {
+          fetchUserData();
+        } else if (msg.channel === `depth@${symbol}`) {
           setDepth(msg.data);
         } else if (msg.channel === `trades@${symbol}`) {
           setRecentTrades((prev) => [msg.data, ...prev.slice(0, 39)]);
@@ -401,12 +675,30 @@ export const App: React.FC = () => {
     };
   }, [symbol]);
 
+  // Real-time synchronization when tab is active/focused
+  useEffect(() => {
+    const handleSync = () => {
+      if (localStorage.getItem('syncnode_token')) {
+        fetchUserData();
+      }
+    };
+    window.addEventListener('focus', handleSync);
+    document.addEventListener('visibilitychange', handleSync);
+    return () => {
+      window.removeEventListener('focus', handleSync);
+      document.removeEventListener('visibilitychange', handleSync);
+    };
+  }, []);
+
+
   const handleLogout = () => {
     localStorage.removeItem('syncnode_token');
+    localStorage.removeItem('syncnode_refresh_token');
     setUser(null);
     setBalances([]);
     setOrders([]);
-    setActiveTab('dashboard');
+    setUserTrades([]);
+    setActiveTab('home');
   };
 
   const handleCancelOrder = async (orderId: string) => {
@@ -473,13 +765,44 @@ export const App: React.FC = () => {
         }}
       />
 
-      {/* 1. DASHBOARD VIEW */}
-      {activeTab === 'dashboard' && (
+      {/* 1. DASHBOARD / ASSETS / DEPOSIT / WITHDRAW / TRANSFERS / ORDERS / SECURITY / KYC / API KEYS / SESSIONS / SETTINGS */}
+      {PROTECTED_TABS.has(activeTab) && user && (
         <DashboardView
           user={user}
           balances={balances}
           orders={orders}
           userTrades={userTrades}
+          initialSidebarTab={
+            activeTab === 'wallet' || activeTab === 'assets' || activeTab === 'margin' || activeTab === 'futures' || activeTab === 'funding' || activeTab === 'deposit' || activeTab === 'withdraw' || activeTab === 'history'
+              ? 'assets'
+              : activeTab === 'transfers'
+              ? 'transfers'
+              : activeTab === 'orders'
+              ? 'orders'
+              : activeTab === 'security' || activeTab === 'kyc' || activeTab === 'apikeys' || activeTab === 'sessions'
+              ? 'security'
+              : activeTab === 'settings'
+              ? 'settings'
+              : 'dashboard'
+          }
+          initialWalletSubTab={
+            activeTab === 'margin'
+              ? 'margin'
+              : activeTab === 'futures'
+              ? 'futures'
+              : activeTab === 'funding'
+              ? 'funding'
+              : activeTab === 'deposit'
+              ? 'deposit'
+              : activeTab === 'withdraw'
+              ? 'withdraw'
+              : activeTab === 'history'
+              ? 'history'
+              : 'overview'
+          }
+          initialSecuritySubTab={
+            activeTab === 'kyc' ? 'kyc' : activeTab === 'apikeys' ? 'apikeys' : activeTab === 'sessions' ? 'sessions' : '2fa'
+          }
           onRefreshUser={fetchUserData}
           onNavigateToTrade={(sym) => {
             if (sym) {
@@ -499,17 +822,27 @@ export const App: React.FC = () => {
         />
       )}
 
+      {PROTECTED_TABS.has(activeTab) && !user && !loadingUser && (
+        <SignupView
+          initialMode="login"
+          onSuccess={handleAuthSuccess}
+          onNavigateHome={() => setActiveTab('home')}
+        />
+      )}
+
       {/* 2. WATCHLIST & ALERTS VIEW */}
       {activeTab === 'watchlist' && (
-        <WatchlistView
-          watchlistSymbols={watchlist}
-          onToggleWatchlist={toggleWatchlist}
-          onNavigateToStock={(sym) => {
-            setStockSymbol(sym);
-            setActiveTab('stock', sym);
-          }}
-          onOpenSearch={() => setIsSearchOpen(true)}
-        />
+        <Suspense fallback={<ViewFallback />}>
+          <WatchlistView
+            watchlistSymbols={watchlist}
+            onToggleWatchlist={toggleWatchlist}
+            onNavigateToStock={(sym) => {
+              setStockSymbol(sym);
+              setActiveTab('stock', sym);
+            }}
+            onOpenSearch={() => setIsSearchOpen(true)}
+          />
+        </Suspense>
       )}
 
       {/* 3. DEDICATED FINANCIAL NEWS VIEW */}
@@ -532,34 +865,38 @@ export const App: React.FC = () => {
 
       {/* 4. STOCK DETAILED PAGE */}
       {activeTab === 'stock' && (
-        <StockDetailView
-          stockSymbol={stockSymbol}
-          onSelectStock={(sym) => {
-            setStockSymbol(sym);
-            setActiveTab('stock', sym);
-          }}
-          onNavigateToTrade={(sym) => {
-            if (sym) {
-              setSymbol(sym);
-              setActiveTab('spot', sym);
-            } else {
-              setActiveTab('spot');
-            }
-          }}
-        />
+        <Suspense fallback={<ViewFallback />}>
+          <StockDetailView
+            stockSymbol={stockSymbol}
+            onSelectStock={(sym) => {
+              setStockSymbol(sym);
+              setActiveTab('stock', sym);
+            }}
+            onNavigateToTrade={(sym) => {
+              if (sym) {
+                setSymbol(sym);
+                setActiveTab('spot', sym);
+              } else {
+                setActiveTab('spot');
+              }
+            }}
+          />
+        </Suspense>
       )}
 
-      {/* 5. EMAIL TEMPLATES SHOWCASE VIEW (All 5 Templates) */}
-      {activeTab === 'emails' && (
-        <EmailTemplatesView />
+      {/* 5. EMAIL TEMPLATES SHOWCASE VIEW (Gated for admin users) */}
+      {activeTab === 'emails' && user?.admin_roles && user.admin_roles.length > 0 && (
+        <Suspense fallback={<ViewFallback />}>
+          <EmailTemplatesView />
+        </Suspense>
       )}
 
-      {/* 6. SIGNUP & PERSONALIZATION FULL VIEW */}
-      {(activeTab === 'signup' || activeTab === 'login') && (
+      {/* 6. SIGNUP & PERSONALIZATION FULL VIEW (Only for unauthenticated visitors) */}
+      {(activeTab === 'signup' || activeTab === 'login') && !user && (
         <SignupView
           initialMode={activeTab === 'login' ? 'login' : 'signup'}
           onSuccess={handleAuthSuccess}
-          onNavigateHome={() => setActiveTab('dashboard')}
+          onNavigateHome={() => setActiveTab('home')}
         />
       )}
 
@@ -580,22 +917,6 @@ export const App: React.FC = () => {
               setActiveTab('stock', sym);
             }
           }}
-        />
-      )}
-
-      {/* 6.75 BINANCE EARN VIEW */}
-      {activeTab === 'earn' && (
-        <EarnView
-          user={user}
-          onNavigateToTrade={(sym) => {
-            if (sym) {
-              setSymbol(sym);
-              setActiveTab('spot', sym);
-            } else {
-              setActiveTab('spot');
-            }
-          }}
-          onOpenAuth={() => setActiveTab('signup')}
         />
       )}
 
@@ -620,69 +941,52 @@ export const App: React.FC = () => {
 
       {/* 8. SPOT TRADING TERMINAL */}
       {activeTab === 'spot' && (
-        <div className="terminal-grid">
-          <TickerBar
-            symbol={symbol}
-            onSelectSymbol={setSymbol}
-            ticker={ticker}
-            markets={markets}
-          />
+        <SpotTradeView
+          symbol={symbol}
+          onSelectSymbol={setSymbol}
+          ticker={ticker}
+          markets={markets}
+          depth={depth || { bids: [], asks: [] }}
+          trades={recentTrades}
+          balances={balances}
+          userOrders={orders}
+          userTrades={userTrades}
+          onOrderSubmitted={() => {
+            fetchUserData();
+            fetchDepth();
+            fetchRecentTrades();
+          }}
+          user={user}
+          onOpenAuth={() => setActiveTab('signup')}
+        />
+      )}
 
-          <OrderBook
-            depth={depth}
-            onSelectPrice={(p) => setSelectedPrice(p)}
-            lastPrice={ticker?.lastPrice}
-            spread={ticker?.spread}
-          />
-
-          <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-            <div style={{ flex: 1 }}>
-              <TradingChart symbol={symbol} />
-            </div>
-            <UserOrdersTable
-              orders={orders}
-              userTrades={userTrades}
-              onCancelOrder={handleCancelOrder}
-              onCancelAllOrders={handleCancelAllOrders}
-            />
-          </div>
-
-          <RecentTrades trades={recentTrades} />
-
-          <OrderEntryForm
-            symbol={symbol}
-            selectedPrice={selectedPrice}
-            balances={balances}
-            onOrderSubmitted={() => {
-              fetchUserData();
-              fetchDepth();
-              fetchRecentTrades();
-            }}
+      {/* 8.5 HIGH-YIELD EARN & STAKING PLATFORM */}
+      {activeTab === 'earn' && (
+        <Suspense fallback={<ViewFallback />}>
+          <InvestmentView
             user={user}
+            balances={balances}
             onOpenAuth={() => setActiveTab('signup')}
+            onNavigateToWallet={() => setActiveTab('wallet')}
           />
-        </div>
+        </Suspense>
       )}
 
       {/* 9. P2P ESCROW */}
       {activeTab === 'p2p' && (
-        <P2PView user={user} onOpenAuth={() => setActiveTab('signup')} />
+        <Suspense fallback={<ViewFallback />}>
+          <P2PView user={user} onOpenAuth={() => setActiveTab('signup')} />
+        </Suspense>
       )}
 
-      {/* 10. ASSETS & WALLET */}
-      {activeTab === 'wallet' && (
-        <WalletView balances={balances} onRefresh={fetchUserData} />
-      )}
-
-      {/* 11. SECURITY & 2FA */}
-      {activeTab === 'security' && (
-        <SecurityView user={user} onRefreshUser={fetchUserData} />
-      )}
-
-      {/* 12. ADMIN CONSOLE */}
-      {activeTab === 'admin' && (
-        <AdminConsole />
+      {/* 10. ADMIN CONSOLE (Protected strictly for users with admin roles) */}
+      {activeTab === 'admin' && user?.admin_roles && user.admin_roles.length > 0 && (
+        <Suspense fallback={<ViewFallback />}>
+          <AdminConsole />
+        </Suspense>
       )}
     </div>
   );
+
 };

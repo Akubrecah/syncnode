@@ -33,14 +33,14 @@ export const RiskAlerts: React.FC<RiskAlertsProps> = ({ circuitBreakers }) => {
         
         {circuitBreakers?.isGlobalTradingHalted && (
           <div style={{ background: 'rgba(246,70,93,0.15)', border: '1px solid #f6465d', color: '#f6465d', padding: '10px 14px', borderRadius: '6px', marginBottom: '8px', fontWeight: 700 }}>
-            🚨 Global Trading is currently HALTED across all order books.
+            Global Trading is currently HALTED across all order books.
           </div>
         )}
 
         {haltedMarkets.length > 0 ? (
           haltedMarkets.map((sym) => (
             <div key={sym} style={{ background: 'rgba(252,213,53,0.1)', border: '1px solid #FCD535', color: '#FCD535', padding: '8px 12px', borderRadius: '6px', marginBottom: '6px', fontSize: '13px' }}>
-              ⚠️ Market <strong>{sym}</strong> is halted by Circuit Breaker.
+              Market <strong>{sym}</strong> is halted by Circuit Breaker.
             </div>
           ))
         ) : (

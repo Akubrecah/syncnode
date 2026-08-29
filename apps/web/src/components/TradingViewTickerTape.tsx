@@ -83,7 +83,7 @@ export const TradingViewTickerTape: React.FC<TradingViewTickerTapeProps> = memo(
           zIndex: 10,
           background: 'transparent'
         }}
-        title="Open Live Spot Exchange on Syncnode"
+        title="Open Live Spot Exchange on CryptoBridge"
       />
     </div>
   );

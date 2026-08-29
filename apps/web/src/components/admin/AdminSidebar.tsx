@@ -14,8 +14,8 @@ export type AdminSectionId =
   | 'circuit-breakers' | 'risk-monitoring' | 'risk-parameters'
   | 'all-users' | 'user-surveillance' | 'kyc-compliance' | 'suspended-accounts'
   | 'markets' | 'order-books' | 'trades' | 'trading-surveillance'
-  | 'proof-of-reserves' | 'treasury' | 'fees' | 'financial-reports'
-  | 'deposits' | 'withdrawals' | 'internal-transfers'
+  | 'proof-of-reserves' | 'treasury' | 'fees' | 'financial-reports' | 'investment-plans'
+  | 'deposits' | 'withdrawals' | 'internal-transfers' | 'deposit-wallets'
   | 'escrows' | 'disputes' | 'escrow-merchants'
   | 'audit-logs' | 'login-security' | 'api-keys' | 'two-factor-compliance' | 'security-alerts'
   | 'fee-configuration' | 'market-configuration' | 'risk-configuration' | 'system-configuration';
@@ -76,6 +76,7 @@ export const ADMIN_NAV_GROUPS: NavGroup[] = [
     items: [
       { id: 'proof-of-reserves', label: 'Proof of Reserves', icon: <Landmark size={15} />, permission: 'viewFinance' },
       { id: 'treasury', label: 'Treasury', icon: <Vault size={15} />, permission: 'viewFinance' },
+      { id: 'investment-plans', label: 'Investment Plans', icon: <Coins size={15} />, permission: 'viewFinance' },
       { id: 'fees', label: 'Fees', icon: <Coins size={15} />, permission: 'viewFinance' },
       { id: 'financial-reports', label: 'Financial Reports', icon: <FileBarChart size={15} />, permission: 'viewFinance' }
     ]
@@ -83,8 +84,9 @@ export const ADMIN_NAV_GROUPS: NavGroup[] = [
   {
     title: 'Wallet',
     items: [
+      { id: 'deposit-wallets', label: 'Deposit Wallets Config', icon: <KeyRound size={15} />, permission: 'viewFinance' },
       { id: 'deposits', label: 'Deposits', icon: <ArrowDownToLine size={15} />, permission: 'viewFinance' },
-      { id: 'withdrawals', label: 'Withdrawals', icon: <ArrowUpFromLine size={15} />, permission: 'viewFinance' },
+      { id: 'withdrawals', label: 'Withdrawal Queue', icon: <ArrowUpFromLine size={15} />, permission: 'viewFinance' },
       { id: 'internal-transfers', label: 'Internal Transfers', icon: <Send size={15} />, permission: 'viewFinance' }
     ]
   },

@@ -179,8 +179,7 @@ export const TradingViewWidget: React.FC<TradingViewWidgetProps> = memo(({
       popup_height: '650',
       support_host: 'https://www.tradingview.com',
       backgroundColor: '#12141a',
-      gridColor: 'rgba(43, 49, 58, 0.5)',
-      container_id: 'tradingview_advanced_chart'
+      gridColor: 'rgba(43, 49, 58, 0.5)'
     });
 
     container.appendChild(script);

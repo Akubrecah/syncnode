@@ -14,6 +14,7 @@ import { TradingViewTechnicalAnalysis } from './TradingViewTechnicalAnalysis';
 import { TradingViewSymbolProfile } from './TradingViewSymbolProfile';
 import { TradingViewTimeline } from './TradingViewTimeline';
 import { TradingViewFinancials } from './TradingViewFinancials';
+import { Footer } from './Footer';
 
 interface StockDetailViewProps {
   stockSymbol?: string;
@@ -275,6 +276,9 @@ export const StockDetailView: React.FC<StockDetailViewProps> = ({
           </div>
         </div>
 
+      </div>
+      <div style={{ marginTop: '40px' }}>
+        <Footer onNavigateToTrade={onNavigateToTrade} />
       </div>
     </div>
   );

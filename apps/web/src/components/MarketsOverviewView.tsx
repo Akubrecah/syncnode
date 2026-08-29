@@ -27,6 +27,7 @@ import {
   List
 } from 'lucide-react';
 import { TradingViewCryptoScreener } from './TradingViewCryptoScreener';
+import { Footer } from './Footer';
 
 interface MarketsOverviewViewProps {
   onNavigateToTrade: (sym?: string) => void;
@@ -1139,12 +1140,12 @@ export const MarketsOverviewView: React.FC<MarketsOverviewViewProps> = ({
           <div style={{ marginBottom: '24px' }}>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
               {[
-                { key: 'gainers', label: '🚀 Top Gainers' },
-                { key: 'volume', label: '💎 24h Volume Leaders' },
-                { key: 'hot', label: '🔥 Hot / Trending' },
-                { key: 'marketcap', label: '👑 Market Cap Rank' },
-                { key: 'losers', label: '🔻 Top Losers' },
-                { key: 'new', label: '✨ New Listings' }
+                { key: 'gainers', label: 'Top Gainers' },
+                { key: 'volume', label: '24h Volume Leaders' },
+                { key: 'hot', label: 'Hot / Trending' },
+                { key: 'marketcap', label: 'Market Cap Rank' },
+                { key: 'losers', label: 'Top Losers' },
+                { key: 'new', label: 'New Listings' }
               ].map((cat) => {
                 const isSelected = rankingCategory === cat.key;
                 return (
@@ -1180,7 +1181,7 @@ export const MarketsOverviewView: React.FC<MarketsOverviewViewProps> = ({
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                 {[
                   { key: 'all', label: 'All' },
-                  { key: 'watchlist', label: '⭐ Watchlist' },
+                  { key: 'watchlist', label: 'Watchlist' },
                   ...(subTab === 'coin_futures' ? [{ key: 'perpetual', label: 'Perpetual' }, { key: 'quarterly', label: 'Quarterly Delivery' }] : []),
                   { key: 'Layer1_Layer2', label: 'Layer 1 / Layer 2' },
                   { key: 'AI', label: 'AI & Data' },
@@ -1471,113 +1472,10 @@ export const MarketsOverviewView: React.FC<MarketsOverviewViewProps> = ({
         )}
       </div>
 
-      {/* 6. EXACT FOOTER (Matching Source Specs) */}
-      <footer className="footer-wrapper" style={{ borderTop: '1px solid #29313D', padding: '48px 32px 24px 32px', marginTop: '48px' }}>
-        <div style={{ maxWidth: '1360px', margin: '0 auto' }}>
-          <div className="footer-content" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '32px', marginBottom: '40px' }}>
-            
-            {/* Column 1: Community */}
-            <div className="footer-community">
-              <h3 className="footer-navlist-title">Community</h3>
-              <div className="footer-icongroup">
-                <a href="https://discord.gg" target="_blank" rel="noreferrer">Discord</a>
-                <a href="https://t.me" target="_blank" rel="noreferrer">Telegram</a>
-                <a href="https://twitter.com" target="_blank" rel="noreferrer">X (Twitter)</a>
-                <a href="https://reddit.com" target="_blank" rel="noreferrer">Reddit</a>
-                <a href="https://youtube.com" target="_blank" rel="noreferrer">YouTube</a>
-              </div>
-            </div>
-
-            {/* Column 2: About Us */}
-            <div className="footer-navlist-group">
-              <h3 className="footer-navlist-title">About Us</h3>
-              <ul className="footer-navlist-item-list">
-                <li className="footer-navlist-item"><a href="#/about">About</a></li>
-                <li className="footer-navlist-item"><a href="#/careers">Careers</a></li>
-                <li className="footer-navlist-item"><a href="#/announcements">Announcements</a></li>
-                <li className="footer-navlist-item"><a href="#/news">News</a></li>
-                <li className="footer-navlist-item"><a href="#/press">Press</a></li>
-                <li className="footer-navlist-item"><a href="#/legal">Legal</a></li>
-                <li className="footer-navlist-item"><a href="#/terms">Terms</a></li>
-                <li className="footer-navlist-item"><a href="#/privacy">Privacy</a></li>
-                <li className="footer-navlist-item"><a href="#/building-trust">Building Trust</a></li>
-              </ul>
-            </div>
-
-            {/* Column 3: Products */}
-            <div className="footer-navlist-group">
-              <h3 className="footer-navlist-title">Products</h3>
-              <ul className="footer-navlist-item-list">
-                <li className="footer-navlist-item"><a href="#/spot">Exchange</a></li>
-                <li className="footer-navlist-item"><a href="#/earn">Binance Earn</a></li>
-                <li className="footer-navlist-item"><a href="#/buy-crypto">Buy Crypto</a></li>
-                <li className="footer-navlist-item"><a href="#/pay">Pay</a></li>
-                <li className="footer-navlist-item"><a href="#/academy">Academy</a></li>
-                <li className="footer-navlist-item"><a href="#/gift-card">Gift Card</a></li>
-                <li className="footer-navlist-item"><a href="#/earn">Launchpool &amp; Staking</a></li>
-                <li className="footer-navlist-item"><a href="#/earn">Auto-Invest</a></li>
-                <li className="footer-navlist-item"><a href="#/research">Research</a></li>
-              </ul>
-            </div>
-
-            {/* Column 4: Business */}
-            <div className="footer-navlist-group">
-              <h3 className="footer-navlist-title">Business</h3>
-              <ul className="footer-navlist-item-list">
-                <li className="footer-navlist-item"><a href="#/p2p">P2P Merchant Application</a></li>
-                <li className="footer-navlist-item"><a href="#/listing">Listing Application</a></li>
-                <li className="footer-navlist-item"><a href="#/vip">Institutional &amp; VIP Services</a></li>
-                <li className="footer-navlist-item"><a href="#/labs">Labs</a></li>
-                <li className="footer-navlist-item"><a href="#/onchain-pay">Onchain Pay</a></li>
-              </ul>
-            </div>
-
-            {/* Column 5: Learn */}
-            <div className="footer-navlist-group">
-              <h3 className="footer-navlist-title">Learn</h3>
-              <ul className="footer-navlist-item-list">
-                <li className="footer-navlist-item"><a href="#/learn-earn">Learn &amp; Earn</a></li>
-                <li className="footer-navlist-item"><a href="#/markets">Browse Crypto Prices</a></li>
-                <li className="footer-navlist-item"><a href="#/price/bitcoin">Bitcoin Price</a></li>
-                <li className="footer-navlist-item"><a href="#/price/ethereum">Ethereum Price</a></li>
-                <li className="footer-navlist-item"><a href="#/how-to-buy/bitcoin">Buy Bitcoin</a></li>
-                <li className="footer-navlist-item"><a href="#/how-to-buy/bnb">Buy BNB</a></li>
-              </ul>
-            </div>
-
-            {/* Column 6: Service & Support */}
-            <div className="footer-navlist-group">
-              <h3 className="footer-navlist-title">Service &amp; Support</h3>
-              <ul className="footer-navlist-item-list">
-                <li className="footer-navlist-item"><a href="#/chat">24/7 Chat Support</a></li>
-                <li className="footer-navlist-item"><a href="#/support">Support Center</a></li>
-                <li className="footer-navlist-item"><a href="#/feedback">Product Feedback</a></li>
-                <li className="footer-navlist-item"><a href="#/fees">Fees</a></li>
-                <li className="footer-navlist-item"><a href="#/api">APIs</a></li>
-                <li className="footer-navlist-item"><a href="#/verify">Official Verification</a></li>
-                <li className="footer-navlist-item"><a href="#/proof-of-reserves">Proof of Reserves</a></li>
-              </ul>
-            </div>
-          </div>
-
-          {/* Legal / FSRA Disclaimer & Copyright */}
-          <div className="footer-copyright" style={{ borderTop: '1px solid #202630', paddingTop: '24px', fontSize: '12px', color: '#707A8A', lineHeight: '1.7' }}>
-            <div className="footer-copyright-legal" style={{ marginBottom: '14px' }}>
-              <div>
-                <strong>Risk Warning:</strong> Virtual asset prices can be volatile. The value of your investment may go down or up and you may not get back the amount invested. You are solely responsible for your investment decisions and Syncnode is not liable for any trading losses you may incur.
-              </div>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-              <div>Syncnode © 2026. All rights reserved.</div>
-              <div style={{ display: 'flex', gap: '20px' }}>
-                <span>Cookie Preferences</span>
-                <span>Terms of Service</span>
-                <span>Privacy Notice</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </footer>
+      {/* Unified Institutional Footer without Community */}
+      <Footer
+        onNavigateToTrade={onNavigateToTrade}
+      />
     </div>
   );
 };

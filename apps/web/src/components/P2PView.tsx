@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Shield, CheckCircle, AlertTriangle, MessageSquare, ArrowRight } from 'lucide-react';
+import { Footer } from './Footer';
 
 interface P2PViewProps {
   user: any;
@@ -511,6 +512,10 @@ export const P2PView: React.FC<P2PViewProps> = ({ user, onOpenAuth }) => {
           </div>
         </div>
       )}
+
+      <div style={{ marginTop: '40px' }}>
+        <Footer onOpenAuth={onOpenAuth} />
+      </div>
     </div>
   );
 };

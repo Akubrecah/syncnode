@@ -17,6 +17,7 @@ import {
 import { PriceAlertModal, PriceAlertData } from './PriceAlertModal';
 import { TradingViewMarketQuotes } from './TradingViewMarketQuotes';
 import { TradingViewMiniChart } from './TradingViewMiniChart';
+import { Footer } from './Footer';
 
 interface WatchlistStock {
   symbol: string;
@@ -515,15 +516,15 @@ export const WatchlistView: React.FC<WatchlistViewProps> = ({
                   <div className="wl-alert-company-info">
                     <div className="wl-alert-logo">
                       {alt.symbol === 'AAPL' ? (
-                        <span></span>
+                        <span>AAPL</span>
                       ) : alt.symbol === 'TSLA' ? (
-                        <span style={{ color: '#ef4444', fontWeight: 800 }}>T</span>
+                        <span style={{ color: '#ef4444', fontWeight: 800 }}>TSLA</span>
                       ) : alt.symbol === 'META' ? (
-                        <span style={{ color: '#3b82f6', fontWeight: 800 }}>♾️</span>
+                        <span style={{ color: '#3b82f6', fontWeight: 800 }}>META</span>
                       ) : alt.symbol === 'MSFT' ? (
-                        <span>🪟</span>
+                        <span>MSFT</span>
                       ) : (
-                        <span>📈</span>
+                        <span>{alt.symbol.slice(0, 4)}</span>
                       )}
                     </div>
                     <div>
@@ -606,6 +607,8 @@ export const WatchlistView: React.FC<WatchlistViewProps> = ({
           ))}
         </div>
       </div>
+
+      <Footer />
 
       {/* DEDICATED PRICE ALERT MODAL (Exact Reference Layout) */}
       <PriceAlertModal

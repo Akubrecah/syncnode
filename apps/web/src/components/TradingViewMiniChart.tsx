@@ -117,7 +117,7 @@ export const TradingViewMiniChart: React.FC<TradingViewMiniChartProps> = memo(({
             cursor: 'pointer',
             background: 'transparent'
           }}
-          title={`View ${symbol} on Syncnode`}
+          title={`View ${symbol} on CryptoBridge`}
         />
       )}
     </div>

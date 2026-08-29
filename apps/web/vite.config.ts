@@ -10,9 +10,27 @@ export default defineConfig({
         target: 'http://localhost:4000',
         changeOrigin: true
       },
+      '/admin': {
+        target: 'http://localhost:4000',
+        changeOrigin: true
+      },
       '/ws': {
         target: 'ws://localhost:4000',
         ws: true
+      }
+    }
+  },
+  build: {
+    target: 'esnext',
+    minify: 'esbuild',
+    cssCodeSplit: true,
+    chunkSizeWarningLimit: 600,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom'],
+          'vendor-icons': ['lucide-react']
+        }
       }
     }
   }

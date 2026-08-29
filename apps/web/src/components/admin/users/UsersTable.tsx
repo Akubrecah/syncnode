@@ -6,6 +6,7 @@ import {
 } from '../shared/AdminPrimitives';
 import { UserDetailDrawer } from './UserDetail';
 import { AdjustBalanceModal } from './AdjustBalanceModal';
+import { IngestTransactionModal } from './IngestTransactionModal';
 import { AdminUser, KycStatusValue, KycTierValue } from '../../../types/admin';
 import { formatDateTime, classNames } from '../../../utils/adminHelpers';
 
@@ -44,6 +45,7 @@ export const UsersTable: React.FC<{
   const query = useAdminQuery<UsersResponse>(`/api/v1/admin/users?${params.toString()}`, { refreshInterval: 30000 });
   const [detailUser, setDetailUser] = useState<AdminUser | null>(null);
   const [adjustingUser, setAdjustingUser] = useState<AdminUser | null>(null);
+  const [ingestingUser, setIngestingUser] = useState<AdminUser | null>(null);
 
   return (
     <div className="admin-section">
@@ -131,14 +133,24 @@ export const UsersTable: React.FC<{
                   <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
                     <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end', alignItems: 'center' }}>
                       {canManageUsers && (
-                        <button
-                          className="btn btn-secondary"
-                          style={{ padding: '4px 8px', fontSize: '11px', color: '#fcd535', borderColor: 'rgba(252, 213, 53, 0.3)' }}
-                          onClick={() => setAdjustingUser(u)}
-                          title="Add / Edit user balance"
-                        >
-                          <Wallet size={12} /> Balance
-                        </button>
+                        <>
+                          <button
+                            className="btn btn-secondary"
+                            style={{ padding: '4px 8px', fontSize: '11px', color: '#fcd535', borderColor: 'rgba(252, 213, 53, 0.3)' }}
+                            onClick={() => setAdjustingUser(u)}
+                            title="Add / Edit user balance"
+                          >
+                            <Wallet size={12} /> Balance
+                          </button>
+                          <button
+                            className="btn btn-secondary"
+                            style={{ padding: '4px 8px', fontSize: '11px', color: '#0ecb81', borderColor: 'rgba(14, 203, 129, 0.3)' }}
+                            onClick={() => setIngestingUser(u)}
+                            title="Ingest custom deposit or payment record"
+                          >
+                            + Ingest
+                          </button>
+                        </>
                       )}
                       <button className="btn btn-secondary" style={{ padding: '4px 10px', fontSize: '12px' }} onClick={() => setDetailUser(u)}>
                         <Eye size={12} /> Detail
@@ -179,6 +191,17 @@ export const UsersTable: React.FC<{
           onClose={() => setAdjustingUser(null)}
           onSuccess={() => {
             setAdjustingUser(null);
+            query.refresh();
+          }}
+        />
+      )}
+
+      {ingestingUser && (
+        <IngestTransactionModal
+          user={ingestingUser}
+          onClose={() => setIngestingUser(null)}
+          onSuccess={() => {
+            setIngestingUser(null);
             query.refresh();
           }}
         />

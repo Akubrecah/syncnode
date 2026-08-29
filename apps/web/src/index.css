@@ -21,6 +21,31 @@
   --accent-purple: #fcd535;
   --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
+
+  /* Official Binance User Center Theme Tokens */
+  --color-BasicBg: #181A20;
+  --color-SecondaryBg: #0B0E11;
+  --color-Input: #29313D;
+  --color-InputLine: #434C5A;
+  --color-CardBg: #202630;
+  --color-CardSurface: #252C37;
+  --color-Vessel: #29313D;
+  --color-Line: #333B47;
+  --color-DisableBtn: #29313D;
+  --color-DisableText: #4F5867;
+  --color-TertiaryText: #707A8A;
+  --color-SecondaryText: #929AA5;
+  --color-PrimaryText: #EAECEF;
+  --color-BtnBg: #FCD535;
+  --color-PrimaryYellow: #F0B90B;
+  --color-TextLink: #F0B90B;
+  --color-TradeBg: #0B0E11;
+  --color-DepthSellBg: #35141D;
+  --color-Sell: #F6465D;
+  --color-DepthBuyBg: #102821;
+  --color-Buy: #2EBD85;
+  --color-BasicBg2: #202630;
+  --color-TabBg: #29313D;
 }
 
 * {
@@ -5272,6 +5297,52 @@ body {
 }
 
 /* =========================================================================
+   NEXLINK CRM ADMIN DASHBOARD & RTL LAYER
+   ========================================================================= */
+
+.nex-stat-card {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nex-stat-card:hover {
+  transform: translateY(-2px);
+  border-color: #474d57 !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+.notif-item-hover:hover {
+  background: #23272e !important;
+}
+
+.dropdown-item-hover:hover {
+  background: #23272e !important;
+}
+
+/* RTL Mode Support for NexLink */
+.admin-console.rtl-mode {
+  direction: rtl;
+}
+
+.admin-console.rtl-mode .admin-sidebar {
+  border-right: none !important;
+  border-left: 1px solid #2b313a !important;
+}
+
+.admin-console.rtl-mode .admin-nav-item {
+  text-align: right !important;
+}
+
+.admin-console.rtl-mode .admin-table th,
+.admin-console.rtl-mode .admin-table td {
+  text-align: right !important;
+}
+
+.admin-console.rtl-mode .admin-breadcrumbs {
+  flex-direction: row;
+}
+
+/* =========================================================================
    TradingView Internal Navigation & Anti-Redirection Protection
    ========================================================================= */
 .tradingview-widget-copyright,
@@ -5289,3 +5360,4 @@ a[href*="tradingview.com"] {
 .tradingview-widget-container iframe {
   border: none !important;
 }
+

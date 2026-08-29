@@ -15,10 +15,42 @@ import {
   Settings,
   Coins,
   ShieldCheck,
-  TrendingUp
+  TrendingUp,
+  History,
+  Repeat,
+  CreditCard,
+  FileText
 } from 'lucide-react';
 
-export type TabType = 'home' | 'markets' | 'dashboard' | 'watchlist' | 'news' | 'stock' | 'spot' | 'earn' | 'p2p' | 'wallet' | 'security' | 'admin' | 'emails' | 'signup' | 'login';
+export type TabType =
+  | 'home'
+  | 'markets'
+  | 'dashboard'
+  | 'watchlist'
+  | 'news'
+  | 'stock'
+  | 'spot'
+  | 'earn'
+  | 'p2p'
+  | 'wallet'
+  | 'assets'
+  | 'margin'
+  | 'futures'
+  | 'funding'
+  | 'deposit'
+  | 'withdraw'
+  | 'transfers'
+  | 'orders'
+  | 'history'
+  | 'security'
+  | 'kyc'
+  | 'apikeys'
+  | 'sessions'
+  | 'settings'
+  | 'admin'
+  | 'emails'
+  | 'signup'
+  | 'login';
 
 interface NavbarProps {
   activeTab: TabType;
@@ -44,9 +76,11 @@ export const Navbar: React.FC<NavbarProps> = ({
   circuitBreakers
 }) => {
   const [isTradeMenuOpen, setIsTradeMenuOpen] = useState(false);
+  const [isOrdersMenuOpen, setIsOrdersMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
   const tradeRef = useRef<HTMLDivElement>(null);
+  const ordersRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
 
   // Close dropdowns on outside click
@@ -54,6 +88,9 @@ export const Navbar: React.FC<NavbarProps> = ({
     const handleClickOutside = (e: MouseEvent) => {
       if (tradeRef.current && !tradeRef.current.contains(e.target as Node)) {
         setIsTradeMenuOpen(false);
+      }
+      if (ordersRef.current && !ordersRef.current.contains(e.target as Node)) {
+        setIsOrdersMenuOpen(false);
       }
       if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
         setIsProfileMenuOpen(false);
@@ -64,6 +101,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   }, []);
 
   const isTradeActive = ['spot', 'p2p'].includes(activeTab);
+  const isOrdersActive = ['orders', 'history'].includes(activeTab);
 
   return (
     <header className="header-nav">
@@ -91,7 +129,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <Zap size={18} color="#fcd535" />
           </div>
           <span style={{ color: '#ffffff', fontWeight: 800, letterSpacing: '-0.4px', fontSize: '19px' }}>
-            SYNCNODE
+            CryptoBridge
           </span>
         </a>
 
@@ -109,7 +147,10 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="nav-dropdown-wrapper" ref={tradeRef}>
             <button
               className={`nav-item nav-dropdown-btn ${isTradeActive ? 'active' : ''}`}
-              onClick={() => setIsTradeMenuOpen(!isTradeMenuOpen)}
+              onClick={() => {
+                setIsTradeMenuOpen(!isTradeMenuOpen);
+                setIsOrdersMenuOpen(false);
+              }}
               style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
             >
               <span>Trade</span>
@@ -125,10 +166,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                     setIsTradeMenuOpen(false);
                   }}
                 >
-                  <Activity size={15} color="#00e599" />
+                  <TrendingUp size={15} color="#fcd535" />
                   <div>
-                    <div className="nav-dropdown-title">Spot Trading</div>
-                    <div className="nav-dropdown-desc">CLOB matching engine &amp; TradingView chart</div>
+                    <div style={{ fontWeight: 600, color: '#eaecef' }}>Spot Trading</div>
+                    <div style={{ fontSize: '11px', color: '#848e9c' }}>Trade crypto with high liquidity &amp; depth</div>
                   </div>
                 </button>
 
@@ -139,36 +180,155 @@ export const Navbar: React.FC<NavbarProps> = ({
                     setIsTradeMenuOpen(false);
                   }}
                 >
-                  <Users size={15} color="#fcd535" />
+                  <Users size={15} color="#0ecb81" />
                   <div>
-                    <div className="nav-dropdown-title">P2P Escrow Market</div>
-                    <div className="nav-dropdown-desc">0% fee peer-to-peer fiat gateway</div>
+                    <div style={{ fontWeight: 600, color: '#eaecef' }}>P2P Express</div>
+                    <div style={{ fontSize: '11px', color: '#848e9c' }}>Bank transfer &amp; 100+ local payment methods</div>
                   </div>
                 </button>
               </div>
             )}
           </div>
 
-          {/* 3. Earn */}
+          {/* 3. Orders Dropdown (Assets History, Spot, Futures, P2P, Convert, Payment) - Only visible when logged in */}
+          {user && (
+            <div className="nav-dropdown-wrapper" ref={ordersRef}>
+              <button
+                className={`nav-item nav-dropdown-btn ${isOrdersActive ? 'active' : ''}`}
+                onClick={() => {
+                  setIsOrdersMenuOpen(!isOrdersMenuOpen);
+                  setIsTradeMenuOpen(false);
+                }}
+                style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+              >
+                <span>Orders</span>
+                <ChevronDown size={13} style={{ transform: isOrdersMenuOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }} />
+              </button>
+
+              {isOrdersMenuOpen && (
+                <div className="nav-dropdown-menu" style={{ width: '300px' }}>
+                  {/* 1. Assets History */}
+                  <button
+                    className={`nav-dropdown-item ${activeTab === 'history' ? 'active' : ''}`}
+                    onClick={() => {
+                      setActiveTab('history');
+                      setIsOrdersMenuOpen(false);
+                    }}
+                  >
+                    <History size={16} color="#fcd535" style={{ marginTop: '2px', flexShrink: 0 }} />
+                    <div>
+                      <div style={{ fontWeight: 600, color: '#eaecef' }}>Assets History</div>
+                      <div style={{ fontSize: '11px', color: '#848e9c' }}>Deposit, withdrawal, transfer &amp; asset logs</div>
+                    </div>
+                  </button>
+
+                  {/* 2. Spot Order */}
+                  <button
+                    className={`nav-dropdown-item ${activeTab === 'orders' ? 'active' : ''}`}
+                    onClick={() => {
+                      setActiveTab('orders');
+                      setIsOrdersMenuOpen(false);
+                    }}
+                  >
+                    <FileText size={16} color="#0ecb81" style={{ marginTop: '2px', flexShrink: 0 }} />
+                    <div>
+                      <div style={{ fontWeight: 600, color: '#eaecef' }}>Spot Order</div>
+                      <div style={{ fontSize: '11px', color: '#848e9c' }}>Open orders, order history &amp; trade executions</div>
+                    </div>
+                  </button>
+
+                  {/* 3. Futures Order */}
+                  <button
+                    className={`nav-dropdown-item ${activeTab === 'futures' ? 'active' : ''}`}
+                    onClick={() => {
+                      setActiveTab('futures');
+                      setIsOrdersMenuOpen(false);
+                    }}
+                  >
+                    <Activity size={16} color="#fcd535" style={{ marginTop: '2px', flexShrink: 0 }} />
+                    <div>
+                      <div style={{ fontWeight: 600, color: '#eaecef' }}>Futures Order</div>
+                      <div style={{ fontSize: '11px', color: '#848e9c' }}>USDⓈ-M &amp; COIN-M perpetual orders &amp; positions</div>
+                    </div>
+                  </button>
+
+                  {/* 4. P2P Order */}
+                  <button
+                    className={`nav-dropdown-item ${activeTab === 'p2p' ? 'active' : ''}`}
+                    onClick={() => {
+                      setActiveTab('p2p');
+                      setIsOrdersMenuOpen(false);
+                    }}
+                  >
+                    <Users size={16} color="#0ecb81" style={{ marginTop: '2px', flexShrink: 0 }} />
+                    <div>
+                      <div style={{ fontWeight: 600, color: '#eaecef' }}>P2P Order</div>
+                      <div style={{ fontSize: '11px', color: '#848e9c' }}>P2P buy/sell orders, escrow &amp; payment status</div>
+                    </div>
+                  </button>
+
+                  {/* 5. Convert History */}
+                  <button
+                    className="nav-dropdown-item"
+                    onClick={() => {
+                      setActiveTab('orders');
+                      setIsOrdersMenuOpen(false);
+                    }}
+                  >
+                    <Repeat size={16} color="#fcd535" style={{ marginTop: '2px', flexShrink: 0 }} />
+                    <div>
+                      <div style={{ fontWeight: 600, color: '#eaecef' }}>Convert History</div>
+                      <div style={{ fontSize: '11px', color: '#848e9c' }}>Instant crypto swap &amp; dust BNB conversions</div>
+                    </div>
+                  </button>
+
+                  {/* 6. Payment History */}
+                  <button
+                    className="nav-dropdown-item"
+                    onClick={() => {
+                      setActiveTab('orders');
+                      setIsOrdersMenuOpen(false);
+                    }}
+                  >
+                    <CreditCard size={16} color="#0ecb81" style={{ marginTop: '2px', flexShrink: 0 }} />
+                    <div>
+                      <div style={{ fontWeight: 600, color: '#eaecef' }}>Payment History</div>
+                      <div style={{ fontSize: '11px', color: '#848e9c' }}>Binance Pay transactions &amp; merchant receipts</div>
+                    </div>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* 3.5 High-Yield Earn / Staking */}
           <button
             className={`nav-item ${activeTab === 'earn' ? 'active' : ''}`}
             onClick={() => setActiveTab('earn')}
-            style={{ display: 'flex', alignItems: 'center', gap: '5px' }}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
           >
-            <Coins size={14} color={activeTab === 'earn' ? '#fcd535' : '#848e9c'} />
             <span>Earn</span>
-            <span style={{ fontSize: '9px', background: 'rgba(252, 213, 53, 0.2)', color: '#fcd535', padding: '1px 4px', borderRadius: '3px', fontWeight: 800 }}>
-              16.4%
+            <span style={{
+              background: 'rgba(252, 213, 53, 0.15)',
+              color: '#fcd535',
+              fontSize: '10px',
+              fontWeight: 800,
+              padding: '1px 5px',
+              borderRadius: '3px'
+            }}>
+              250%
             </span>
           </button>
 
-          {/* 4. Stocks & Commodities */}
-          <button
-            className={`nav-item ${activeTab === 'stock' ? 'active' : ''}`}
-            onClick={() => setActiveTab('stock')}
-          >
-            Stocks
-          </button>
+          {/* 4. Stocks & Commodities - Only visible when logged in */}
+          {user && (
+            <button
+              className={`nav-item ${activeTab === 'stock' ? 'active' : ''}`}
+              onClick={() => setActiveTab('stock')}
+            >
+              Stocks
+            </button>
+          )}
 
           {/* 5. Market News */}
           <button
@@ -179,29 +339,34 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
 
           {/* 6. Dashboard / Portfolio */}
-          <button
-            className={`nav-item ${activeTab === 'dashboard' && !isSearchOpen ? 'active' : ''}`}
-            onClick={() => setActiveTab('dashboard')}
-          >
-            Dashboard
-          </button>
+          {user && (
+            <button
+              className={`nav-item ${activeTab === 'dashboard' && !isSearchOpen ? 'active' : ''}`}
+              onClick={() => setActiveTab('dashboard')}
+            >
+              Dashboard
+            </button>
+          )}
 
           {/* 7. Admin Console */}
-          {(user?.adminRole || user?.role || user?.email === 'poweldayck@gmail.com' || activeTab === 'admin') && (
-            <button
-              className={`nav-item ${activeTab === 'admin' ? 'active' : ''}`}
-              onClick={() => setActiveTab('admin')}
+          {user?.admin_roles && user.admin_roles.length > 0 && (
+            <a
+              href="/admin"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="nav-item"
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '5px',
-                color: activeTab === 'admin' ? '#fcd535' : '#ec4899',
-                fontWeight: 700
+                color: '#fcd535',
+                fontWeight: 700,
+                textDecoration: 'none'
               }}
             >
-              <ShieldCheck size={14} color={activeTab === 'admin' ? '#fcd535' : '#ec4899'} />
+              <ShieldCheck size={14} color="#fcd535" />
               <span>Admin</span>
-            </button>
+            </a>
           )}
         </nav>
       </div>
@@ -266,9 +431,22 @@ export const Navbar: React.FC<NavbarProps> = ({
           </span>
         )}
 
-        {/* WebSocket Connection Indicator */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: '#848e9c' }}>
-          <span
+        {/* Live WebSocket Engine Status Indicator */}
+        <div
+          title={isWsConnected ? 'Matching Engine & OrderBook WebSocket: Connected' : 'Matching Engine: Reconnecting...'}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            fontSize: '12px',
+            color: isWsConnected ? '#00e599' : '#ff3b69',
+            background: isWsConnected ? 'rgba(0, 229, 153, 0.08)' : 'rgba(255, 59, 105, 0.08)',
+            padding: '4px 8px',
+            borderRadius: '6px',
+            border: `1px solid ${isWsConnected ? 'rgba(0, 229, 153, 0.25)' : 'rgba(255, 59, 105, 0.25)'}`
+          }}
+        >
+          <div
             style={{
               width: '7px',
               height: '7px',
@@ -277,85 +455,95 @@ export const Navbar: React.FC<NavbarProps> = ({
               boxShadow: isWsConnected ? '0 0 6px #00e599' : 'none'
             }}
           />
-          <span style={{ display: 'none' }}>{isWsConnected ? 'Live' : 'Offline'}</span>
+          <span style={{ display: 'inline-block' }}>{isWsConnected ? 'Live' : 'Offline'}</span>
         </div>
 
-        {/* User Profile / Dropdown */}
-        <div className="nav-profile-wrapper" ref={profileRef}>
-          <div
-            className="nav-profile-pill"
-            onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-          >
-            <div className="nav-avatar-icon">
-              {user ? (user.fullName ? user.fullName[0].toUpperCase() : 'U') : 'JS'}
-            </div>
-            <span className="nav-profile-name">
-              {user ? (user.fullName || user.email.split('@')[0]) : 'User'}
-            </span>
-            <ChevronDown size={13} color="#848e9c" style={{ transform: isProfileMenuOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }} />
-          </div>
-
-          {/* Profile Dropdown Menu */}
-          {isProfileMenuOpen && (
-            <div className="nav-profile-menu">
-              <div className="profile-menu-header">
-                <div className="profile-menu-avatar">
-                  {user ? (user.fullName ? user.fullName[0].toUpperCase() : 'U') : 'U'}
-                </div>
-                <div>
-                  <div className="profile-menu-name">{user ? user.fullName || 'User' : 'Syncnode User'}</div>
-                  <div className="profile-menu-email">{user ? user.email : 'user@syncnode.com'}</div>
-                </div>
+        {/* User Profile / Dropdown - Strictly rendered for authenticated users */}
+        {user ? (
+          <div className="nav-profile-wrapper" ref={profileRef}>
+            <div
+              className="nav-profile-pill"
+              onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+            >
+              <div className="nav-avatar-icon">
+                {user.fullName && user.fullName.trim()
+                  ? (user.fullName.trim().split(/\s+/).length >= 2
+                      ? `${user.fullName.trim().split(/\s+/)[0][0]}${user.fullName.trim().split(/\s+/)[1][0]}`.toUpperCase()
+                      : user.fullName.slice(0, 2).toUpperCase())
+                  : (user.email ? user.email.slice(0, 2).toUpperCase() : '')}
               </div>
+              <span className="nav-profile-name">
+                {user.fullName || (user.email ? user.email.split('@')[0] : '')}
+              </span>
+              <ChevronDown size={13} color="#848e9c" style={{ transform: isProfileMenuOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }} />
+            </div>
 
-              <div className="profile-menu-links">
-                <button
-                  className="profile-menu-item"
-                  onClick={() => {
-                    setActiveTab('dashboard');
-                    setIsProfileMenuOpen(false);
-                  }}
-                >
-                  <Activity size={14} color="#fcd535" />
-                  <span>Dashboard &amp; Assets</span>
-                </button>
+            {/* Profile Dropdown Menu */}
+            {isProfileMenuOpen && (
+              <div className="nav-profile-menu">
+                <div className="profile-menu-header">
+                  <div className="profile-menu-avatar">
+                    {user.fullName && user.fullName.trim()
+                      ? (user.fullName.trim().split(/\s+/).length >= 2
+                          ? `${user.fullName.trim().split(/\s+/)[0][0]}${user.fullName.trim().split(/\s+/)[1][0]}`.toUpperCase()
+                          : user.fullName.slice(0, 2).toUpperCase())
+                      : (user.email ? user.email.slice(0, 2).toUpperCase() : '')}
+                  </div>
+                  <div>
+                    <div className="profile-menu-name">{user.fullName || (user.email ? user.email.split('@')[0] : '')}</div>
+                    <div className="profile-menu-email">{user.email || ''}</div>
+                  </div>
+                </div>
 
-                <button
-                  className="profile-menu-item"
-                  onClick={() => {
-                    setActiveTab('watchlist');
-                    setIsProfileMenuOpen(false);
-                  }}
-                >
-                  <Star size={14} color="#fcd535" />
-                  <span>Watchlist &amp; Alerts</span>
-                </button>
+                <div className="profile-menu-links">
+                  <button
+                    className="profile-menu-item"
+                    onClick={() => {
+                      setActiveTab('dashboard');
+                      setIsProfileMenuOpen(false);
+                    }}
+                  >
+                    <Activity size={14} color="#fcd535" />
+                    <span>Dashboard &amp; Assets</span>
+                  </button>
 
-                <button
-                  className="profile-menu-item"
-                  onClick={() => {
-                    setActiveTab('security');
-                    setIsProfileMenuOpen(false);
-                  }}
-                >
-                  <Settings size={14} color="#848e9c" />
-                  <span>Account &amp; 2FA Security</span>
-                </button>
+                  <button
+                    className="profile-menu-item"
+                    onClick={() => {
+                      setActiveTab('watchlist');
+                      setIsProfileMenuOpen(false);
+                    }}
+                  >
+                    <Star size={14} color="#fcd535" />
+                    <span>Watchlist &amp; Alerts</span>
+                  </button>
 
-                <button
-                  className="profile-menu-item"
-                  onClick={() => {
-                    setActiveTab('admin');
-                    setIsProfileMenuOpen(false);
-                  }}
-                >
-                  <ShieldCheck size={14} color="#ec4899" />
-                  <span>Risk Engine &amp; Admin</span>
-                </button>
+                  <button
+                    className="profile-menu-item"
+                    onClick={() => {
+                      setActiveTab('security');
+                      setIsProfileMenuOpen(false);
+                    }}
+                  >
+                    <Settings size={14} color="#848e9c" />
+                    <span>Account &amp; 2FA Security</span>
+                  </button>
 
-                <div className="nav-dropdown-divider"></div>
+                  {user.admin_roles && user.admin_roles.length > 0 && (
+                    <button
+                      className="profile-menu-item"
+                      onClick={() => {
+                        setActiveTab('admin');
+                        setIsProfileMenuOpen(false);
+                      }}
+                    >
+                      <ShieldCheck size={14} color="#fcd535" />
+                      <span>Risk Engine &amp; Admin</span>
+                    </button>
+                  )}
 
-                {user ? (
+                  <div className="nav-dropdown-divider"></div>
+
                   <button
                     className="profile-menu-item logout"
                     onClick={() => {
@@ -366,36 +554,12 @@ export const Navbar: React.FC<NavbarProps> = ({
                     <LogOut size={14} />
                     <span>Log Out</span>
                   </button>
-                ) : (
-                  <>
-                    <button
-                      className="profile-menu-item"
-                      onClick={() => {
-                        setActiveTab('login');
-                        setIsProfileMenuOpen(false);
-                      }}
-                    >
-                      <span>Sign In</span>
-                    </button>
-                    <button
-                      className="profile-menu-item register"
-                      onClick={() => {
-                        setActiveTab('signup');
-                        setIsProfileMenuOpen(false);
-                      }}
-                    >
-                      <UserPlus size={14} />
-                      <span>Create Account</span>
-                    </button>
-                  </>
-                )}
+                </div>
               </div>
-            </div>
-          )}
-        </div>
-
-        {/* Auth Buttons for Unauthenticated Users */}
-        {!user && (
+            )}
+          </div>
+        ) : (
+          /* Auth Buttons for Unauthenticated Users */
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <button
               className="btn btn-secondary"

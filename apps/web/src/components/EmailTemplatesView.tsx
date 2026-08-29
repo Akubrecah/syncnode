@@ -28,16 +28,16 @@ export const EmailTemplatesView: React.FC = () => {
   const [sentSuccess, setSentSuccess] = useState(false);
 
   // Dynamic parameters for live preview testing
-  const [userName, setUserName] = useState('Adrian');
-  const [ticker, setTicker] = useState('MSFT');
-  const [companyName, setCompanyName] = useState('Microsoft Corp');
-  const [targetPrice, setTargetPrice] = useState('$340.00');
-  const [currentPrice, setCurrentPrice] = useState('$352.52');
-  const [change, setChange] = useState('+1.4%');
+  const [userName, setUserName] = useState('');
+  const [ticker, setTicker] = useState('BTC');
+  const [companyName, setCompanyName] = useState('Bitcoin');
+  const [targetPrice, setTargetPrice] = useState('$96,400.00');
+  const [currentPrice, setCurrentPrice] = useState('$96,450.00');
+  const [change, setChange] = useState('+3.4%');
 
   const templates: Record<TemplateKey, { title: string; subtitle: string; icon: React.ReactNode; getHtml: () => string }> = {
     welcome: {
-      title: 'Welcome to Signalist 🚀',
+      title: 'Welcome to Signalist',
       subtitle: 'Onboarding welcome & product tour email',
       icon: <Sparkles size={16} color="#00e599" />,
       getHtml: () => generateWelcomeEmail({
@@ -46,7 +46,7 @@ export const EmailTemplatesView: React.FC = () => {
       })
     },
     price_above: {
-      title: `🔔 [${ticker}] just hit your alert (Price Above)`,
+      title: `[${ticker}] just hit your alert (Price Above)`,
       subtitle: 'Target price reached & profit taking notification',
       icon: <TrendingUp size={16} color="#00e599" />,
       getHtml: () => generatePriceAlertEmail({
@@ -60,7 +60,7 @@ export const EmailTemplatesView: React.FC = () => {
       })
     },
     price_below: {
-      title: `🔔 [${ticker}] just hit your alert (Price Below)`,
+      title: `[${ticker}] just hit your alert (Price Below)`,
       subtitle: 'Dip alert & buying opportunity notification',
       icon: <Bell size={16} color="#f87171" />,
       getHtml: () => generatePriceAlertEmail({
@@ -74,7 +74,7 @@ export const EmailTemplatesView: React.FC = () => {
       })
     },
     re_engagement: {
-      title: `🔔 [${userName}], opportunities are waiting for you`,
+      title: `[${userName}], opportunities are waiting for you`,
       subtitle: 'Re-activation campaign for inactive users',
       icon: <UserCheck size={16} color="#fcd535" />,
       getHtml: () => generateReEngagementEmail({

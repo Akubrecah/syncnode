@@ -25,16 +25,19 @@ import {
   Activity,
   ArrowUpRight,
   ArrowDownRight,
-  Layers,
   Bot,
   Flame,
   Star,
   RefreshCw,
-  Search
+  Search,
+  Send,
+  Newspaper,
+  Sliders
 } from 'lucide-react';
 import { TradingViewTickerTape } from './TradingViewTickerTape';
 import { TradingViewMarketOverview } from './TradingViewMarketOverview';
 import { TradingViewMiniChart } from './TradingViewMiniChart';
+import { Footer } from './Footer';
 
 interface HomeViewProps {
   markets: any[];
@@ -105,12 +108,12 @@ export const HomeView: React.FC<HomeViewProps> = ({
     { id: 'BTC', name: 'Bitcoin', symbol: 'BTC/USDT', defaultPrice: 96450.20, defaultChange: 2.85, defaultVol: '$42.8B', marketCap: '$1.91T', logo: '₿', color: '#f7931a' },
     { id: 'ETH', name: 'Ethereum', symbol: 'ETH/USDT', defaultPrice: 2785.40, defaultChange: 3.42, defaultVol: '$19.4B', marketCap: '$335.2B', logo: 'Ξ', color: '#627eea' },
     { id: 'SOL', name: 'Solana', symbol: 'SOL/USDT', defaultPrice: 188.75, defaultChange: 6.14, defaultVol: '$8.6B', marketCap: '$88.4B', logo: '◎', color: '#14f195' },
-    { id: 'BNB', name: 'BNB', symbol: 'BNB/USDT', defaultPrice: 624.10, defaultChange: 1.75, defaultVol: '$2.1B', marketCap: '$93.8B', logo: '🔶', color: '#f3ba2f' },
+    { id: 'BNB', name: 'BNB', symbol: 'BNB/USDT', defaultPrice: 624.10, defaultChange: 1.75, defaultVol: '$2.1B', marketCap: '$93.8B', logo: 'BNB', color: '#f3ba2f' },
     { id: 'XRP', name: 'Ripple', symbol: 'XRP/USDT', defaultPrice: 2.34, defaultChange: -0.85, defaultVol: '$5.4B', marketCap: '$134.1B', logo: '✕', color: '#23292f' },
     { id: 'DOGE', name: 'Dogecoin', symbol: 'DOGE/USDT', defaultPrice: 0.285, defaultChange: 12.40, defaultVol: '$4.7B', marketCap: '$41.8B', logo: 'Ð', color: '#c2a633' },
     { id: 'ADA', name: 'Cardano', symbol: 'ADA/USDT', defaultPrice: 0.82, defaultChange: 4.15, defaultVol: '$1.8B', marketCap: '$29.4B', logo: '₳', color: '#0033ad' },
-    { id: 'AVAX', name: 'Avalanche', symbol: 'AVAX/USDT', defaultPrice: 34.60, defaultChange: 5.80, defaultVol: '$1.4B', marketCap: '$14.2B', logo: '🔺', color: '#e84142' },
-    { id: 'SUI', name: 'Sui', symbol: 'SUI/USDT', defaultPrice: 3.45, defaultChange: 8.90, defaultVol: '$2.3B', marketCap: '$9.8B', logo: '💧', color: '#4da2ff' },
+    { id: 'AVAX', name: 'Avalanche', symbol: 'AVAX/USDT', defaultPrice: 34.60, defaultChange: 5.80, defaultVol: '$1.4B', marketCap: '$14.2B', logo: 'AVAX', color: '#e84142' },
+    { id: 'SUI', name: 'Sui', symbol: 'SUI/USDT', defaultPrice: 3.45, defaultChange: 8.90, defaultVol: '$2.3B', marketCap: '$9.8B', logo: 'SUI', color: '#4da2ff' },
     { id: 'NEAR', name: 'NEAR Protocol', symbol: 'NEAR/USDT', defaultPrice: 6.80, defaultChange: 7.25, defaultVol: '$980M', marketCap: '$8.1B', logo: 'Ⓝ', color: '#000000' }
   ];
 
@@ -173,28 +176,36 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
   const faqs = [
     {
-      q: 'What makes Syncnode one of the world’s leading cryptocurrency exchanges?',
-      a: 'Syncnode is engineered with an institutional double-entry ledger ensuring zero mathematical discrepancies, microsecond-latency deterministic matching with full price-time FIFO execution, deep spot and P2P liquidity, 100% verified Proof of Reserves, and segregated cold vault storage with SAFU protection.'
+      q: 'What is CryptoBridge and how does the exchange work?',
+      a: 'CryptoBridge is an institutional digital asset exchange engineered with a high-throughput deterministic matching engine (Price-Time FIFO), a strict double-entry ledger architecture, deep spot and P2P liquidity, 100% verified Proof of Reserves, and multi-sig cold vault custody.'
     },
     {
-      q: 'Where and how can I buy cryptocurrency?',
-      a: 'You can buy cryptocurrencies like Bitcoin (BTC), Ethereum (ETH), Solana (SOL), and USDT in seconds using credit/debit cards, bank wire transfers (SEPA, ACH, SWIFT), or through the zero-fee Syncnode P2P Escrow marketplace with over 100+ local payment methods.'
+      q: 'How do I deposit funds and are there zero-fee transfer options?',
+      a: 'You can fund your account via direct on-chain blockchain deposits (BTC, ETH, SOL, USDT), fiat bank payments via the P2P Escrow market, or receive instant zero-fee Internal Transfers from any other CryptoBridge user with sub-millisecond settlement.'
     },
     {
-      q: 'How do I start spot trading on Syncnode?',
-      a: 'To begin spot trading, create a free Syncnode account, complete swift automated KYC verification, deposit crypto or fiat, and access our institutional trading terminal with real-time L2 order books, advanced limit/market/stop-limit order types, and live TradingView-grade charts.'
+      q: 'How does the zero-fee Instant Internal Transfer work?',
+      a: 'Internal transfers allow you to send any cryptocurrency to another CryptoBridge user instantly by entering their User ID or registered Email. Because settlement occurs directly on our core double-entry ledger, there are 0% network gas fees and zero blockchain confirmation wait times.'
     },
     {
-      q: 'How does the P2P Escrow system guarantee safety?',
-      a: 'When a P2P trade is initiated, the seller’s cryptocurrency is cryptographically locked into the Syncnode atomic smart escrow. The seller cannot withdraw or double-spend the funds until the buyer confirms fiat payment and the seller authorizes release. In case of dispute, 24/7 compliance officers resolve the escrow.'
+      q: 'How does the P2P Escrow system guarantee seller and buyer safety?',
+      a: 'When a P2P trade is opened, the seller’s crypto is automatically locked into CryptoBridge’s cryptographic escrow vault. The seller cannot double-spend or withdraw the crypto until the buyer sends payment and release is confirmed. In case of dispute, 24/7 compliance officers inspect proof and resolve the escrow.'
     },
     {
-      q: 'How does Proof of Reserves guarantee 100% solvency?',
-      a: 'Syncnode operates an on-chain Proof of Reserves (PoR) system where 100% of customer deposits are backed 1:1 in segregated on-chain reserves. Anyone can independently inspect vault balances and verify that total exchange assets strictly exceed or equal total customer liabilities.'
+      q: 'How does Proof of Reserves guarantee 100% full solvency?',
+      a: 'CryptoBridge enforces strict mathematical double-entry accounting where customer liabilities are 100% backed 1:1 by segregated exchange vault assets. Anyone can verify in real time that total exchange vault holdings equal or exceed total customer balances.'
     },
     {
-      q: 'What fees apply on Syncnode?',
-      a: 'Syncnode offers ultra-competitive maker/taker fee tiers (as low as 0.08% / 0.10%), zero-fee crypto deposits, low on-chain network withdrawal fees, and 0% maker/taker trading fees on the P2P marketplace.'
+      q: 'How do I access Stock & Equity Intelligence?',
+      a: 'Navigate to Stock Intelligence to view real-time interactive TradingView charts, multi-timeframe RSI and Moving Average technical gauges, earnings/financial statement overviews, and live macroeconomic timelines for top tech equities (NVDA, AAPL, TSLA) and commodities (Gold, Silver, Crude Oil).'
+    },
+    {
+      q: 'What trading fees apply on CryptoBridge?',
+      a: 'CryptoBridge offers ultra-low maker/taker fees starting at 0.08% / 0.10% for spot markets, 0.00% fees on all Internal Transfers, 0% platform fees on P2P escrow trades, and zero deposit fees on all supported crypto assets.'
+    },
+    {
+      q: 'How does CryptoBridge protect user accounts and funds (SAFU)?',
+      a: 'User accounts are secured with TOTP-based Two-Factor Authentication (2FA), Argon2id/PBKDF2 password hashing, and session anomaly detection. Over 95% of digital assets are stored in air-gapped, geographically distributed cold hardware vaults backed by our $1 Billion SAFU insurance fund.'
     }
   ];
 
@@ -207,33 +218,18 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
       <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '32px 24px' }}>
         {/* =========================================================================
-            1. HERO SECTION (CARD BASED WITH ROUNDED RECTANGLES)
+            1. HERO SECTION (CLEAN INSTITUTIONAL FLAT SURFACE)
             ========================================================================= */}
         <section
           style={{
-            background: 'linear-gradient(135deg, rgba(32, 38, 48, 0.95) 0%, rgba(24, 26, 32, 0.95) 100%)',
-            borderRadius: '24px',
+            background: '#181a20',
+            borderRadius: '20px',
             border: '1px solid #2b313a',
-            padding: '48px 40px',
-            marginBottom: '32px',
-            position: 'relative',
-            overflow: 'hidden',
-            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)'
+            padding: '44px 40px',
+            marginBottom: '28px',
+            position: 'relative'
           }}
         >
-          {/* Subtle Golden Glow Accent */}
-          <div
-            style={{
-              position: 'absolute',
-              top: '-100px',
-              right: '-100px',
-              width: '350px',
-              height: '350px',
-              background: 'radial-gradient(circle, rgba(252, 213, 53, 0.12) 0%, rgba(0, 0, 0, 0) 70%)',
-              pointerEvents: 'none'
-            }}
-          />
-
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '36px', alignItems: 'center' }}>
             {/* Hero Left Content */}
             <div>
@@ -242,140 +238,179 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '8px',
-                  background: 'rgba(252, 213, 53, 0.12)',
-                  border: '1px solid rgba(252, 213, 53, 0.3)',
-                  borderRadius: '100px',
-                  padding: '6px 14px',
-                  fontSize: '12px',
+                  background: '#202630',
+                  border: '1px solid #2b313a',
+                  borderRadius: '6px',
+                  padding: '5px 12px',
+                  fontSize: '11px',
                   fontWeight: 700,
                   color: '#fcd535',
-                  marginBottom: '20px'
+                  marginBottom: '18px',
+                  letterSpacing: '0.5px'
                 }}
               >
-                <Sparkles size={14} />
-                <span>240,000,000+ USERS TRUST SYNCNODE</span>
+                <span>CRYPTOBRIDGE INSTITUTIONAL SPOT &amp; P2P LIQUIDITY</span>
               </div>
 
               <h1
                 style={{
-                  fontSize: '44px',
+                  fontSize: '40px',
                   fontWeight: 800,
                   lineHeight: '1.2',
-                  color: '#eaecef',
+                  color: '#ffffff',
                   margin: '0 0 16px 0',
                   letterSpacing: '-0.5px'
                 }}
               >
-                Buy, Trade &amp; Hold <br />
-                <span
-                  style={{
-                    background: 'linear-gradient(90deg, #fcd535 0%, #f0b90b 50%, #f6851b 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent'
-                  }}
-                >
-                  350+ Cryptocurrencies
+                Institutional-Grade <br />
+                <span style={{ color: '#fcd535' }}>
+                  Digital Asset Exchange
                 </span>
               </h1>
 
-              <p style={{ fontSize: '15px', color: '#848e9c', lineHeight: '1.6', margin: '0 0 28px 0', maxWidth: '520px' }}>
-                Experience lightning-fast deterministic execution, deep L2 liquidity, 0.1% low trading fees, and 100% cryptographically verified Proof-of-Reserves.
+              <p style={{ fontSize: '14px', color: '#848e9c', lineHeight: '1.6', margin: '0 0 24px 0', maxWidth: '520px' }}>
+                High-throughput deterministic matching engine with 0.10% spot fees, double-entry ledger settlement, and cryptographic Proof-of-Reserves.
               </p>
 
-              {/* Quick Registration Rounded Rectangle Card */}
-              <div
-                style={{
-                  background: '#181a20',
-                  borderRadius: '16px',
-                  border: '1px solid #2b313a',
-                  padding: '8px 8px 8px 16px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  maxWidth: '480px',
-                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2)'
-                }}
-              >
-                <input
-                  type="text"
-                  placeholder="Email or Phone number"
-                  value={emailInput}
-                  onChange={(e) => setEmailInput(e.target.value)}
-                  style={{
-                    flex: 1,
-                    background: 'transparent',
-                    border: 'none',
-                    outline: 'none',
-                    color: '#eaecef',
-                    fontSize: '14px'
-                  }}
-                />
-                <button
-                  onClick={() => {
-                    if (user) onNavigateToTrade('BTC/USDT');
-                    else onOpenAuth();
-                  }}
-                  style={{
-                    background: '#fcd535',
-                    color: '#181a20',
-                    border: 'none',
-                    borderRadius: '12px',
-                    padding: '12px 24px',
-                    fontSize: '14px',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    transition: 'all 0.2s ease',
-                    whiteSpace: 'nowrap'
-                  }}
-                >
-                  <span>{user ? 'Go to Trade' : 'Sign Up'}</span>
-                  <ArrowRight size={16} />
-                </button>
-              </div>
+              {/* Quick Registration / Authenticated Action Card */}
+              {user ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                  <button
+                    onClick={() => {
+                      window.location.hash = '#/dashboard';
+                    }}
+                    style={{
+                      background: '#fcd535',
+                      color: '#181a20',
+                      border: 'none',
+                      borderRadius: '12px',
+                      padding: '14px 28px',
+                      fontSize: '14px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    <span>Open Dashboard</span>
+                    <ArrowRight size={16} />
+                  </button>
 
-              {/* Social login pills */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '18px' }}>
-                <span style={{ fontSize: '12px', color: '#848e9c' }}>Or continue with:</span>
-                <button
-                  onClick={onOpenAuth}
-                  style={{
-                    background: '#202630',
-                    border: '1px solid #2b313a',
-                    borderRadius: '10px',
-                    padding: '6px 14px',
-                    color: '#eaecef',
-                    fontSize: '12px',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px'
-                  }}
-                >
-                  Google
-                </button>
-                <button
-                  onClick={onOpenAuth}
-                  style={{
-                    background: '#202630',
-                    border: '1px solid #2b313a',
-                    borderRadius: '10px',
-                    padding: '6px 14px',
-                    color: '#eaecef',
-                    fontSize: '12px',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px'
-                  }}
-                >
-                  Apple
-                </button>
-              </div>
+                  <button
+                    onClick={() => onNavigateToTrade('BTC/USDT')}
+                    style={{
+                      background: '#202630',
+                      color: '#eaecef',
+                      border: '1px solid #2b313a',
+                      borderRadius: '12px',
+                      padding: '14px 24px',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}
+                  >
+                    <span>Trade BTC/USDT</span>
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <div
+                    style={{
+                      background: '#181a20',
+                      borderRadius: '16px',
+                      border: '1px solid #2b313a',
+                      padding: '8px 8px 8px 16px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      maxWidth: '480px',
+                      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2)'
+                    }}
+                  >
+                    <input
+                      type="text"
+                      placeholder="Email or Phone number"
+                      value={emailInput}
+                      onChange={(e) => setEmailInput(e.target.value)}
+                      style={{
+                        flex: 1,
+                        background: 'transparent',
+                        border: 'none',
+                        outline: 'none',
+                        color: '#eaecef',
+                        fontSize: '14px'
+                      }}
+                    />
+                    <button
+                      onClick={onOpenAuth}
+                      style={{
+                        background: '#fcd535',
+                        color: '#181a20',
+                        border: 'none',
+                        borderRadius: '12px',
+                        padding: '12px 24px',
+                        fontSize: '14px',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        transition: 'all 0.2s ease',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      <span>Sign Up</span>
+                      <ArrowRight size={16} />
+                    </button>
+                  </div>
+
+                  {/* Social login pills */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '18px' }}>
+                    <span style={{ fontSize: '12px', color: '#848e9c' }}>Or continue with:</span>
+                    <button
+                      onClick={onOpenAuth}
+                      style={{
+                        background: '#202630',
+                        border: '1px solid #2b313a',
+                        borderRadius: '10px',
+                        padding: '6px 14px',
+                        color: '#eaecef',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      Google
+                    </button>
+                    <button
+                      onClick={onOpenAuth}
+                      style={{
+                        background: '#202630',
+                        border: '1px solid #2b313a',
+                        borderRadius: '10px',
+                        padding: '6px 14px',
+                        color: '#eaecef',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      Apple
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Hero Right: 4-Grid of Live Mini-Chart Rounded Cards */}
@@ -638,23 +673,23 @@ export const HomeView: React.FC<HomeViewProps> = ({
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Coins size={18} color="#f0b90b" />
-                <h3 style={{ fontSize: '16px', fontWeight: 700, margin: 0 }}>Binance Earn Yield</h3>
+                <ShieldCheck size={18} color="#2ebd85" />
+                <h3 style={{ fontSize: '16px', fontWeight: 700, margin: 0 }}>CryptoBridge Vault &amp; Transfers</h3>
               </div>
-              <a href="#/earn" style={{ fontSize: '12px', color: '#fcd535', textDecoration: 'none', fontWeight: 600 }}>
-                View All
+              <a href="#/wallet" style={{ fontSize: '12px', color: '#fcd535', textDecoration: 'none', fontWeight: 600 }}>
+                Transfer
               </a>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {[
-                { coin: 'USDT', name: 'Tether USD', apr: '12.80% APR', type: 'Simple Earn', color: '#26a17b' },
-                { coin: 'SOL', name: 'Solana Staking', apr: '8.40% APR', type: 'BNSOL Liquid', color: '#14f195' },
-                { coin: 'ETH', name: 'Ethereum Staking', apr: '4.20% APR', type: 'WBETH Liquid', color: '#627eea' }
+                { label: 'Instant Transfers', desc: 'Zero Network Fees', val: '0.00% FEE', color: '#2ebd85' },
+                { label: 'Proof of Reserves', desc: 'Full 1:1 Solvency', val: '100% BACKED', color: '#fcd535' },
+                { label: 'Cold Storage Vault', desc: 'Multi-Sig Segregated', val: 'SAFU SECURE', color: '#3b82f6' }
               ].map((e) => (
                 <div
-                  key={e.coin}
-                  onClick={() => (window.location.hash = '#/earn')}
+                  key={e.label}
+                  onClick={() => (window.location.hash = '#/wallet')}
                   style={{
                     display: 'flex',
                     justifyContent: 'space-between',
@@ -668,16 +703,16 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#202630', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, color: e.color, fontSize: '12px' }}>
-                      {e.coin.slice(0, 2)}
+                      ✓
                     </div>
                     <div>
-                      <div style={{ fontSize: '13px', fontWeight: 700, color: '#eaecef' }}>{e.coin}</div>
-                      <div style={{ fontSize: '11px', color: '#848e9c' }}>{e.type}</div>
+                      <div style={{ fontSize: '13px', fontWeight: 700, color: '#eaecef' }}>{e.label}</div>
+                      <div style={{ fontSize: '11px', color: '#848e9c' }}>{e.desc}</div>
                     </div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '13px', fontWeight: 800, color: '#2ebd85' }}>{e.apr}</div>
-                    <div style={{ fontSize: '11px', color: '#fcd535' }}>Subscribe</div>
+                    <div style={{ fontSize: '12px', fontWeight: 800, color: e.color }}>{e.val}</div>
+                    <div style={{ fontSize: '11px', color: '#848e9c' }}>Verified</div>
                   </div>
                 </div>
               ))}
@@ -733,11 +768,11 @@ export const HomeView: React.FC<HomeViewProps> = ({
           {/* Category Tabs */}
           <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '20px' }}>
             {[
-              { id: 'hot', label: '🔥 Hot Markets' },
-              { id: 'gainers', label: '🚀 Top Gainers' },
-              { id: 'volume', label: '📊 24h Volume' },
-              { id: 'new', label: '✨ New Listings' },
-              { id: 'tradingview', label: '📈 TradingView Screener' }
+              { id: 'hot', label: 'Hot Markets' },
+              { id: 'gainers', label: 'Top Gainers' },
+              { id: 'volume', label: '24h Volume' },
+              { id: 'new', label: 'New Listings' },
+              { id: 'tradingview', label: 'TradingView Screener' }
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -1082,7 +1117,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
         <section style={{ marginBottom: '40px' }}>
           <div style={{ textAlign: 'center', marginBottom: '32px' }}>
             <h2 style={{ fontSize: '28px', fontWeight: 800, color: '#eaecef', margin: '0 0 8px 0' }}>
-              Explore the Syncnode Ecosystem
+              Explore the CryptoBridge Ecosystem
             </h2>
             <p style={{ fontSize: '14px', color: '#848e9c', margin: 0 }}>
               Institutional-grade products engineered for high performance, deep liquidity, and maximum security.
@@ -1105,11 +1140,11 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 action: () => onNavigateToTrade('BTC/USDT')
               },
               {
-                title: 'Binance Earn',
-                desc: 'Earn up to 16.4% APR with Simple Earn, ETH/SOL staking, and automated compounding.',
-                icon: Coins,
-                color: '#f0b90b',
-                action: () => (window.location.hash = '#/earn')
+                title: 'Instant Internal Transfers',
+                desc: 'Zero network fees and sub-millisecond instant balance settlement between CryptoBridge accounts.',
+                icon: Send,
+                color: '#2ebd85',
+                action: () => (window.location.hash = '#/wallet')
               },
               {
                 title: 'P2P Escrow Market',
@@ -1119,27 +1154,6 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 action: onNavigateToP2P
               },
               {
-                title: 'Trading Bots',
-                desc: 'Automate Spot Grid, DCA & Portfolio Rebalancing with institutional execution bots.',
-                icon: Bot,
-                color: '#8b5cf6',
-                action: () => onNavigateToTrade('BTC/USDT')
-              },
-              {
-                title: 'Proof of Reserves',
-                desc: '100% full-reserve backing on all customer assets audited on-chain in real time.',
-                icon: ShieldCheck,
-                color: '#2ebd85',
-                action: () => onNavigateToTrade('ETH/USDT')
-              },
-              {
-                title: 'SAFU Vault Custody',
-                desc: 'Segregated cold storage, multi-sig pipelines, and $1 Billion SAFU user protection.',
-                icon: Lock,
-                color: '#ef4444',
-                action: onOpenAuth
-              },
-              {
                 title: 'Stock Intelligence',
                 desc: 'Live technicals, financials, and symbol intelligence for NASDAQ:NVDA, AAPL & TSLA.',
                 icon: Activity,
@@ -1147,11 +1161,32 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 action: () => (window.location.hash = '#/stock/NVDA')
               },
               {
-                title: 'Mobile App Pro',
-                desc: 'Trade on the go with real-time price alerts and biometric authentication.',
-                icon: Smartphone,
-                color: '#ec4899',
-                action: () => window.open('https://www.binance.com/en/download', '_blank')
+                title: 'Proof of Reserves',
+                desc: '100% full-reserve backing on all customer assets audited on-chain in real time.',
+                icon: ShieldCheck,
+                color: '#2ebd85',
+                action: () => (window.location.hash = '#/dashboard')
+              },
+              {
+                title: 'SAFU Vault Custody',
+                desc: 'Segregated cold storage, multi-sig pipelines, and $1 Billion SAFU user protection.',
+                icon: Lock,
+                color: '#ef4444',
+                action: () => (window.location.hash = '#/security')
+              },
+              {
+                title: 'Executive Admin Console',
+                desc: 'Live risk governance, circuit breakers, user fund credit controls, and compliance queue.',
+                icon: Sliders,
+                color: '#f59e0b',
+                action: () => window.open('/admin', '_blank')
+              },
+              {
+                title: 'Live Market News',
+                desc: 'Real-time breaking financial news, macroeconomic updates, and institutional flow intelligence.',
+                icon: Newspaper,
+                color: '#8b5cf6',
+                action: () => (window.location.hash = '#/news')
               }
             ].map((prod) => {
               const Icon = prod.icon;
@@ -1239,7 +1274,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <div>
               <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#eaecef', margin: '0 0 4px 0' }}>Your Funds are SAFU</h2>
               <p style={{ fontSize: '14px', color: '#848e9c', margin: 0 }}>
-                Syncnode protects user assets with an institutional $1 Billion Secure Asset Fund for Users (SAFU) and ISO 27001 certified zero-trust infrastructure.
+                CryptoBridge protects user assets with an institutional $1 Billion Secure Asset Fund for Users (SAFU) and ISO 27001 certified zero-trust infrastructure.
               </p>
             </div>
           </div>
@@ -1275,7 +1310,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               Frequently Asked Questions
             </h2>
             <p style={{ fontSize: '13px', color: '#848e9c', margin: 0 }}>
-              Got questions about trading, safety, or fees on Syncnode? Find your answers below.
+              Got questions about trading, safety, or fees on CryptoBridge? Find your answers below.
             </p>
           </div>
 
@@ -1311,24 +1346,24 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </section>
 
         {/* =========================================================================
-            8. BOTTOM CTA CARD (ROUNDED RECTANGLE)
+            8. BOTTOM CTA CARD (CLEAN INSTITUTIONAL TERMINAL CTA)
             ========================================================================= */}
         <section
           style={{
-            background: 'linear-gradient(135deg, #fcd535 0%, #f0b90b 100%)',
-            borderRadius: '24px',
-            padding: '48px 40px',
+            background: '#181a20',
+            borderRadius: '20px',
+            border: '1px solid #2b313a',
+            padding: '44px 36px',
             textAlign: 'center',
-            color: '#181a20',
-            boxShadow: '0 20px 40px rgba(252, 213, 53, 0.25)',
+            color: '#eaecef',
             marginBottom: '32px'
           }}
         >
-          <h2 style={{ fontSize: '32px', fontWeight: 900, margin: '0 0 10px 0', letterSpacing: '-0.5px' }}>
-            Start Trading in 3 Minutes
+          <h2 style={{ fontSize: '28px', fontWeight: 800, color: '#ffffff', margin: '0 0 10px 0', letterSpacing: '-0.5px' }}>
+            Start Trading on CryptoBridge
           </h2>
-          <p style={{ fontSize: '15px', fontWeight: 600, margin: '0 0 24px 0', opacity: 0.9 }}>
-            Join over 240,000,000 traders and institutional clients worldwide.
+          <p style={{ fontSize: '14px', color: '#848e9c', margin: '0 0 24px 0' }}>
+            Deterministic matching engine. 0.10% standard spot fee tier. Instant zero-fee internal transfers.
           </p>
 
           <div style={{ display: 'flex', justifyContent: 'center', gap: '14px', flexWrap: 'wrap' }}>
@@ -1338,12 +1373,12 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 else onOpenAuth();
               }}
               style={{
-                background: '#181a20',
-                color: '#eaecef',
+                background: '#fcd535',
+                color: '#181a20',
                 border: 'none',
-                borderRadius: '12px',
-                padding: '14px 28px',
-                fontSize: '15px',
+                borderRadius: '8px',
+                padding: '12px 28px',
+                fontSize: '14px',
                 fontWeight: 700,
                 cursor: 'pointer',
                 display: 'flex',
@@ -1352,19 +1387,19 @@ export const HomeView: React.FC<HomeViewProps> = ({
               }}
             >
               <span>{user ? 'Open Trading Terminal' : 'Sign Up Free'}</span>
-              <ArrowRight size={18} />
+              <ArrowRight size={16} />
             </button>
 
             <button
               onClick={() => onNavigateToTrade('BTC/USDT')}
               style={{
-                background: 'transparent',
-                color: '#181a20',
-                border: '2px solid #181a20',
-                borderRadius: '12px',
-                padding: '14px 28px',
-                fontSize: '15px',
-                fontWeight: 700,
+                background: '#202630',
+                color: '#eaecef',
+                border: '1px solid #2b313a',
+                borderRadius: '8px',
+                padding: '12px 28px',
+                fontSize: '14px',
+                fontWeight: 600,
                 cursor: 'pointer'
               }}
             >
@@ -1374,56 +1409,12 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </section>
       </div>
 
-      {/* Comprehensive Footer */}
-      <footer style={{ background: '#12141a', borderTop: '1px solid #2b313a', padding: '48px 24px 24px 24px' }}>
-        <div style={{ maxWidth: '1440px', margin: '0 auto' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '36px', marginBottom: '36px' }}>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '18px', fontWeight: 800, color: '#fcd535', marginBottom: '12px' }}>
-                <Zap size={22} />
-                <span>SYNCNODE</span>
-              </div>
-              <p style={{ fontSize: '12px', color: '#848e9c', lineHeight: '1.6' }}>
-                The world's leading institutional digital asset exchange platform with full Proof of Reserves.
-              </p>
-            </div>
-
-            <div>
-              <h4 style={{ fontSize: '14px', fontWeight: 700, color: '#eaecef', marginBottom: '14px' }}>Products</h4>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px', color: '#848e9c' }}>
-                <li><a href="#/spot" style={{ color: '#848e9c', textDecoration: 'none' }}>Spot Exchange</a></li>
-                <li><a href="#/earn" style={{ color: '#848e9c', textDecoration: 'none' }}>Binance Earn</a></li>
-                <li><a href="#/p2p" style={{ color: '#848e9c', textDecoration: 'none' }}>P2P Escrow</a></li>
-                <li><a href="#/stock" style={{ color: '#848e9c', textDecoration: 'none' }}>Stock Intelligence</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 style={{ fontSize: '14px', fontWeight: 700, color: '#eaecef', marginBottom: '14px' }}>Services</h4>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px', color: '#848e9c' }}>
-                <li><a href="#" style={{ color: '#848e9c', textDecoration: 'none' }}>Zero-Fee Deposits</a></li>
-                <li><a href="#" style={{ color: '#848e9c', textDecoration: 'none' }}>Fee Schedule</a></li>
-                <li><a href="#" style={{ color: '#848e9c', textDecoration: 'none' }}>Referral Program</a></li>
-                <li><a href="#" style={{ color: '#848e9c', textDecoration: 'none' }}>API Documentation</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 style={{ fontSize: '14px', fontWeight: 700, color: '#eaecef', marginBottom: '14px' }}>Support &amp; Legal</h4>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px', color: '#848e9c' }}>
-                <li><a href="#" style={{ color: '#848e9c', textDecoration: 'none' }}>24/7 Live Support</a></li>
-                <li><a href="#" style={{ color: '#848e9c', textDecoration: 'none' }}>Terms of Service</a></li>
-                <li><a href="#" style={{ color: '#848e9c', textDecoration: 'none' }}>Privacy Policy</a></li>
-                <li><a href="#" style={{ color: '#848e9c', textDecoration: 'none' }}>Risk Warning</a></li>
-              </ul>
-            </div>
-          </div>
-
-          <div style={{ borderTop: '1px solid #2b313a', paddingTop: '20px', textAlign: 'center', fontSize: '12px', color: '#707a8a' }}>
-            Syncnode Exchange © 2026. All rights reserved.
-          </div>
-        </div>
-      </footer>
+      {/* Unified Institutional Footer without Community */}
+      <Footer
+        onNavigateToTrade={onNavigateToTrade}
+        onNavigateToP2P={onNavigateToP2P}
+        onOpenAuth={onOpenAuth}
+      />
     </div>
   );
 };

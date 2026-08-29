@@ -62,19 +62,19 @@ const STOCK_DATABASE: SearchStockItem[] = [
   { symbol: 'GBP/JPY', name: 'British Pound / Japanese Yen', exchange: 'FOREX', sector: 'Cross Currency Pair', category: 'Forex' },
 
   // Major Cryptocurrencies
-  { symbol: 'BTC/USDT', name: 'Bitcoin / TetherUS', exchange: 'BINANCE / SYNCNODE', sector: 'Layer 1 Store of Value', category: 'Crypto', isPopular: true },
-  { symbol: 'ETH/USDT', name: 'Ethereum / TetherUS', exchange: 'BINANCE / SYNCNODE', sector: 'Smart Contract Platform', category: 'Crypto', isPopular: true },
-  { symbol: 'SOL/USDT', name: 'Solana / TetherUS', exchange: 'BINANCE / SYNCNODE', sector: 'High-Throughput L1', category: 'Crypto', isPopular: true },
-  { symbol: 'XRP/USDT', name: 'Ripple / TetherUS', exchange: 'BINANCE / SYNCNODE', sector: 'Cross-Border Payments', category: 'Crypto', isPopular: true },
-  { symbol: 'BNB/USDT', name: 'BNB / TetherUS', exchange: 'BINANCE / SYNCNODE', sector: 'Exchange Ecosystem', category: 'Crypto', isPopular: true },
-  { symbol: 'DOGE/USDT', name: 'Dogecoin / TetherUS', exchange: 'BINANCE / SYNCNODE', sector: 'Meme & Payment Asset', category: 'Crypto', isPopular: true },
-  { symbol: 'ADA/USDT', name: 'Cardano / TetherUS', exchange: 'BINANCE / SYNCNODE', sector: 'Proof of Stake L1', category: 'Crypto' },
-  { symbol: 'AVAX/USDT', name: 'Avalanche / TetherUS', exchange: 'BINANCE / SYNCNODE', sector: 'Subnet Ecosystem', category: 'Crypto' },
-  { symbol: 'SUI/USDT', name: 'Sui Network / TetherUS', exchange: 'BINANCE / SYNCNODE', sector: 'Move-based L1', category: 'Crypto' },
-  { symbol: 'NEAR/USDT', name: 'NEAR Protocol / TetherUS', exchange: 'BINANCE / SYNCNODE', sector: 'Sharded L1 & AI', category: 'Crypto' },
-  { symbol: 'LINK/USDT', name: 'Chainlink / TetherUS', exchange: 'BINANCE / SYNCNODE', sector: 'Decentralized Oracle', category: 'Crypto' },
-  { symbol: 'TON/USDT', name: 'Toncoin / TetherUS', exchange: 'BINANCE / SYNCNODE', sector: 'Telegram Ecosystem', category: 'Crypto' },
-  { symbol: 'PEPE/USDT', name: 'Pepe / TetherUS', exchange: 'BINANCE / SYNCNODE', sector: 'Community Meme Token', category: 'Crypto' }
+  { symbol: 'BTC/USDT', name: 'Bitcoin / TetherUS', exchange: 'BINANCE / CRYPTOBRIDGE', sector: 'Layer 1 Store of Value', category: 'Crypto', isPopular: true },
+  { symbol: 'ETH/USDT', name: 'Ethereum / TetherUS', exchange: 'BINANCE / CRYPTOBRIDGE', sector: 'Smart Contract Platform', category: 'Crypto', isPopular: true },
+  { symbol: 'SOL/USDT', name: 'Solana / TetherUS', exchange: 'BINANCE / CRYPTOBRIDGE', sector: 'High-Throughput L1', category: 'Crypto', isPopular: true },
+  { symbol: 'XRP/USDT', name: 'Ripple / TetherUS', exchange: 'BINANCE / CRYPTOBRIDGE', sector: 'Cross-Border Payments', category: 'Crypto', isPopular: true },
+  { symbol: 'BNB/USDT', name: 'BNB / TetherUS', exchange: 'BINANCE / CRYPTOBRIDGE', sector: 'Exchange Ecosystem', category: 'Crypto', isPopular: true },
+  { symbol: 'DOGE/USDT', name: 'Dogecoin / TetherUS', exchange: 'BINANCE / CRYPTOBRIDGE', sector: 'Meme & Payment Asset', category: 'Crypto', isPopular: true },
+  { symbol: 'ADA/USDT', name: 'Cardano / TetherUS', exchange: 'BINANCE / CRYPTOBRIDGE', sector: 'Proof of Stake L1', category: 'Crypto' },
+  { symbol: 'AVAX/USDT', name: 'Avalanche / TetherUS', exchange: 'BINANCE / CRYPTOBRIDGE', sector: 'Subnet Ecosystem', category: 'Crypto' },
+  { symbol: 'SUI/USDT', name: 'Sui Network / TetherUS', exchange: 'BINANCE / CRYPTOBRIDGE', sector: 'Move-based L1', category: 'Crypto' },
+  { symbol: 'NEAR/USDT', name: 'NEAR Protocol / TetherUS', exchange: 'BINANCE / CRYPTOBRIDGE', sector: 'Sharded L1 & AI', category: 'Crypto' },
+  { symbol: 'LINK/USDT', name: 'Chainlink / TetherUS', exchange: 'BINANCE / CRYPTOBRIDGE', sector: 'Decentralized Oracle', category: 'Crypto' },
+  { symbol: 'TON/USDT', name: 'Toncoin / TetherUS', exchange: 'BINANCE / CRYPTOBRIDGE', sector: 'Telegram Ecosystem', category: 'Crypto' },
+  { symbol: 'PEPE/USDT', name: 'Pepe / TetherUS', exchange: 'BINANCE / CRYPTOBRIDGE', sector: 'Community Meme Token', category: 'Crypto' }
 ];
 
 interface SearchModalProps {
@@ -180,7 +180,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
                 cursor: 'pointer'
               }}
             >
-              {cat === 'All' ? '🌐 All Assets' : cat === 'Stock' ? '📈 Stocks' : cat === 'Crypto' ? '🪙 Crypto' : cat === 'Forex' ? '💱 Currencies / FX' : '📊 Indices'}
+              {cat === 'All' ? 'All Assets' : cat === 'Stock' ? 'Stocks' : cat === 'Crypto' ? 'Crypto' : cat === 'Forex' ? 'Currencies / FX' : 'Indices'}
             </button>
           ))}
         </div>
@@ -223,7 +223,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
                 }}
               >
                 <div className="search-stock-avatar">
-                  {item.category === 'Crypto' ? '🪙' : item.category === 'Forex' ? '💱' : item.category === 'Index' ? '📊' : item.symbol.slice(0, 3)}
+                  {item.symbol.slice(0, 3)}
                 </div>
 
                 <div className="search-stock-info">

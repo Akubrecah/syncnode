@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Flame, TrendingUp, Globe, Clock, ExternalLink, Bookmark, Share2 } from 'lucide-react';
+import { Footer } from './Footer';
 
 interface NewsViewProps {
   onNavigateToStock?: (sym: string) => void;
@@ -244,8 +245,8 @@ export const NewsView: React.FC<NewsViewProps> = ({ onNavigateToStock, onNavigat
             </div>
           ))}
         </div>
-
       </div>
+      <Footer onNavigateToTrade={onNavigateToTrade} />
     </div>
   );
 };

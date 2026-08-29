@@ -71,7 +71,7 @@ const emailWrapper = (content: string, preheaderText: string = '') => `
                 <tr>
                   <td align="left">
                     <div style="display: inline-flex; align-items: center;">
-                      <span style="display: inline-block; width: 26px; height: 26px; border-radius: 6px; background-color: rgba(0, 229, 153, 0.12); border: 1px solid rgba(0, 229, 153, 0.3); text-align: center; line-height: 26px; color: #00e599; font-weight: 800; font-size: 15px;">⚡</span>
+                      <span style="display: inline-block; width: 26px; height: 26px; border-radius: 6px; background-color: rgba(0, 229, 153, 0.12); border: 1px solid rgba(0, 229, 153, 0.3); text-align: center; line-height: 26px; color: #00e599; font-weight: 800; font-size: 15px;">S</span>
                       <span style="font-size: 20px; font-weight: 800; color: #ffffff; margin-left: 8px; letter-spacing: -0.5px;">Signalist</span>
                     </div>
                   </td>
@@ -241,7 +241,7 @@ export function generatePriceAlertEmail(params: PriceAlertEmailParams): string {
     </table>
   `;
 
-  return emailWrapper(content, `🔔 [${params.ticker}] just hit your alert at ${params.currentPrice}!`);
+  return emailWrapper(content, `[${params.ticker}] just hit your alert at ${params.currentPrice}!`);
 }
 
 /**
@@ -250,7 +250,7 @@ export function generatePriceAlertEmail(params: PriceAlertEmailParams): string {
 export function generateReEngagementEmail(params: ReEngagementEmailParams): string {
   const content = `
     <h1 style="font-size: 20px; font-weight: 800; color: #ffffff; margin: 0 0 16px; letter-spacing: -0.3px;">
-      We Miss You, ${params.name || 'Adrian'}
+      We Miss You, ${params.name || 'Valued Trader'}
     </h1>
 
     <p style="font-size: 13.5px; line-height: 1.55; color: #94a3b8; margin: 0 0 16px;">
@@ -285,7 +285,7 @@ export function generateReEngagementEmail(params: ReEngagementEmailParams): stri
     </table>
   `;
 
-  return emailWrapper(content, `[${params.name || 'Adrian'}], opportunities are waiting for you on Signalist`);
+  return emailWrapper(content, `[${params.name || 'Valued Trader'}], opportunities are waiting for you on Signalist`);
 }
 
 /**
