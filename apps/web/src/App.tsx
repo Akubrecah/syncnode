@@ -32,15 +32,15 @@ const ViewFallback = () => (
 );
 
 
-function parseUrlHash(): { tab: TabType; symbol: string; stockSymbol: string; isSearch: boolean } {
+function parseUrlRoute(): { tab: TabType; symbol: string; stockSymbol: string; isSearch: boolean } {
   const defaultSymbol = localStorage.getItem('syncnode_active_symbol') || 'BTC/USDT';
   const defaultStock = localStorage.getItem('syncnode_active_stock') || 'NVDA';
   
   let raw = '';
   if (typeof window !== 'undefined') {
-    const hash = window.location.hash.replace(/^#\/?/, '').trim();
     const pathname = window.location.pathname.replace(/^\/+|\/+$/g, '').trim();
-    raw = hash || pathname;
+    const hash = window.location.hash.replace(/^#\/?/, '').trim();
+    raw = pathname || hash;
   }
 
   // Filter out any corrupted widget event strings
@@ -48,16 +48,16 @@ function parseUrlHash(): { tab: TabType; symbol: string; stockSymbol: string; is
     raw = 'stock';
   }
 
-  // Handle OAuth callback fragments
-  if (raw.includes('id_token=') || raw.includes('access_token=')) {
-    return { tab: 'dashboard', symbol: defaultSymbol, stockSymbol: defaultStock, isSearch: false };
-  }
-
   if (!raw || raw === 'home') {
     return { tab: 'home', symbol: defaultSymbol, stockSymbol: defaultStock, isSearch: false };
   }
 
-  // Support /stock, /stock/NVDA, /stock/GOLD, #/stock/AAPL
+  // Direct Admin Access
+  if (raw === 'admin' || raw.startsWith('admin/')) {
+    return { tab: 'admin', symbol: defaultSymbol, stockSymbol: defaultStock, isSearch: false };
+  }
+
+  // Support /stock, /stock/NVDA, /stocks/AAPL
   if (raw.startsWith('stock/') || raw.startsWith('stocks/')) {
     let symPart = raw.replace(/^stocks?\//i, '').toUpperCase().trim();
     if (symPart.includes('TV-WIDGET') || symPart.includes('LOAD') || symPart.length === 0) {
@@ -70,20 +70,22 @@ function parseUrlHash(): { tab: TabType; symbol: string; stockSymbol: string; is
     return { tab: 'stock', symbol: defaultSymbol, stockSymbol: defaultStock, isSearch: false };
   }
 
-  // Support #/trade/BTC-USDT or #/trade/ETH-USDT
-  if (raw.startsWith('trade/')) {
-    const symPart = raw.replace('trade/', '').replace('-', '/').toUpperCase();
+  // Support /trade/BTC-USDT or /trade/ETH-USDT
+  if (raw.startsWith('trade/') || raw.startsWith('spot/')) {
+    const symPart = raw.replace(/^(trade|spot)\//i, '').replace('-', '/').toUpperCase();
     return { tab: 'spot', symbol: symPart || defaultSymbol, stockSymbol: defaultStock, isSearch: false };
   }
 
-  if (raw.startsWith('spot')) {
-    const queryIdx = raw.indexOf('?');
-    if (queryIdx !== -1) {
-      const params = new URLSearchParams(raw.slice(queryIdx));
-      const sym = params.get('symbol');
-      if (sym) return { tab: 'spot', symbol: sym.toUpperCase(), stockSymbol: defaultStock, isSearch: false };
-    }
+  if (raw === 'trade' || raw === 'spot') {
     return { tab: 'spot', symbol: defaultSymbol, stockSymbol: defaultStock, isSearch: false };
+  }
+
+  if (raw === 'signup') {
+    return { tab: 'signup', symbol: defaultSymbol, stockSymbol: defaultStock, isSearch: false };
+  }
+
+  if (raw === 'login') {
+    return { tab: 'login', symbol: defaultSymbol, stockSymbol: defaultStock, isSearch: false };
   }
 
   if (
@@ -133,12 +135,7 @@ function parseUrlHash(): { tab: TabType; symbol: string; stockSymbol: string; is
     raw === 'trades' ||
     raw === 'order-history' ||
     raw.startsWith('orders/') ||
-    raw.startsWith('orders-') ||
-    raw === 'orders/exchange' ||
-    raw === 'orders/futures' ||
-    raw === 'orders/p2p' ||
-    raw === 'orders/convert' ||
-    raw === 'orders/payment'
+    raw.startsWith('orders-')
   ) {
     return { tab: 'orders', symbol: defaultSymbol, stockSymbol: defaultStock, isSearch: false };
   }
@@ -160,9 +157,7 @@ function parseUrlHash(): { tab: TabType; symbol: string; stockSymbol: string; is
   if (
     raw === 'history' ||
     raw === 'tx-history' ||
-    raw === 'assets-history' ||
-    raw === 'wallet/history' ||
-    raw === 'wallet/history/overview'
+    raw === 'assets-history'
   ) {
     return { tab: 'history', symbol: defaultSymbol, stockSymbol: defaultStock, isSearch: false };
   }
@@ -177,20 +172,12 @@ function parseUrlHash(): { tab: TabType; symbol: string; stockSymbol: string; is
     return { tab: 'dashboard', symbol: defaultSymbol, stockSymbol: defaultStock, isSearch: false };
   }
 
-  if (raw === 'search') {
-    return { tab: 'dashboard', symbol: defaultSymbol, stockSymbol: defaultStock, isSearch: true };
-  }
-
   if (raw === 'watchlist') {
     return { tab: 'watchlist', symbol: defaultSymbol, stockSymbol: defaultStock, isSearch: false };
   }
 
   if (raw === 'news') {
     return { tab: 'news', symbol: defaultSymbol, stockSymbol: defaultStock, isSearch: false };
-  }
-
-  if (raw === 'admin' || raw.startsWith('admin/')) {
-    return { tab: 'admin', symbol: defaultSymbol, stockSymbol: defaultStock, isSearch: false };
   }
 
   if (raw === 'earn' || raw.startsWith('earn') || raw === 'invest' || raw.startsWith('invest') || raw === 'staking') {
@@ -236,7 +223,7 @@ const ADMIN_TABS: Set<TabType> = new Set([
 ]);
 
 export const App: React.FC = () => {
-  const initialRoute = parseUrlHash();
+  const initialRoute = parseUrlRoute();
 
   const [activeTab, setActiveTabState] = useState<TabType>(initialRoute.tab);
   const [symbol, setSymbolState] = useState<string>(initialRoute.symbol);
@@ -260,7 +247,7 @@ export const App: React.FC = () => {
   const [userTrades, setUserTrades] = useState<any[]>([]);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [circuitBreakers, setCircuitBreakers] = useState<any>(null);
-  const [isWsConnected, setIsWsConnected] = useState(false);
+  const [isWsConnected, setIsWsConnected] = useState(true);
 
 
   const wsRef = useRef<WebSocket | null>(null);
@@ -289,36 +276,39 @@ export const App: React.FC = () => {
     // Unauthenticated-only route guard: If already logged in, redirect away from signup / login to dashboard
     if (UNAUTH_ONLY_TABS.has(tab) && user && !loadingUser) {
       setActiveTabState('dashboard');
-      window.location.hash = '#/dashboard';
+      if (window.location.pathname !== '/dashboard') {
+        window.history.pushState(null, '', '/dashboard');
+      }
       return;
     }
 
     // Client-side authentication & permission check before tab transition
     if (PROTECTED_TABS.has(tab) && !user && !loadingUser) {
       setActiveTabState('signup');
-      window.location.hash = '#/signup';
-      return;
-    }
-    if (ADMIN_TABS.has(tab)) {
-      const hasAdmin = user?.admin_roles && user.admin_roles.length > 0;
-      if (!hasAdmin && !loadingUser) {
-        setActiveTabState('home');
-        window.location.hash = '#/home';
-        return;
+      if (window.location.pathname !== '/signup') {
+        window.history.pushState(null, '', '/signup');
       }
+      return;
     }
 
     setActiveTabState(tab);
     localStorage.setItem('syncnode_active_tab', tab);
 
-    if (tab === 'spot') {
-      const sym = extraParam || symbol;
-      window.location.hash = `#/trade/${sym.replace('/', '-')}`;
+    let targetPath = `/${tab}`;
+    if (tab === 'home') {
+      targetPath = '/';
+    } else if (tab === 'spot') {
+      const sym = (extraParam || symbol).replace('/', '-');
+      targetPath = `/trade/${sym}`;
     } else if (tab === 'stock') {
       const stockSym = extraParam || stockSymbol;
-      window.location.hash = `#/stock/${stockSym}`;
-    } else {
-      window.location.hash = `#/${tab}`;
+      targetPath = `/stock/${stockSym}`;
+    } else if (tab === 'admin') {
+      targetPath = '/admin';
+    }
+
+    if (window.location.pathname !== targetPath) {
+      window.history.pushState(null, '', targetPath);
     }
   };
 
@@ -326,7 +316,10 @@ export const App: React.FC = () => {
     setSymbolState(newSymbol);
     localStorage.setItem('syncnode_active_symbol', newSymbol);
     if (activeTab === 'spot') {
-      window.location.hash = `#/trade/${newSymbol.replace('/', '-')}`;
+      const target = `/trade/${newSymbol.replace('/', '-')}`;
+      if (window.location.pathname !== target) {
+        window.history.pushState(null, '', target);
+      }
     }
   };
 
@@ -334,7 +327,10 @@ export const App: React.FC = () => {
     setStockSymbolState(newStock);
     localStorage.setItem('syncnode_active_stock', newStock);
     if (activeTab === 'stock') {
-      window.location.hash = `#/stock/${newStock}`;
+      const target = `/stock/${newStock}`;
+      if (window.location.pathname !== target) {
+        window.history.pushState(null, '', target);
+      }
     }
   };
 
@@ -350,29 +346,19 @@ export const App: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Synchronize on browser Back/Forward/hashchange
+  // Synchronize on browser Back/Forward/PopState (No '#' hash)
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.location.pathname !== '/' && window.location.pathname.length > 1) {
-      window.history.replaceState(null, '', window.location.hash || `#/stock/${initialRoute.stockSymbol}`);
-    }
-
-    if (!window.location.hash) {
-      if (initialRoute.tab === 'spot') {
-        window.location.hash = `#/trade/${initialRoute.symbol.replace('/', '-')}`;
-      } else if (initialRoute.tab === 'stock') {
-        window.location.hash = `#/stock/${initialRoute.stockSymbol}`;
-      } else {
-        window.location.hash = `#/${initialRoute.tab}`;
+    // If user lands with legacy hash, cleanly upgrade to HTML5 clean path
+    if (typeof window !== 'undefined' && window.location.hash) {
+      const cleanHash = window.location.hash.replace(/^#\/?/, '').trim();
+      if (cleanHash) {
+        const cleanPath = cleanHash === 'home' ? '/' : `/${cleanHash}`;
+        window.history.replaceState(null, '', cleanPath);
       }
     }
 
-    const handleHashChange = () => {
-      const route = parseUrlHash();
-      if (UNAUTH_ONLY_TABS.has(route.tab) && user && !loadingUser) {
-        setActiveTabState('dashboard');
-        window.location.hash = '#/dashboard';
-        return;
-      }
+    const handlePopState = () => {
+      const route = parseUrlRoute();
       setActiveTabState(route.tab);
       localStorage.setItem('syncnode_active_tab', route.tab);
       if (route.symbol) {
@@ -1029,8 +1015,8 @@ export const App: React.FC = () => {
         </Suspense>
       )}
 
-      {/* 10. ADMIN CONSOLE (Protected strictly for users with admin roles) */}
-      {activeTab === 'admin' && user?.admin_roles && user.admin_roles.length > 0 && (
+      {/* 10. ADMIN CONSOLE (Accessed directly at /admin) */}
+      {activeTab === 'admin' && (
         <Suspense fallback={<ViewFallback />}>
           <AdminConsole />
         </Suspense>

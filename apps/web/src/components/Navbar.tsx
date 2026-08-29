@@ -109,7 +109,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         
         {/* BRAND LOGO */}
         <a
-          href="#/home"
+          href="/"
           className="brand-logo"
           onClick={(e) => {
             e.preventDefault();

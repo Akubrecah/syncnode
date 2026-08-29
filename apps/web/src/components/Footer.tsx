@@ -59,7 +59,7 @@ export const Footer: React.FC<FooterProps> = ({
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <li>
                 <a
-                  href="#/spot"
+                  href="/trade/BTC-USDT"
                   onClick={(e) => {
                     if (onNavigateToTrade) {
                       e.preventDefault();
@@ -75,7 +75,7 @@ export const Footer: React.FC<FooterProps> = ({
               </li>
               <li>
                 <a
-                  href="#/invest"
+                  href="/invest"
                   style={{ color: '#848e9c', textDecoration: 'none', transition: 'color 0.15s', display: 'flex', alignItems: 'center', gap: '6px' }}
                   onMouseEnter={(e) => (e.currentTarget.style.color = '#fcd535')}
                   onMouseLeave={(e) => (e.currentTarget.style.color = '#848e9c')}
@@ -86,7 +86,7 @@ export const Footer: React.FC<FooterProps> = ({
               </li>
               <li>
                 <a
-                  href="#/wallet"
+                  href="/wallet"
                   style={{ color: '#848e9c', textDecoration: 'none', transition: 'color 0.15s' }}
                   onMouseEnter={(e) => (e.currentTarget.style.color = '#fcd535')}
                   onMouseLeave={(e) => (e.currentTarget.style.color = '#848e9c')}
@@ -96,7 +96,7 @@ export const Footer: React.FC<FooterProps> = ({
               </li>
               <li>
                 <a
-                  href="#/p2p"
+                  href="/p2p"
                   onClick={(e) => {
                     if (onNavigateToP2P) {
                       e.preventDefault();
@@ -112,7 +112,7 @@ export const Footer: React.FC<FooterProps> = ({
               </li>
               <li>
                 <a
-                  href="#/stock/NVDA"
+                  href="/stock/NVDA"
                   style={{ color: '#848e9c', textDecoration: 'none', transition: 'color 0.15s' }}
                   onMouseEnter={(e) => (e.currentTarget.style.color = '#fcd535')}
                   onMouseLeave={(e) => (e.currentTarget.style.color = '#848e9c')}
@@ -122,7 +122,7 @@ export const Footer: React.FC<FooterProps> = ({
               </li>
               <li>
                 <a
-                  href="#/news"
+                  href="/news"
                   style={{ color: '#848e9c', textDecoration: 'none', transition: 'color 0.15s' }}
                   onMouseEnter={(e) => (e.currentTarget.style.color = '#fcd535')}
                   onMouseLeave={(e) => (e.currentTarget.style.color = '#848e9c')}
@@ -139,7 +139,7 @@ export const Footer: React.FC<FooterProps> = ({
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <li>
                 <a
-                  href="#/dashboard"
+                  href="/dashboard"
                   style={{ color: '#848e9c', textDecoration: 'none', transition: 'color 0.15s' }}
                   onMouseEnter={(e) => (e.currentTarget.style.color = '#fcd535')}
                   onMouseLeave={(e) => (e.currentTarget.style.color = '#848e9c')}
@@ -149,7 +149,7 @@ export const Footer: React.FC<FooterProps> = ({
               </li>
               <li>
                 <a
-                  href="#/security"
+                  href="/security"
                   style={{ color: '#848e9c', textDecoration: 'none', transition: 'color 0.15s' }}
                   onMouseEnter={(e) => (e.currentTarget.style.color = '#fcd535')}
                   onMouseLeave={(e) => (e.currentTarget.style.color = '#848e9c')}
@@ -160,8 +160,6 @@ export const Footer: React.FC<FooterProps> = ({
               <li>
                 <a
                   href="/admin"
-                  target="_blank"
-                  rel="noreferrer"
                   style={{ color: '#fcd535', textDecoration: 'none', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                 >
                   <span>Executive Admin Console</span>
@@ -170,7 +168,7 @@ export const Footer: React.FC<FooterProps> = ({
               </li>
               <li>
                 <a
-                  href="#/dashboard"
+                  href="/dashboard"
                   style={{ color: '#848e9c', textDecoration: 'none', transition: 'color 0.15s' }}
                   onMouseEnter={(e) => (e.currentTarget.style.color = '#fcd535')}
                   onMouseLeave={(e) => (e.currentTarget.style.color = '#848e9c')}
@@ -180,7 +178,7 @@ export const Footer: React.FC<FooterProps> = ({
               </li>
               <li>
                 <a
-                  href="#/watchlist"
+                  href="/watchlist"
                   style={{ color: '#848e9c', textDecoration: 'none', transition: 'color 0.15s' }}
                   onMouseEnter={(e) => (e.currentTarget.style.color = '#fcd535')}
                   onMouseLeave={(e) => (e.currentTarget.style.color = '#848e9c')}
