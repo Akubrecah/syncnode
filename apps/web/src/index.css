@@ -5542,12 +5542,23 @@ a[href*="tradingview.com"] {
   .app-container {
     padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)) !important;
   }
+
+  /* Trading Terminal Responsive Layout */
+  .terminal-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    height: auto !important;
+    min-height: 100vh !important;
+  }
+  .terminal-grid .panel {
+    min-height: 380px !important;
+  }
 }
 
 @media (max-width: 768px) {
   .header-nav {
-    padding: 0 14px !important;
-    height: 56px !important;
+    padding: 0 12px !important;
+    height: 54px !important;
   }
   
   /* Tables horizontal scroll container */
@@ -5560,16 +5571,80 @@ a[href*="tradingview.com"] {
   }
   
   /* Dashboard layout mobile adapt */
+  .dashboard-container {
+    padding: 12px 10px !important;
+  }
+  
   .dashboard-sidebar {
     width: 100% !important;
     border-right: none !important;
     border-bottom: 1px solid #2b313a !important;
+    display: flex !important;
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+    gap: 6px !important;
+    padding: 8px 4px !important;
   }
 
-  /* Card layouts adapt to single column */
-  .grid-2, .grid-3, .grid-4 {
+  .dashboard-sidebar .sidebar-tab-btn {
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    padding: 8px 12px !important;
+  }
+
+  /* Modals Full Screen / Bottom Sheet Adapt on Mobile */
+  .modal-overlay {
+    padding: 8px !important;
+    align-items: flex-end !important;
+  }
+
+  .modal-content,
+  .auth-card,
+  .dialog-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 16px 16px 0 0 !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+  }
+
+  /* Hero and Banner scaling */
+  .hero-headline {
+    font-size: clamp(24px, 7vw, 34px) !important;
+    line-height: 1.25 !important;
+  }
+
+  .hero-subheadline {
+    font-size: 13.5px !important;
+  }
+
+  /* Grid containers adapt to single column */
+  .grid-2, .grid-3, .grid-4, .market-cards-grid {
     grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  /* Compact padding for buttons and cards */
+  .p-responsive {
+    padding: 12px !important;
   }
 }
+
+@media (max-width: 480px) {
+  .brand-logo span {
+    font-size: 15px !important;
+  }
+  .mobile-bottom-nav {
+    height: calc(52px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  .mobile-tab-btn span {
+    font-size: 10px !important;
+  }
+  .mobile-tab-btn svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+}
+
 
 
