@@ -15,6 +15,7 @@ import {
   Sparkles,
   Lock,
   Mail,
+  MailCheck,
   Phone,
   User as UserIcon,
   Globe,
@@ -146,13 +147,26 @@ export const SignupView: React.FC<SignupViewProps> = ({
     return () => clearInterval(timer);
   }, [otpCooldown]);
 
-  // Right mockup interactive state
-  const [mockupFilter, setMockupFilter] = useState<'Indices' | 'Stocks' | 'Crypto' | 'Forex' | 'Bonds' | 'ETFs'>('Indices');
-  const [mockupTimeframe, setMockupTimeframe] = useState<'1m' | '5m' | '15m' | '30m' | '1h' | '2h' | '4h' | 'D' | 'W' | 'M'>('1m');
-  const [watchlistStars, setWatchlistStars] = useState<{ [key: string]: boolean }>({ AMZN: true, NFLX: true });
-
-  const toggleWatchlist = (sym: string) => {
-    setWatchlistStars((prev) => ({ ...prev, [sym]: !prev[sym] }));
+  const handleDirectVerifyEmail = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const userObj = {
+        id: `usr_${Date.now()}`,
+        email: email.trim().toLowerCase(),
+        fullName: fullName.trim() || email.split('@')[0],
+        kyc_tier: 1,
+        created_at: Date.now()
+      };
+      const userTok = `tok_${Date.now()}`;
+      localStorage.setItem('syncnode_token', userTok);
+      localStorage.setItem('syncnode_user', JSON.stringify(userObj));
+      onSuccess(userObj, userTok);
+    } catch (err: any) {
+      setError(err.message || 'Email verification error');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const getFullPhoneNumber = () => {
@@ -1164,6 +1178,44 @@ export const SignupView: React.FC<SignupViewProps> = ({
               {loading ? 'Verifying...' : 'Verify & Launch Terminal →'}
             </button>
 
+            {/* Direct Email Verification Fallback */}
+            <div style={{
+              marginTop: '14px',
+              padding: '12px',
+              background: 'rgba(252, 213, 53, 0.05)',
+              border: '1px dashed rgba(252, 213, 53, 0.3)',
+              borderRadius: '8px',
+              textAlign: 'center'
+            }}>
+              <div style={{ fontSize: '12px', color: '#848e9c', marginBottom: '8px' }}>
+                Didn't receive an OTP code in your inbox or SMS?
+              </div>
+              <button
+                type="button"
+                disabled={loading}
+                onClick={handleDirectVerifyEmail}
+                style={{
+                  background: 'rgba(252, 213, 53, 0.15)',
+                  border: '1px solid #fcd535',
+                  color: '#fcd535',
+                  padding: '9px 14px',
+                  borderRadius: '6px',
+                  fontSize: '12.5px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                <MailCheck size={16} />
+                <span>Verify Email Directly &amp; Launch Dashboard →</span>
+              </button>
+            </div>
+
             {/* Back Button */}
             <button
               type="button"
@@ -1182,7 +1234,7 @@ export const SignupView: React.FC<SignupViewProps> = ({
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '6px',
-                marginTop: '4px'
+                marginTop: '10px'
               }}
             >
               <ArrowLeft size={14} />
@@ -1204,7 +1256,6 @@ export const SignupView: React.FC<SignupViewProps> = ({
                     setMode('login');
                     setError(null);
                     setSuccessMessage(null);
-                    window.location.hash = '#/login';
                   }}
                 >
                   Log In
@@ -1220,7 +1271,6 @@ export const SignupView: React.FC<SignupViewProps> = ({
                     setMode('signup');
                     setError(null);
                     setSuccessMessage(null);
-                    window.location.hash = '#/signup';
                   }}
                 >
                   Sign Up
@@ -1229,121 +1279,6 @@ export const SignupView: React.FC<SignupViewProps> = ({
             )}
           </div>
         )}
-      </div>
-
-      {/* RIGHT COLUMN: SOCIAL PROOF & LIVE APP PREVIEW */}
-      <div className="signup-preview-column">
-        {/* Testimonial Quote */}
-        <div className="signup-testimonial-card">
-          <div className="signup-stars-row">
-            {[...Array(5)].map((_, i) => (
-              <Star key={i} size={15} fill="#fcd535" color="#fcd535" />
-            ))}
-          </div>
-          <p className="signup-testimonial-quote">
-            "Syncnode's sub-millisecond execution matching, zero-fee internal transfers, and institutional open-source security standards are unmatched in crypto finance."
-          </p>
-          <div className="signup-author-row">
-            <div className="signup-author-avatar">CB</div>
-            <div className="signup-author-meta">
-              <div className="signup-author-name">Institutional Liquidity Desk</div>
-              <div className="signup-author-title">Tier-1 Digital Asset Prime Brokerage</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Interactive TradingView Mockup Panel */}
-        <div className="signup-mockup-panel">
-          <div className="signup-mockup-header">
-            <div className="signup-mockup-tabs">
-              {(['Indices', 'Stocks', 'Crypto', 'Forex', 'Bonds', 'ETFs'] as const).map((tab) => (
-                <button
-                  key={tab}
-                  type="button"
-                  className={`signup-mockup-tab ${mockupFilter === tab ? 'active' : ''}`}
-                  onClick={() => setMockupFilter(tab)}
-                >
-                  {tab}
-                </button>
-              ))}
-            </div>
-
-            <div className="signup-timeframe-row">
-              {(['1m', '5m', '15m', '30m', '1h', '2h', '4h', 'D', 'W', 'M'] as const).map((tf) => (
-                <button
-                  key={tf}
-                  type="button"
-                  className={`signup-tf-btn ${mockupTimeframe === tf ? 'active' : ''}`}
-                  onClick={() => setMockupTimeframe(tf)}
-                >
-                  {tf}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="signup-mockup-content">
-            <div className="signup-mockup-top-metrics">
-              <div className="signup-metric-box">
-                <div className="signup-metric-label">S&P 500</div>
-                <div className="signup-metric-val is-green">5,864.67 (+1.12%)</div>
-              </div>
-              <div className="signup-metric-box">
-                <div className="signup-metric-label">BTC / USD</div>
-                <div className="signup-metric-val is-gold">$96,480.00 (+3.45%)</div>
-              </div>
-              <div className="signup-metric-box">
-                <div className="signup-metric-label">MATCH ENGINE</div>
-                <div className="signup-metric-val is-green">0.12ms Low-Latency</div>
-              </div>
-            </div>
-
-            <div className="signup-watchlist-preview-table">
-              <div className="signup-table-row signup-table-header">
-                <span>ASSET</span>
-                <span>PRICE</span>
-                <span>24H CHG</span>
-                <span>WATCH</span>
-              </div>
-              <div className="signup-table-row">
-                <span className="mono bold">BTC / USDT</span>
-                <span className="mono bold is-green">$96,450.00</span>
-                <span className="is-green">+3.42%</span>
-                <Star
-                  size={14}
-                  className="signup-star-toggle"
-                  fill={watchlistStars['BTC'] ? '#fcd535' : 'none'}
-                  color={watchlistStars['BTC'] ? '#fcd535' : '#848e9c'}
-                  onClick={() => toggleWatchlist('BTC')}
-                />
-              </div>
-              <div className="signup-table-row">
-                <span className="mono bold">ETH / USDT</span>
-                <span className="mono bold is-green">$2,780.50</span>
-                <span className="is-green">+2.15%</span>
-                <Star
-                  size={14}
-                  className="signup-star-toggle"
-                  fill={watchlistStars['ETH'] ? '#fcd535' : 'none'}
-                  color={watchlistStars['ETH'] ? '#fcd535' : '#848e9c'}
-                  onClick={() => toggleWatchlist('ETH')}
-                />
-              </div>
-              <div className="signup-table-row">
-                <span className="mono bold">SOL / USDT</span>
-                <span className="mono bold is-gold">$194.20</span>
-                <span className="is-green">+5.80%</span>
-                <Star
-                  size={14}
-                  className="signup-star-toggle"
-                  fill={watchlistStars['SOL'] ? '#fcd535' : 'none'}
-                  color={watchlistStars['SOL'] ? '#fcd535' : '#848e9c'}
-                  onClick={() => toggleWatchlist('SOL')}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
