@@ -749,7 +749,7 @@ export const MarketsOverviewView: React.FC<MarketsOverviewViewProps> = ({
       )}
 
       {/* 3. MAIN CONTENT CONTAINER */}
-      <div style={{ maxWidth: '1360px', margin: '0 auto', padding: '24px 32px' }}>
+      <div className="markets-main-wrapper" style={{ maxWidth: '1360px', margin: '0 auto', padding: '24px 32px' }}>
         
         {/* VIEW 1: TRADINGVIEW SCREENER */}
         {headerNav === 'trading_data' && subTab === 'screener' && (
@@ -766,7 +766,7 @@ export const MarketsOverviewView: React.FC<MarketsOverviewViewProps> = ({
         {headerNav === 'overview' && (
           <div>
             {/* Highlights Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px', marginBottom: '28px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '16px', marginBottom: '28px' }}>
               
               {/* Card 1: Hot Coins */}
               <div style={{ background: '#202630', borderRadius: '16px', border: '1px solid #29313D', padding: '20px' }}>
@@ -1004,7 +1004,7 @@ export const MarketsOverviewView: React.FC<MarketsOverviewViewProps> = ({
             </div>
 
             {/* 6 Analytics Cards Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '20px', marginBottom: '28px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: '20px', marginBottom: '28px' }}>
               
               {/* Card 1: Top Trader Long/Short Ratio (Accounts) */}
               <div style={{ background: '#202630', borderRadius: '16px', border: '1px solid #29313D', padding: '20px' }}>

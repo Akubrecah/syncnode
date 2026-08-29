@@ -52,6 +52,9 @@ export const SpotTradeView: React.FC<SpotTradeViewProps> = ({
   // Bottom table tab
   const [bottomTab, setBottomTab] = useState<'OPEN_ORDERS' | 'ORDER_HISTORY' | 'TRADE_HISTORY' | 'FUNDS'>('OPEN_ORDERS');
 
+  // Mobile Trading Sub-Navigation Tab
+  const [mobileTradeTab, setMobileTradeTab] = useState<'trade' | 'chart' | 'orderbook' | 'trades'>('trade');
+
   // Timeframe
   const [timeframe, setTimeframe] = useState<'1m' | '15m' | '1h' | '4h' | '1D' | '1W'>('15m');
 
@@ -256,7 +259,7 @@ export const SpotTradeView: React.FC<SpotTradeViewProps> = ({
         </div>
 
         {/* Right tags */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '12px' }}>
+        <div className="spot-header-tags" style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '12px' }}>
           <span style={{ color: '#848e9c' }}>Spread:</span>
           <span style={{ color: '#0ecb81', fontWeight: 700, fontFamily: 'monospace' }}>
             {ticker?.spread ? `$${parseFloat(ticker.spread).toFixed(2)}` : '$0.50'}
@@ -267,8 +270,40 @@ export const SpotTradeView: React.FC<SpotTradeViewProps> = ({
         </div>
       </div>
 
+      {/* MOBILE SUB-NAVIGATION BAR (SWITCHER) */}
+      <div className="spot-mobile-nav-bar">
+        <button
+          type="button"
+          className={`spot-mobile-nav-tab ${mobileTradeTab === 'trade' ? 'active' : ''}`}
+          onClick={() => setMobileTradeTab('trade')}
+        >
+          ⚡ Trade Form
+        </button>
+        <button
+          type="button"
+          className={`spot-mobile-nav-tab ${mobileTradeTab === 'chart' ? 'active' : ''}`}
+          onClick={() => setMobileTradeTab('chart')}
+        >
+          📈 Live Chart
+        </button>
+        <button
+          type="button"
+          className={`spot-mobile-nav-tab ${mobileTradeTab === 'orderbook' ? 'active' : ''}`}
+          onClick={() => setMobileTradeTab('orderbook')}
+        >
+          📖 Order Book
+        </button>
+        <button
+          type="button"
+          className={`spot-mobile-nav-tab ${mobileTradeTab === 'trades' ? 'active' : ''}`}
+          onClick={() => setMobileTradeTab('trades')}
+        >
+          🕒 Market Trades
+        </button>
+      </div>
+
       {/* 2. MAIN 4-COLUMN TRADING GRID */}
-      <div style={{
+      <div className="spot-terminal-grid" style={{
         display: 'grid',
         gridTemplateColumns: '280px 1fr 340px 280px',
         flex: 1,
@@ -277,7 +312,7 @@ export const SpotTradeView: React.FC<SpotTradeViewProps> = ({
       }}>
         
         {/* COLUMN 1: ORDER BOOK */}
-        <div style={{ background: '#181a20', borderRight: '1px solid #2b313a', display: 'flex', flexDirection: 'column' }}>
+        <div className={`spot-col-orderbook ${mobileTradeTab === 'orderbook' ? 'mobile-active' : ''}`} style={{ background: '#181a20', borderRight: '1px solid #2b313a', display: 'flex', flexDirection: 'column' }}>
           <div style={{ padding: '10px 14px', borderBottom: '1px solid #2b313a', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontSize: '13px', fontWeight: 700, color: '#eaecef' }}>Order Book</span>
             <div style={{ fontSize: '11px', color: '#848e9c' }}>0.01 Precision</div>
@@ -355,7 +390,7 @@ export const SpotTradeView: React.FC<SpotTradeViewProps> = ({
         </div>
 
         {/* COLUMN 2: CANDLESTICK CHART */}
-        <div style={{ background: '#12161c', display: 'flex', flexDirection: 'column', borderRight: '1px solid #2b313a' }}>
+        <div className={`spot-col-chart ${mobileTradeTab === 'chart' ? 'mobile-active' : ''}`} style={{ background: '#12161c', display: 'flex', flexDirection: 'column', borderRight: '1px solid #2b313a' }}>
           {/* Chart Header Tools */}
           <div style={{ padding: '8px 16px', borderBottom: '1px solid #2b313a', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#181a20' }}>
             <div style={{ display: 'flex', gap: '6px' }}>
@@ -390,7 +425,7 @@ export const SpotTradeView: React.FC<SpotTradeViewProps> = ({
         </div>
 
         {/* COLUMN 3: SPOT ORDER ENTRY FORM */}
-        <div style={{ background: '#181a20', borderRight: '1px solid #2b313a', display: 'flex', flexDirection: 'column', padding: '16px' }}>
+        <div className={`spot-col-tradeform ${mobileTradeTab === 'trade' ? 'mobile-active' : ''}`} style={{ background: '#181a20', borderRight: '1px solid #2b313a', display: 'flex', flexDirection: 'column', padding: '16px' }}>
           {/* Buy / Sell Tabs */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '14px' }}>
             <button
@@ -600,7 +635,7 @@ export const SpotTradeView: React.FC<SpotTradeViewProps> = ({
         </div>
 
         {/* COLUMN 4: MARKET TRADES & MY TRADES */}
-        <div style={{ background: '#181a20', display: 'flex', flexDirection: 'column' }}>
+        <div className={`spot-col-trades ${mobileTradeTab === 'trades' ? 'mobile-active' : ''}`} style={{ background: '#181a20', display: 'flex', flexDirection: 'column' }}>
           <div style={{ padding: '10px 14px', borderBottom: '1px solid #2b313a', display: 'flex', gap: '14px' }}>
             <button
               onClick={() => setRightPanelTab('MARKET_TRADES')}

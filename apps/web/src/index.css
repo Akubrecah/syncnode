@@ -5385,6 +5385,11 @@ a[href*="tradingview.com"] {
   display: flex !important;
 }
 
+.spot-mobile-nav-bar {
+  display: none;
+}
+
+
 /* Mobile Slide-Out Drawer */
 .mobile-drawer-overlay {
   position: fixed;
@@ -5543,6 +5548,66 @@ a[href*="tradingview.com"] {
     padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)) !important;
   }
 
+  /* Spot Trading Terminal Mobile Switcher & Grid */
+  .spot-mobile-nav-bar {
+    display: flex !important;
+    background: #181a20;
+    border-bottom: 1px solid #2b313a;
+    padding: 6px 10px;
+    gap: 6px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .spot-mobile-nav-tab {
+    flex: 1;
+    white-space: nowrap;
+    padding: 8px 12px;
+    border-radius: 6px;
+    background: #202630;
+    color: #848e9c;
+    border: 1px solid #2b313a;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s ease;
+  }
+
+  .spot-mobile-nav-tab.active {
+    background: rgba(252, 213, 53, 0.15);
+    color: #fcd535;
+    border-color: #fcd535;
+  }
+
+  .spot-terminal-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: auto !important;
+  }
+
+  .spot-col-orderbook,
+  .spot-col-chart,
+  .spot-col-tradeform,
+  .spot-col-trades {
+    display: none !important;
+    width: 100% !important;
+    border-right: none !important;
+  }
+
+  .spot-col-orderbook.mobile-active,
+  .spot-col-chart.mobile-active,
+  .spot-col-tradeform.mobile-active,
+  .spot-col-trades.mobile-active {
+    display: flex !important;
+    min-height: 480px !important;
+    width: 100% !important;
+  }
+
+  .spot-header-tags {
+    display: none !important;
+  }
+
   /* Trading Terminal Responsive Layout */
   .terminal-grid {
     display: flex !important;
@@ -5599,7 +5664,9 @@ a[href*="tradingview.com"] {
     max-width: 100vw !important;
   }
 
-  .home-main-wrapper {
+  .home-main-wrapper,
+  .markets-main-wrapper,
+  .p2p-main-container {
     padding: 16px 12px !important;
   }
   

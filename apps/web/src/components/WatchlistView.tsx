@@ -402,7 +402,7 @@ export const WatchlistView: React.FC<WatchlistViewProps> = ({
           )}
 
           {watchlistMode === 'mini-charts' && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px', padding: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '16px', padding: '16px' }}>
               {watchlistSymbols.slice(0, 8).map((sym) => (
                 <div
                   key={sym}

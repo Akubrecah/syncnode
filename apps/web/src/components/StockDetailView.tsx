@@ -186,7 +186,7 @@ export const StockDetailView: React.FC<StockDetailViewProps> = ({
         </div>
 
         {/* TOP ROW: MAIN INTERACTIVE TRADINGVIEW CHART (Left) + TECHNICAL ANALYSIS GAUGE (Right) */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '20px', alignItems: 'stretch' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))', gap: '20px', alignItems: 'stretch' }}>
           
           {/* Main Chart Card */}
           <div style={{ background: '#202630', borderRadius: '16px', border: '1px solid #29313D', padding: '16px', overflow: 'hidden' }}>
@@ -229,7 +229,7 @@ export const StockDetailView: React.FC<StockDetailViewProps> = ({
         </div>
 
         {/* BOTTOM 3-COLUMN ANALYSIS: Live Company/Asset Profile | Financial News Timeline | Financial Statement Overview */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '20px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '20px' }}>
           
           {/* Column 1: Live Profile */}
           <div style={{ background: '#202630', borderRadius: '16px', border: '1px solid #29313D', padding: '20px' }}>

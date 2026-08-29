@@ -235,7 +235,7 @@ export const InvestmentView: React.FC<InvestmentViewProps> = ({
           </p>
 
           {/* Key Metric Highlights */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '16px' }}>
             <div style={{ background: '#1e2329', border: '1px solid #2b313a', borderRadius: '12px', padding: '18px 20px' }}>
               <div style={{ fontSize: '12px', color: '#848e9c', marginBottom: '4px' }}>Peak Projected Return</div>
               <div style={{ fontSize: '26px', fontWeight: 900, color: '#0ecb81' }}>Up to 300%</div>
@@ -289,7 +289,7 @@ export const InvestmentView: React.FC<InvestmentViewProps> = ({
             )}
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px', alignItems: 'center' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '24px', alignItems: 'center' }}>
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '13px' }}>
                 <span style={{ color: '#848e9c' }}>Deposit Capital:</span>
@@ -507,7 +507,7 @@ export const InvestmentView: React.FC<InvestmentViewProps> = ({
           Available Investment &amp; Staking Tiers
         </h2>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginBottom: '60px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '20px', marginBottom: '60px' }}>
           {plans.map((p) => (
             <div
               key={p.id}

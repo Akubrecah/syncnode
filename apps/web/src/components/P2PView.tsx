@@ -186,7 +186,7 @@ export const P2PView: React.FC<P2PViewProps> = ({ user, onOpenAuth }) => {
   };
 
   return (
-    <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '40px 24px', width: '100%' }}>
+    <div className="p2p-main-container" style={{ maxWidth: '1280px', margin: '0 auto', padding: '40px 24px', width: '100%' }}>
       {/* P2P Header Banner */}
       <div style={{ background: '#1e2329', border: '1px solid #2b313a', borderRadius: '16px', padding: '28px 32px', marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px' }}>
         <div>
@@ -210,7 +210,7 @@ export const P2PView: React.FC<P2PViewProps> = ({ user, onOpenAuth }) => {
             <span className="badge badge-yellow">{activeTrade.status}</span>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', fontSize: '14px', marginBottom: '20px' }} className="mono">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))', gap: '16px', fontSize: '14px', marginBottom: '20px' }} className="mono">
             <div>
               <span style={{ color: '#848e9c' }}>Asset: </span>
               <strong style={{ color: '#ffffff' }}>{activeTrade.cryptoAmount} {activeTrade.asset}</strong>
