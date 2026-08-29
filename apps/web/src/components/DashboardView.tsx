@@ -436,7 +436,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
         {/* Referral */}
         <button
-          onClick={() => handleCopy('https://accounts.binance.com/register?ref=74819284', 'referral')}
+          onClick={() => handleCopy(typeof window !== 'undefined' ? `${window.location.origin}/#/signup?ref=${referralCode}` : `https://cryptobridge-syncode.vercel.app/#/signup?ref=${referralCode}`, 'referral')}
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -555,13 +555,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Smartphone size={18} color="#fcd535" />
-            <span style={{ fontSize: '12px', fontWeight: 700, color: '#eaecef' }}>Binance Mobile App</span>
+            <span style={{ fontSize: '12px', fontWeight: 700, color: '#eaecef' }}>CryptoBridge Mobile PWA</span>
           </div>
           <p style={{ fontSize: '11px', color: '#848e9c', margin: 0 }}>
-            Scan &amp; Trade on the go with real-time price alerts.
+            Trade on the go with real-time price alerts &amp; sub-millisecond execution.
           </p>
           <button
-            onClick={() => window.open('https://www.binance.com/en/download', '_blank')}
+            onClick={() => { if (typeof window !== 'undefined') window.location.hash = '#/spot'; }}
             style={{
               padding: '6px 10px',
               borderRadius: '6px',
@@ -577,7 +577,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               gap: '6px'
             }}
           >
-            <span>Download App</span>
+            <span>Open Mobile Trade</span>
             <ExternalLink size={12} />
           </button>
         </div>
@@ -1009,7 +1009,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 action: () => navigateTo('spot')
               },
               {
-                title: 'Binance Earn',
+                title: 'CryptoBridge Earn',
                 desc: 'Earn up to 16.4% APR with Simple Earn & Staking',
                 icon: Coins,
                 color: '#f0b90b',

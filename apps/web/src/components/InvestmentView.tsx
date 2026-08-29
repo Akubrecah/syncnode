@@ -224,7 +224,7 @@ export const InvestmentView: React.FC<InvestmentViewProps> = ({
         <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(252, 213, 53, 0.12)', border: '1px solid rgba(252, 213, 53, 0.3)', borderRadius: '20px', padding: '6px 14px', marginBottom: '16px' }}>
             <Sparkles size={14} color="#fcd535" />
-            <span style={{ fontSize: '13px', fontWeight: 700, color: '#fcd535' }}>Binance Institutional Yield &amp; Fixed Growth</span>
+            <span style={{ fontSize: '13px', fontWeight: 700, color: '#fcd535' }}>CryptoBridge Institutional Yield &amp; Fixed Growth</span>
           </div>
 
           <h1 style={{ fontSize: '38px', fontWeight: 900, letterSpacing: '-0.02em', margin: '0 0 12px', color: '#eaecef' }}>

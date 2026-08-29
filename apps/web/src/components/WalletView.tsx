@@ -1229,7 +1229,7 @@ export const WalletView: React.FC<WalletViewProps> = ({
     }));
     setStatusMsg({
       type: 'success',
-      text: `Payment sent! Transferred ${amount} ${fundingSendAsset} to ${fundingSendRecipient} via Binance Pay with 0 fee.`
+      text: `Payment sent! Transferred ${amount} ${fundingSendAsset} to ${fundingSendRecipient} via CryptoBridge Instant Pay with 0 fee.`
     });
     setIsFundingSendModalOpen(false);
     setFundingSendRecipient('');
@@ -1408,7 +1408,7 @@ export const WalletView: React.FC<WalletViewProps> = ({
                   {hideSensitiveValues ? '******' : `+$${(fundingTotalValuationUsd * 0.0085).toFixed(2)} (+0.85%)`}
                 </span>
                 <span style={{ fontSize: '11px', background: 'rgba(46, 189, 133, 0.1)', color: '#2ebd85', padding: '2px 6px', borderRadius: '4px', fontWeight: 700 }}>
-                  P2P &amp; Binance Pay
+                  P2P &amp; CryptoBridge Pay
                 </span>
               </div>
             ) : (
@@ -3803,7 +3803,7 @@ export const WalletView: React.FC<WalletViewProps> = ({
               <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                 <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#eaecef', margin: 0 }}>Funding</h2>
                 <span style={{ fontSize: '12px', background: '#29313d', color: '#fcd535', padding: '3px 8px', borderRadius: '4px', fontWeight: 700 }}>
-                  P2P &amp; Binance Pay
+                  P2P &amp; CryptoBridge Pay
                 </span>
               </div>
 
@@ -4673,7 +4673,7 @@ export const WalletView: React.FC<WalletViewProps> = ({
               </div>
               <div style={{ fontSize: '15px', fontWeight: 800, color: '#ffffff' }}>Scan QR to Deposit {selectedAsset}</div>
               <div style={{ fontSize: '12px', color: '#929aa5', marginTop: '6px', textAlign: 'center' }}>
-                Supported by Trust Wallet, MetaMask, Binance App, and hardware signers.
+                Supported by Trust Wallet, MetaMask, Web3 Wallets, and hardware signers.
               </div>
             </div>
           </div>
@@ -6141,7 +6141,7 @@ export const WalletView: React.FC<WalletViewProps> = ({
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Send size={20} color="#fcd535" />
-                  <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#eaecef', margin: 0 }}>Send via Binance Pay</h3>
+                  <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#eaecef', margin: 0 }}>Send via CryptoBridge Instant Pay</h3>
                 </div>
                 <button
                   onClick={() => setIsFundingSendModalOpen(false)}
@@ -6164,7 +6164,7 @@ export const WalletView: React.FC<WalletViewProps> = ({
                   lineHeight: '1.5'
                 }}
               >
-                Instant cryptocurrency transfers to other Binance users with <strong>0% transaction fees</strong> using Email, Phone Number, or Binance Pay ID.
+                Instant cryptocurrency transfers to other CryptoBridge users with <strong>0% transaction fees</strong> using Email, Phone Number, or User UID.
               </div>
 
               {/* Recipient Input */}
