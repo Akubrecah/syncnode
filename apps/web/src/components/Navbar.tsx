@@ -366,13 +366,15 @@ export const Navbar: React.FC<NavbarProps> = ({
             News
           </button>
 
-          {/* 6. Dashboard / Portfolio */}
-          <button
-            className={`nav-item ${activeTab === 'dashboard' && !isSearchOpen ? 'active' : ''}`}
-            onClick={() => setActiveTab('dashboard')}
-          >
-            Dashboard
-          </button>
+          {/* 6. Dashboard / Portfolio - Authenticated only */}
+          {currentUser && (
+            <button
+              className={`nav-item ${activeTab === 'dashboard' && !isSearchOpen ? 'active' : ''}`}
+              onClick={() => setActiveTab('dashboard')}
+            >
+              Dashboard
+            </button>
+          )}
 
           {/* 7. Admin Console */}
           {currentUser?.admin_roles && currentUser.admin_roles.length > 0 && (
