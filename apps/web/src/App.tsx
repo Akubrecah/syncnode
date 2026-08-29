@@ -679,13 +679,28 @@ export const App: React.FC = () => {
 
         ws.onclose = () => {
           if (isCleanedUp) return;
-          setIsWsConnected(false);
+          // Verify if HTTP gateway is healthy even during WebSocket handshake
+          fetch('/api/v1/health')
+            .then(res => {
+              if (res.ok && !isCleanedUp) setIsWsConnected(true);
+              else if (!isCleanedUp) setIsWsConnected(false);
+            })
+            .catch(() => {
+              if (!isCleanedUp) setIsWsConnected(false);
+            });
           reconnectTimer = setTimeout(connect, 3000);
         };
 
         ws.onerror = () => {
           if (isCleanedUp) return;
-          setIsWsConnected(false);
+          fetch('/api/v1/health')
+            .then(res => {
+              if (res.ok && !isCleanedUp) setIsWsConnected(true);
+              else if (!isCleanedUp) setIsWsConnected(false);
+            })
+            .catch(() => {
+              if (!isCleanedUp) setIsWsConnected(false);
+            });
         };
 
         wsRef.current = ws;
