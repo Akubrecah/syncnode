@@ -589,15 +589,16 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       <main className="dashboard-main-content" style={{ flex: 1, minWidth: 0, padding: '32px 36px', maxWidth: '1400px', margin: '0 auto', overflowY: 'auto' }}>
         {/* TOP USER PROFILE & STATUS HEADER */}
         <div
+          className="dashboard-user-header"
           style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             flexWrap: 'wrap',
-            gap: '20px',
-            paddingBottom: '24px',
+            gap: '16px',
+            paddingBottom: '20px',
             borderBottom: '1px solid #2b313a',
-            marginBottom: '28px'
+            marginBottom: '20px'
           }}
         >
           {/* User Info Left */}
@@ -775,14 +776,16 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             ESTIMATED BALANCE & ACCOUNT BREAKDOWN CARD
             ========================================================================= */}
         <div
+          className="dashboard-balance-card"
           style={{
-            background: '#202630',
+            background: 'linear-gradient(135deg, #202630 0%, #181a20 100%)',
             borderRadius: '16px',
             border: '1px solid #2b313a',
-            padding: '28px',
-            marginBottom: '28px',
+            padding: '24px',
+            marginBottom: '24px',
             position: 'relative',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.25)'
           }}
         >
           {/* Top Row: Total Balance */}
@@ -923,7 +926,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 {hideBalances ? '******' : `$${fundingAccountUsd.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
               </div>
               <div style={{ fontSize: '12px', color: '#848e9c', marginTop: '4px' }}>
-                P2P &amp; Binance Pay
+                P2P &amp; CryptoBridge Pay
               </div>
             </div>
 
@@ -964,7 +967,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               onClick={() => navigateTo('earn')}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                <span style={{ fontSize: '13px', color: '#848e9c', fontWeight: 600 }}>Binance Earn</span>
+                <span style={{ fontSize: '13px', color: '#848e9c', fontWeight: 600 }}>CryptoBridge Earn</span>
                 <span style={{ fontSize: '11px', color: '#2ebd85', fontWeight: 700 }}>Flexible</span>
               </div>
               <div style={{ fontSize: '18px', fontWeight: 700, color: '#eaecef' }}>
