@@ -144,29 +144,39 @@ export const TradingChart: React.FC<TradingChartProps> = ({ symbol }) => {
   }, [candles, chartEngine]);
 
   return (
-    <div className="panel" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <div className="panel-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+    <div className="trading-chart-panel" style={{ width: '100%', height: '100%', minHeight: '480px', display: 'flex', flexDirection: 'column', background: '#12141a' }}>
+      <div className="trading-chart-header" style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '6px 12px',
+        background: '#181a20',
+        borderBottom: '1px solid #2b313a',
+        flexWrap: 'wrap',
+        gap: '8px'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
           {/* Chart Engine Switcher */}
-          <div style={{ display: 'flex', background: '#181a20', padding: '2px', borderRadius: '6px', border: '1px solid #2b313a' }}>
+          <div style={{ display: 'flex', background: '#202630', padding: '2px', borderRadius: '6px', border: '1px solid #2b313a' }}>
             <button
               onClick={() => setChartEngine('tradingview')}
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '4px',
-                padding: '3px 10px',
+                padding: '4px 8px',
                 borderRadius: '4px',
                 fontSize: '11px',
                 fontWeight: 700,
                 cursor: 'pointer',
                 border: 'none',
                 background: chartEngine === 'tradingview' ? '#fcd535' : 'transparent',
-                color: chartEngine === 'tradingview' ? '#181a20' : '#848e9c'
+                color: chartEngine === 'tradingview' ? '#181a20' : '#848e9c',
+                whiteSpace: 'nowrap'
               }}
             >
               <Activity size={12} />
-              <span>TradingView Pro</span>
+              <span>TradingView</span>
             </button>
             <button
               onClick={() => setChartEngine('canvas')}
@@ -174,36 +184,37 @@ export const TradingChart: React.FC<TradingChartProps> = ({ symbol }) => {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '4px',
-                padding: '3px 10px',
+                padding: '4px 8px',
                 borderRadius: '4px',
                 fontSize: '11px',
                 fontWeight: 700,
                 cursor: 'pointer',
                 border: 'none',
                 background: chartEngine === 'canvas' ? '#fcd535' : 'transparent',
-                color: chartEngine === 'canvas' ? '#181a20' : '#848e9c'
+                color: chartEngine === 'canvas' ? '#181a20' : '#848e9c',
+                whiteSpace: 'nowrap'
               }}
             >
               <BarChart2 size={12} />
-              <span>L2 Engine</span>
+              <span>L2 Depth</span>
             </button>
           </div>
 
           {/* Timeframe Buttons */}
-          <div style={{ display: 'flex', gap: '4px' }}>
+          <div style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
             {['1m', '5m', '15m', '1h', '4h', '1d'].map((itv) => (
               <button
                 key={itv}
                 onClick={() => setInterval(itv)}
                 style={{
-                  padding: '2px 8px',
+                  padding: '4px 6px',
                   borderRadius: '4px',
                   fontSize: '11px',
                   fontWeight: 700,
                   cursor: 'pointer',
                   border: 'none',
                   background: interval === itv ? '#2b313a' : 'transparent',
-                  color: interval === itv ? '#fcd535' : 'var(--text-secondary)'
+                  color: interval === itv ? '#fcd535' : '#848e9c'
                 }}
               >
                 {itv}
@@ -212,15 +223,14 @@ export const TradingChart: React.FC<TradingChartProps> = ({ symbol }) => {
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-            {chartEngine === 'tradingview' ? 'Live TradingView Feed' : 'Deterministic L2 Depth'}
-          </span>
-          <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#00e599', boxShadow: '0 0 6px #00e599' }}></span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: '#848e9c' }}>
+          <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#00e599', display: 'inline-block', boxShadow: '0 0 6px #00e599' }}></span>
+          <span className="desktop-only">{chartEngine === 'tradingview' ? 'Live TradingView Feed' : 'Deterministic L2 Depth'}</span>
+          <span style={{ fontSize: '10px', color: '#00e599', fontWeight: 700 }}>LIVE</span>
         </div>
       </div>
 
-      <div style={{ flex: 1, position: 'relative', overflow: 'hidden', height: 'calc(100% - 41px)' }}>
+      <div className="trading-chart-viewport" style={{ flex: 1, width: '100%', minHeight: '440px', position: 'relative', overflow: 'hidden' }}>
         {chartEngine === 'tradingview' ? (
           <TradingViewWidget symbol={symbol} interval={interval} />
         ) : (

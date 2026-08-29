@@ -391,36 +391,8 @@ export const SpotTradeView: React.FC<SpotTradeViewProps> = ({
         </div>
 
         {/* COLUMN 2: CANDLESTICK CHART */}
-        <div className={`spot-col-chart ${mobileTradeTab === 'chart' ? 'mobile-active' : ''}`} style={{ background: '#12161c', display: 'flex', flexDirection: 'column', borderRight: '1px solid #2b313a' }}>
-          {/* Chart Header Tools */}
-          <div style={{ padding: '8px 16px', borderBottom: '1px solid #2b313a', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#181a20' }}>
-            <div style={{ display: 'flex', gap: '6px' }}>
-              {(['1m', '15m', '1h', '4h', '1D', '1W'] as const).map((tf) => (
-                <button
-                  key={tf}
-                  onClick={() => setTimeframe(tf)}
-                  style={{
-                    background: timeframe === tf ? '#29313d' : 'transparent',
-                    color: timeframe === tf ? '#fcd535' : '#848e9c',
-                    border: 'none',
-                    borderRadius: '4px',
-                    padding: '4px 8px',
-                    fontSize: '12px',
-                    fontWeight: 700,
-                    cursor: 'pointer'
-                  }}
-                >
-                  {tf}
-                </button>
-              ))}
-            </div>
-            <div style={{ display: 'flex', gap: '8px', fontSize: '12px', color: '#848e9c' }}>
-              <span>TradingView Pro</span>
-              <span>Indicators</span>
-            </div>
-          </div>
-
-          <div style={{ flex: 1, minHeight: '450px' }}>
+        <div className={`spot-col-chart ${mobileTradeTab === 'chart' ? 'mobile-active' : ''}`} style={{ background: '#12161c', display: 'flex', flexDirection: 'column', borderRight: '1px solid #2b313a', flex: 1, minHeight: '520px' }}>
+          <div style={{ flex: 1, width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
             <TradingChart symbol={symbol} />
           </div>
         </div>

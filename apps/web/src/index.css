@@ -5642,12 +5642,24 @@ a[href*="tradingview.com"] {
   }
 
   .spot-col-orderbook.mobile-active,
-  .spot-col-chart.mobile-active,
   .spot-col-tradeform.mobile-active,
   .spot-col-trades.mobile-active {
     display: flex !important;
     min-height: 480px !important;
     width: 100% !important;
+  }
+
+  .spot-col-chart.mobile-active {
+    display: flex !important;
+    min-height: calc(100vh - 180px) !important;
+    height: calc(100vh - 180px) !important;
+    width: 100% !important;
+  }
+
+  .spot-col-chart.mobile-active .trading-chart-panel,
+  .spot-col-chart.mobile-active .trading-chart-viewport {
+    height: 100% !important;
+    min-height: calc(100vh - 220px) !important;
   }
 
   .spot-header-tags {
