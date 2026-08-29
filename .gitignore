@@ -82,3 +82,9 @@ __pycache__/
 venv/
 ENV/
 
+# Skills & Local agent artifacts
+skills-lock.json
+.agents/skills/clerk*
+.agents/skills/clerk/
+
+
