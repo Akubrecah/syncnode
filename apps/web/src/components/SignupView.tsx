@@ -437,7 +437,7 @@ export const SignupView: React.FC<SignupViewProps> = ({
         </span>
       </div>
 
-      {/* Primary Gateway Switcher (Clerk Cloud vs Direct Express) */}
+      {/* Primary Gateway Switcher (Direct Express vs Clerk Cloud) */}
       <div
         style={{
           display: 'flex',
@@ -451,6 +451,28 @@ export const SignupView: React.FC<SignupViewProps> = ({
           gap: '4px'
         }}
       >
+        <button
+          type="button"
+          onClick={() => setAuthMethod('direct')}
+          style={{
+            flex: 1,
+            padding: '8px',
+            borderRadius: '7px',
+            border: 'none',
+            fontSize: '12.5px',
+            fontWeight: 700,
+            cursor: 'pointer',
+            background: authMethod === 'direct' ? '#fcd535' : 'transparent',
+            color: authMethod === 'direct' ? '#0b0e11' : '#848e9c',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px'
+          }}
+        >
+          <Zap size={14} />
+          <span>Direct Terminal Access (Fast)</span>
+        </button>
         <button
           type="button"
           onClick={() => setAuthMethod('clerk')}
@@ -473,33 +495,28 @@ export const SignupView: React.FC<SignupViewProps> = ({
           <Cloud size={14} />
           <span>Clerk Cloud Gateway</span>
         </button>
-        <button
-          type="button"
-          onClick={() => setAuthMethod('direct')}
-          style={{
-            flex: 1,
-            padding: '8px',
-            borderRadius: '7px',
-            border: 'none',
-            fontSize: '12.5px',
-            fontWeight: 700,
-            cursor: 'pointer',
-            background: authMethod === 'direct' ? '#fcd535' : 'transparent',
-            color: authMethod === 'direct' ? '#0b0e11' : '#848e9c',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '6px'
-          }}
-        >
-          <Zap size={14} />
-          <span>Direct Terminal Access</span>
-        </button>
       </div>
 
       {/* CLERK CLOUD AUTH VIEW */}
       {authMethod === 'clerk' && (
         <div style={{ width: '100%', maxWidth: '460px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          {/* Helpful OAuth Note */}
+          <div
+            style={{
+              background: 'rgba(252, 213, 53, 0.08)',
+              border: '1px solid rgba(252, 213, 53, 0.25)',
+              borderRadius: '8px',
+              padding: '10px 14px',
+              marginBottom: '12px',
+              fontSize: '12px',
+              color: '#eaecef',
+              lineHeight: 1.4,
+              width: '100%'
+            }}
+          >
+            💡 <strong>Google / Social Sign-In:</strong> If you see <em>"External Account was not found"</em>, it means your account hasn't been created in Clerk yet. Click <strong>"Create Account (Clerk)"</strong> below to register with Google!
+          </div>
+
           {/* Sub-tab: Sign In vs Sign Up */}
           <div
             style={{
@@ -528,7 +545,7 @@ export const SignupView: React.FC<SignupViewProps> = ({
                 color: mode === 'login' ? '#0b0e11' : '#848e9c'
               }}
             >
-              Sign In (Clerk)
+              Sign In (Existing)
             </button>
             <button
               type="button"
@@ -545,7 +562,7 @@ export const SignupView: React.FC<SignupViewProps> = ({
                 color: mode === 'signup' ? '#0b0e11' : '#848e9c'
               }}
             >
-              Create Account (Clerk)
+              Create Account (New User)
             </button>
           </div>
 
@@ -554,12 +571,14 @@ export const SignupView: React.FC<SignupViewProps> = ({
               routing="hash"
               appearance={clerkAppearance}
               fallbackRedirectUrl="/dashboard"
+              signUpUrl="#/signup"
             />
           ) : (
             <SignUp
               routing="hash"
               appearance={clerkAppearance}
               fallbackRedirectUrl="/dashboard"
+              signInUrl="#/login"
             />
           )}
         </div>
