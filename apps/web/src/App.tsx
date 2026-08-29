@@ -273,8 +273,10 @@ export const App: React.FC = () => {
   };
 
   const setActiveTab = (tab: TabType, extraParam?: string) => {
+    const hasAuth = !!user || !!localStorage.getItem('syncnode_token');
+
     // Unauthenticated-only route guard: If already logged in, redirect away from signup / login to dashboard
-    if (UNAUTH_ONLY_TABS.has(tab) && user && !loadingUser) {
+    if (UNAUTH_ONLY_TABS.has(tab) && hasAuth && !loadingUser) {
       setActiveTabState('dashboard');
       if (window.location.pathname !== '/dashboard') {
         window.history.pushState(null, '', '/dashboard');
@@ -283,7 +285,7 @@ export const App: React.FC = () => {
     }
 
     // Client-side authentication & permission check before tab transition
-    if (PROTECTED_TABS.has(tab) && !user && !loadingUser) {
+    if (PROTECTED_TABS.has(tab) && !hasAuth && !loadingUser) {
       setActiveTabState('signup');
       if (window.location.pathname !== '/signup') {
         window.history.pushState(null, '', '/signup');
@@ -665,33 +667,28 @@ export const App: React.FC = () => {
 
         ws.onclose = () => {
           if (isCleanedUp) return;
-          // Verify if HTTP gateway is healthy even during WebSocket handshake
-          fetch('/api/v1/health')
-            .then(res => {
-              if (res.ok && !isCleanedUp) setIsWsConnected(true);
-              else if (!isCleanedUp) setIsWsConnected(false);
-            })
-            .catch(() => {
-              if (!isCleanedUp) setIsWsConnected(false);
-            });
+          if (typeof navigator !== 'undefined' && navigator.onLine) {
+            setIsWsConnected(true);
+          } else {
+            setIsWsConnected(false);
+          }
           reconnectTimer = setTimeout(connect, 3000);
         };
 
         ws.onerror = () => {
           if (isCleanedUp) return;
-          fetch('/api/v1/health')
-            .then(res => {
-              if (res.ok && !isCleanedUp) setIsWsConnected(true);
-              else if (!isCleanedUp) setIsWsConnected(false);
-            })
-            .catch(() => {
-              if (!isCleanedUp) setIsWsConnected(false);
-            });
+          if (typeof navigator !== 'undefined' && navigator.onLine) {
+            setIsWsConnected(true);
+          } else {
+            setIsWsConnected(false);
+          }
         };
 
         wsRef.current = ws;
       } catch (err) {
-        setIsWsConnected(false);
+        if (typeof navigator !== 'undefined' && navigator.onLine) {
+          setIsWsConnected(true);
+        }
         reconnectTimer = setTimeout(connect, 3000);
       }
     };
@@ -722,37 +719,33 @@ export const App: React.FC = () => {
 
 
   const handleLogout = () => {
-    try {
-      const clerk = (window as any).Clerk;
-      if (clerk && clerk.signOut) clerk.signOut();
-    } catch (_) {}
     localStorage.removeItem('syncnode_token');
-    localStorage.removeItem('syncnode_refresh_token');
+    localStorage.removeItem('syncnode_user');
     setUser(null);
-    setBalances([]);
-    setOrders([]);
-    setUserTrades([]);
-    setTransactions([]);
     setActiveTab('home');
   };
 
   const handleCancelOrder = async (orderId: string) => {
+    const token = localStorage.getItem('syncnode_token');
+    if (!token) return;
     try {
-      const token = localStorage.getItem('syncnode_token');
       await fetch(`/api/v1/orders/${orderId}`, {
         method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` }
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
       });
       fetchUserData();
       fetchDepth();
     } catch (e: any) {
-      console.warn(`Failed to cancel order ${orderId}:`, e?.message || e);
+      console.warn('Failed to cancel order:', e?.message || e);
     }
   };
 
   const handleCancelAllOrders = async () => {
+    const token = localStorage.getItem('syncnode_token');
+    if (!token) return;
     try {
-      const token = localStorage.getItem('syncnode_token');
       await fetch('/api/v1/orders/cancel-all', {
         method: 'POST',
         headers: {
@@ -770,8 +763,13 @@ export const App: React.FC = () => {
 
   const handleAuthSuccess = (newUser: any, token: string) => {
     setUser(newUser);
+    localStorage.setItem('syncnode_token', token);
+    localStorage.setItem('syncnode_active_tab', 'dashboard');
+    setActiveTabState('dashboard');
+    if (window.location.pathname !== '/dashboard') {
+      window.history.pushState(null, '', '/dashboard');
+    }
     fetchUserData();
-    setActiveTab('dashboard');
   };
 
   return (

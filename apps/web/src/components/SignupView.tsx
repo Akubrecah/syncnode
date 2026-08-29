@@ -372,22 +372,21 @@ export const SignupView: React.FC<SignupViewProps> = ({
 
   // Login handler
   const executeLogin = async () => {
-    const clerk = (window as any).Clerk;
-    if (clerk && clerk.loaded && clerk.client?.signIn) {
+    if (isSignInLoaded && signIn) {
       try {
-        const res = await clerk.client.signIn.create({
+        const res = await signIn.create({
           identifier: email.trim().toLowerCase(),
           password
         });
         if (res.status === 'complete') {
-          if (clerk.setActive) {
-            await clerk.setActive({ session: res.createdSessionId });
+          if (setActive) {
+            await setActive({ session: res.createdSessionId });
           }
           const syncRes = await fetch('/api/v1/auth/clerk', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              clerkId: res.createdUserId || `usr_${Date.now()}`,
+              clerkId: (res as any).createdUserId || `usr_${Date.now()}`,
               email: email.trim().toLowerCase(),
               fullName: email.split('@')[0],
               provider: 'clerk_password'
