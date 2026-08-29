@@ -500,23 +500,6 @@ export const SignupView: React.FC<SignupViewProps> = ({
       {/* CLERK CLOUD AUTH VIEW */}
       {authMethod === 'clerk' && (
         <div style={{ width: '100%', maxWidth: '460px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          {/* Helpful OAuth Note */}
-          <div
-            style={{
-              background: 'rgba(252, 213, 53, 0.08)',
-              border: '1px solid rgba(252, 213, 53, 0.25)',
-              borderRadius: '8px',
-              padding: '10px 14px',
-              marginBottom: '12px',
-              fontSize: '12px',
-              color: '#eaecef',
-              lineHeight: 1.4,
-              width: '100%'
-            }}
-          >
-            💡 <strong>Google / Social Sign-In:</strong> If you see <em>"External Account was not found"</em>, it means your account hasn't been created in Clerk yet. Click <strong>"Create Account (Clerk)"</strong> below to register with Google!
-          </div>
-
           {/* Sub-tab: Sign In vs Sign Up */}
           <div
             style={{
@@ -530,6 +513,23 @@ export const SignupView: React.FC<SignupViewProps> = ({
               gap: '4px'
             }}
           >
+            <button
+              type="button"
+              onClick={() => setMode('signup')}
+              style={{
+                flex: 1,
+                padding: '7px',
+                borderRadius: '6px',
+                border: 'none',
+                fontSize: '12px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                background: mode === 'signup' ? '#fcd535' : 'transparent',
+                color: mode === 'signup' ? '#0b0e11' : '#848e9c'
+              }}
+            >
+              Create Account (Sign Up)
+            </button>
             <button
               type="button"
               onClick={() => setMode('login')}
@@ -546,23 +546,6 @@ export const SignupView: React.FC<SignupViewProps> = ({
               }}
             >
               Sign In (Existing)
-            </button>
-            <button
-              type="button"
-              onClick={() => setMode('signup')}
-              style={{
-                flex: 1,
-                padding: '7px',
-                borderRadius: '6px',
-                border: 'none',
-                fontSize: '12px',
-                fontWeight: 700,
-                cursor: 'pointer',
-                background: mode === 'signup' ? '#fcd535' : 'transparent',
-                color: mode === 'signup' ? '#0b0e11' : '#848e9c'
-              }}
-            >
-              Create Account (New User)
             </button>
           </div>
 
