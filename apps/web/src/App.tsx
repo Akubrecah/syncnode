@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
+import { useUser } from '@clerk/clerk-react';
 import { Navbar, TabType } from './components/Navbar';
 import { DashboardView } from './components/DashboardView';
 import { NewsView } from './components/NewsView';
@@ -248,6 +249,8 @@ export const App: React.FC = () => {
   const [depth, setDepth] = useState<any | null>(null);
   const [recentTrades, setRecentTrades] = useState<any[]>([]);
   const [selectedPrice, setSelectedPrice] = useState<string | undefined>(undefined);
+
+  const { user: clerkUser, isLoaded: isClerkLoaded, isSignedIn: isClerkSignedIn } = useUser();
 
   // User and Auth State
   const [user, setUser] = useState<any | null>(null);
@@ -556,24 +559,26 @@ export const App: React.FC = () => {
     }
   }, [activeTab, user, loadingUser]);
 
-  // Initialize data and synchronize Clerk authenticated sessions
+  // Initialize data
   useEffect(() => {
     fetchMarkets();
     fetchUserData();
+  }, []);
 
-    // Listen for Clerk authenticated session and sync with backend
-    const checkClerkSession = async () => {
-      const clerk = (window as any).Clerk;
-      if (!clerk) return;
+  // Realtime Clerk User Synchronization
+  useEffect(() => {
+    if (!isClerkLoaded) return;
+    if (isClerkSignedIn && clerkUser) {
+      const email = clerkUser.primaryEmailAddress?.emailAddress || clerkUser.emailAddresses?.[0]?.emailAddress;
+      if (!email) return;
 
-      const syncWithClerkUser = async (clerkUser: any) => {
-        if (!clerkUser) return;
-        const email = clerkUser.primaryEmailAddress?.emailAddress || clerkUser.emailAddresses?.[0]?.emailAddress;
-        if (!email) return;
+      const token = localStorage.getItem('syncnode_token');
+      if (user && user.email === email && token) {
+        return;
+      }
 
-        const token = localStorage.getItem('syncnode_token');
-        if (token && user?.email === email) return;
-
+      const syncWithBackend = async () => {
+        setLoadingUser(true);
         try {
           const res = await fetch('/api/v1/auth/clerk', {
             method: 'POST',
@@ -595,29 +600,13 @@ export const App: React.FC = () => {
           }
         } catch (e) {
           console.warn('Failed to sync Clerk session with backend:', e);
+        } finally {
+          setLoadingUser(false);
         }
       };
-
-      if (clerk.loaded && clerk.user) {
-        syncWithClerkUser(clerk.user);
-      }
-
-      clerk.addListener?.((emission: any) => {
-        if (emission.user) {
-          syncWithClerkUser(emission.user);
-        }
-      });
-    };
-
-    const clerkInterval = setInterval(() => {
-      if ((window as any).Clerk?.loaded) {
-        checkClerkSession();
-        clearInterval(clerkInterval);
-      }
-    }, 400);
-
-    return () => clearInterval(clerkInterval);
-  }, [user?.email]);
+      syncWithBackend();
+    }
+  }, [isClerkLoaded, isClerkSignedIn, clerkUser?.id, user?.email]);
 
   // Poll market state every 1.5 seconds
   useEffect(() => {
@@ -635,53 +624,83 @@ export const App: React.FC = () => {
     return () => clearInterval(timer);
   }, [symbol, user?.id]);
 
-  // Connect Authenticated WebSocket stream (CRIT-004)
+  // Connect Authenticated WebSocket stream with Railway production fallback and auto-reconnect
   useEffect(() => {
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const token = localStorage.getItem('syncnode_token');
-    const wsUrl = token
-      ? `${protocol}//${window.location.host}/ws?token=${encodeURIComponent(token)}`
-      : `${protocol}//${window.location.host}/ws`;
-    const ws = new WebSocket(wsUrl);
+    let ws: WebSocket | null = null;
+    let reconnectTimer: any = null;
+    let isCleanedUp = false;
 
-    ws.onopen = () => {
-      setIsWsConnected(true);
-      if (token) {
-        ws.send(JSON.stringify({ action: 'AUTH', token }));
+    const getWsUrl = () => {
+      const token = localStorage.getItem('syncnode_token');
+      const tokenParam = token ? `?token=${encodeURIComponent(token)}` : '';
+      if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+        return `ws://localhost:8000/ws${tokenParam}`;
       }
-      ws.send(JSON.stringify({
-        action: 'SUBSCRIBE',
-        channels: [`depth@${symbol}`, `trades@${symbol}`, `ticker@${symbol}`]
-      }));
+      return `wss://syncnode-web-production.up.railway.app/ws${tokenParam}`;
     };
 
-    ws.onmessage = (event) => {
+    const connect = () => {
+      if (isCleanedUp) return;
       try {
-        const msg = JSON.parse(event.data);
-        if (msg.type === 'BALANCE_UPDATE') {
-          if (msg.balances) {
-            setBalances(msg.balances);
+        const url = getWsUrl();
+        ws = new WebSocket(url);
+
+        ws.onopen = () => {
+          if (isCleanedUp) return;
+          setIsWsConnected(true);
+          const token = localStorage.getItem('syncnode_token');
+          if (token) {
+            ws?.send(JSON.stringify({ action: 'AUTH', token }));
           }
-          if (localStorage.getItem('syncnode_token')) {
-            fetchUserData();
+          ws?.send(JSON.stringify({
+            action: 'SUBSCRIBE',
+            channels: [`depth@${symbol}`, `trades@${symbol}`, `ticker@${symbol}`]
+          }));
+        };
+
+        ws.onmessage = (event) => {
+          if (isCleanedUp) return;
+          try {
+            const msg = JSON.parse(event.data);
+            if (msg.type === 'BALANCE_UPDATE') {
+              if (msg.balances) setBalances(msg.balances);
+              if (localStorage.getItem('syncnode_token')) fetchUserData();
+            } else if (msg.type === 'ORDER_UPDATE' || msg.type === 'TRADE_UPDATE') {
+              fetchUserData();
+            } else if (msg.channel === `depth@${symbol}`) {
+              setDepth(msg.data);
+            } else if (msg.channel === `trades@${symbol}`) {
+              setRecentTrades((prev) => [msg.data, ...prev.slice(0, 39)]);
+            }
+          } catch (e: any) {
+            console.warn('Failed to parse WebSocket message:', e?.message || e);
           }
-        } else if (msg.type === 'ORDER_UPDATE' || msg.type === 'TRADE_UPDATE') {
-          fetchUserData();
-        } else if (msg.channel === `depth@${symbol}`) {
-          setDepth(msg.data);
-        } else if (msg.channel === `trades@${symbol}`) {
-          setRecentTrades((prev) => [msg.data, ...prev.slice(0, 39)]);
-        }
-      } catch (e: any) {
-        console.warn('Failed to parse WebSocket message:', e?.message || e);
+        };
+
+        ws.onclose = () => {
+          if (isCleanedUp) return;
+          setIsWsConnected(false);
+          reconnectTimer = setTimeout(connect, 3000);
+        };
+
+        ws.onerror = () => {
+          if (isCleanedUp) return;
+          setIsWsConnected(false);
+        };
+
+        wsRef.current = ws;
+      } catch (err) {
+        setIsWsConnected(false);
+        reconnectTimer = setTimeout(connect, 3000);
       }
     };
 
-    ws.onclose = () => setIsWsConnected(false);
-    wsRef.current = ws;
+    connect();
 
     return () => {
-      ws.close();
+      isCleanedUp = true;
+      if (reconnectTimer) clearTimeout(reconnectTimer);
+      if (ws) ws.close();
     };
   }, [symbol]);
 

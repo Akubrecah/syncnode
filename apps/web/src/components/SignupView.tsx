@@ -190,24 +190,15 @@ export const SignupView: React.FC<SignupViewProps> = ({
       return;
     }
 
-    // Step 1: Initiate signup via Clerk or Backend
-    const clerk = (window as any).Clerk;
-    if (clerk && clerk.loaded && clerk.client?.signUp) {
+    // Step 1: Initiate signup via Clerk & backend OTP dispatcher
+    if (isSignUpLoaded && signUp) {
       try {
-        await clerk.client.signUp.create({
+        await signUp.create({
           emailAddress: email.trim().toLowerCase(),
           password: password,
           firstName: fullName.trim() || undefined
         });
-        await clerk.client.signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
-
-        setStep('VERIFY_OTP');
-        setOtpCooldown(45);
-        setSuccessMessage(`Clerk verification code dispatched to ${email.trim()}.`);
-        setTimeout(() => {
-          otpInputRefs.current[0]?.focus();
-        }, 100);
-        return;
+        await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
       } catch (clerkErr: any) {
         if (clerkErr?.errors?.[0]?.message) {
           setError(clerkErr.errors[0].message);
@@ -260,14 +251,9 @@ export const SignupView: React.FC<SignupViewProps> = ({
     setError(null);
     setSuccessMessage(null);
 
-    const clerk = (window as any).Clerk;
-    if (clerk && clerk.loaded && clerk.client?.signUp) {
+    if (isSignUpLoaded && signUp) {
       try {
-        await clerk.client.signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
-        setOtpCooldown(45);
-        setSuccessMessage(`New verification code sent to ${email.trim()}.`);
-        setLoading(false);
-        return;
+        await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
       } catch (clerkErr: any) {
         console.warn('Clerk resend fallback:', clerkErr);
       }
@@ -321,13 +307,12 @@ export const SignupView: React.FC<SignupViewProps> = ({
       return;
     }
 
-    const clerk = (window as any).Clerk;
-    if (clerk && clerk.loaded && clerk.client?.signUp) {
+    if (isSignUpLoaded && signUp) {
       try {
-        const completeSignUp = await clerk.client.signUp.attemptEmailAddressVerification({ code: combinedCode });
+        const completeSignUp = await signUp.attemptEmailAddressVerification({ code: combinedCode });
         if (completeSignUp.status === 'complete') {
-          if (clerk.setActive) {
-            await clerk.setActive({ session: completeSignUp.createdSessionId });
+          if (setActive) {
+            await setActive({ session: completeSignUp.createdSessionId });
           }
           const syncRes = await fetch('/api/v1/auth/clerk', {
             method: 'POST',
@@ -347,12 +332,7 @@ export const SignupView: React.FC<SignupViewProps> = ({
           }
         }
       } catch (clerkErr: any) {
-        if (clerkErr?.errors?.[0]?.message) {
-          setError(clerkErr.errors[0].message);
-          setLoading(false);
-          return;
-        }
-        console.warn('Clerk OTP verification fallback to internal engine:', clerkErr);
+        console.warn('Clerk OTP attempt fallback to backend verification:', clerkErr);
       }
     }
 
