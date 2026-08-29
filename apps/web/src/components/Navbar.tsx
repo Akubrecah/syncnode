@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useUser } from '@clerk/clerk-react';
 import {
   Activity,
   Wallet,
@@ -75,6 +76,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   isWsConnected,
   circuitBreakers
 }) => {
+  const { user: clerkUser, isSignedIn: isClerkSignedIn } = useUser();
   const [isTradeMenuOpen, setIsTradeMenuOpen] = useState(false);
   const [isOrdersMenuOpen, setIsOrdersMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -103,10 +105,29 @@ export const Navbar: React.FC<NavbarProps> = ({
   const currentUser = user || (() => {
     try {
       const s = typeof localStorage !== 'undefined' ? localStorage.getItem('syncnode_user') : null;
-      return s ? JSON.parse(s) : null;
-    } catch {
-      return null;
+      if (s) return JSON.parse(s);
+    } catch {}
+    if (isClerkSignedIn && clerkUser) {
+      const email = clerkUser.primaryEmailAddress?.emailAddress || clerkUser.emailAddresses?.[0]?.emailAddress || '';
+      return {
+        id: clerkUser.id,
+        email,
+        fullName: clerkUser.fullName || `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim() || email.split('@')[0] || 'Trader',
+        avatarUrl: clerkUser.imageUrl
+      };
     }
+    try {
+      const token = typeof localStorage !== 'undefined' ? localStorage.getItem('syncnode_token') : null;
+      if (token) {
+        return {
+          id: 'usr_trader',
+          email: '',
+          fullName: 'Trader',
+          kyc_tier: 1
+        };
+      }
+    } catch {}
+    return null;
   })();
 
   const isTradeActive = ['spot', 'p2p'].includes(activeTab);
