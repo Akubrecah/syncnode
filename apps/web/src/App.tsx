@@ -240,8 +240,15 @@ export const App: React.FC = () => {
   const { user: clerkUser, isLoaded: isClerkLoaded, isSignedIn: isClerkSignedIn } = useUser();
 
   // User and Auth State
-  const [user, setUser] = useState<any | null>(null);
-  const [loadingUser, setLoadingUser] = useState<boolean>(true);
+  const [user, setUser] = useState<any | null>(() => {
+    try {
+      const saved = localStorage.getItem('syncnode_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+  const [loadingUser, setLoadingUser] = useState<boolean>(false);
   const [balances, setBalances] = useState<any[]>([]);
   const [orders, setOrders] = useState<any[]>([]);
   const [userTrades, setUserTrades] = useState<any[]>([]);
@@ -514,7 +521,10 @@ export const App: React.FC = () => {
       const cbJson = await cbRes.json();
       const txJson = await txRes.json();
 
-      if (meJson.success) setUser(meJson.user);
+      if (meJson.success && meJson.user) {
+        setUser(meJson.user);
+        localStorage.setItem('syncnode_user', JSON.stringify(meJson.user));
+      }
       if (balJson.success) setBalances(balJson.balances);
       if (ordJson.success) setOrders(ordJson.orders);
       if (trdJson.success) setUserTrades(trdJson.trades);
@@ -526,26 +536,6 @@ export const App: React.FC = () => {
       setLoadingUser(false);
     }
   };
-
-
-  // Auth & Permissions Guard Interceptor
-  useEffect(() => {
-    if (loadingUser) return;
-
-    if (PROTECTED_TABS.has(activeTab) && !user) {
-      setActiveTabState('signup');
-      window.location.hash = '#/signup';
-    } else if (UNAUTH_ONLY_TABS.has(activeTab) && user) {
-      setActiveTabState('dashboard');
-      window.location.hash = '#/dashboard';
-    } else if (ADMIN_TABS.has(activeTab)) {
-      const hasAdmin = user?.admin_roles && user.admin_roles.length > 0;
-      if (!hasAdmin) {
-        setActiveTabState('home');
-        window.location.hash = '#/home';
-      }
-    }
-  }, [activeTab, user, loadingUser]);
 
   // Initialize data
   useEffect(() => {
@@ -799,9 +789,9 @@ export const App: React.FC = () => {
       />
 
       {/* 1. DASHBOARD / ASSETS / DEPOSIT / WITHDRAW / TRANSFERS / ORDERS / SECURITY / KYC / API KEYS / SESSIONS / SETTINGS */}
-      {PROTECTED_TABS.has(activeTab) && user && (
+      {PROTECTED_TABS.has(activeTab) && (user || localStorage.getItem('syncnode_token')) && (
         <DashboardView
-          user={user}
+          user={user || { id: 'usr_active', email: '', fullName: 'Trader', kyc_tier: 1 }}
           balances={balances}
           orders={orders}
           userTrades={userTrades}
@@ -855,7 +845,7 @@ export const App: React.FC = () => {
         />
       )}
 
-      {PROTECTED_TABS.has(activeTab) && !user && !loadingUser && (
+      {PROTECTED_TABS.has(activeTab) && !user && !localStorage.getItem('syncnode_token') && !loadingUser && (
         <SignupView
           initialMode="login"
           onSuccess={handleAuthSuccess}
