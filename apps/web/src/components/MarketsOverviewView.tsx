@@ -591,61 +591,44 @@ export const MarketsOverviewView: React.FC<MarketsOverviewViewProps> = ({
     <div className="com-trading-data-wrap" style={{ minHeight: '100vh', background: 'var(--color-BasicBg, #181A20)', color: 'var(--color-PrimaryText, #EAECEF)', fontFamily: 'BinanceNova, -apple-system, BlinkMacSystemFont, sans-serif' }}>
       
       {/* 1. TOP HEADER NAVIGATION (Overview | Trading Data | AI Select | Token Unlock) */}
-      <div style={{ borderBottom: '1px solid #29313D', padding: '0 32px' }}>
-        <div style={{ maxWidth: '1360px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '64px' }}>
+      <div className="markets-top-nav-bar" style={{ borderBottom: '1px solid #29313D', padding: '0 24px', background: '#181A20' }}>
+        <div className="markets-top-nav-inner" style={{ maxWidth: '1360px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', minHeight: '56px', flexWrap: 'wrap', gap: '12px' }}>
           
-          <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
+          <div className="markets-top-tabs-row" style={{ display: 'flex', alignItems: 'center', gap: '20px', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
             <button
               onClick={() => handleHeaderNav('overview')}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: headerNav === 'overview' ? '#EAECEF' : '#848E9C',
-                fontSize: '20px',
-                fontWeight: 700,
-                cursor: 'pointer',
-                padding: '0',
-                transition: 'color 0.15s'
-              }}
+              className={`markets-nav-tab-btn ${headerNav === 'overview' ? 'active' : ''}`}
             >
               Overview
             </button>
 
             <button
               onClick={() => handleHeaderNav('trading_data')}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: headerNav === 'trading_data' ? '#EAECEF' : '#848E9C',
-                fontSize: '20px',
-                fontWeight: 700,
-                cursor: 'pointer',
-                padding: '0',
-                transition: 'color 0.15s'
-              }}
+              className={`markets-nav-tab-btn ${headerNav === 'trading_data' ? 'active' : ''}`}
             >
               Trading Data
             </button>
 
-            <span style={{ color: '#848E9C', fontSize: '20px', fontWeight: 700, cursor: 'not-allowed', opacity: 0.5 }}>
+            <span className="markets-nav-tab-btn disabled desktop-only">
               AI Select
             </span>
 
-            <span style={{ color: '#848E9C', fontSize: '20px', fontWeight: 700, cursor: 'not-allowed', opacity: 0.5 }}>
+            <span className="markets-nav-tab-btn disabled desktop-only">
               Token Unlock
             </span>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', fontSize: '12px', color: '#848E9C' }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <div className="markets-live-status-row" style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '12px', color: '#848E9C' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}>
               <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#2EBD85', display: 'inline-block' }}></span>
-              Real-time Live Stream
+              <span className="desktop-only">Real-time </span>Live
             </span>
             <button
               onClick={fetchLiveProducts}
-              style={{ background: '#202630', border: '1px solid #333B47', borderRadius: '4px', color: '#EAECEF', padding: '5px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+              style={{ background: '#202630', border: '1px solid #333B47', borderRadius: '6px', color: '#EAECEF', padding: '5px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px' }}
+              title="Refresh live market data"
             >
-              <RefreshCw size={12} className={isLoading ? 'animate-spin' : ''} />
+              <RefreshCw size={13} className={isLoading ? 'animate-spin' : ''} />
               <span>Refresh</span>
             </button>
           </div>

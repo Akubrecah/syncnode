@@ -5534,6 +5534,48 @@ a[href*="tradingview.com"] {
   display: none;
 }
 
+/* Markets Overview Top Navigation Tabs */
+.markets-top-nav-bar {
+  padding: 0 24px;
+}
+
+.markets-nav-tab-btn {
+  background: transparent;
+  border: none;
+  color: #848E9C;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 14px 4px;
+  position: relative;
+  transition: color 0.15s ease;
+  white-space: nowrap;
+}
+
+.markets-nav-tab-btn:hover {
+  color: #EAECEF;
+}
+
+.markets-nav-tab-btn.active {
+  color: #EAECEF;
+}
+
+.markets-nav-tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #FCD535;
+  border-radius: 2px 2px 0 0;
+}
+
+.markets-nav-tab-btn.disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
 /* Mobile Breakpoint Media Queries */
 @media (max-width: 992px) {
   .desktop-nav-links {
@@ -5709,6 +5751,21 @@ a[href*="tradingview.com"] {
   .markets-main-wrapper,
   .p2p-main-container {
     padding: 16px 12px !important;
+  }
+
+  .markets-top-nav-bar {
+    padding: 8px 12px !important;
+  }
+  .markets-top-nav-inner {
+    min-height: 48px !important;
+    gap: 8px !important;
+  }
+  .markets-nav-tab-btn {
+    font-size: 14px !important;
+    padding: 8px 4px !important;
+  }
+  .markets-top-tabs-row {
+    gap: 12px !important;
   }
   
   .hero-section-card,
