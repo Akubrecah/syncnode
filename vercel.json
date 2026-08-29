@@ -2,9 +2,9 @@
   "buildCommand": "npm run build",
   "outputDirectory": "apps/web/dist",
   "rewrites": [
-    { "source": "/api/:path*", "destination": "https://YOUR_BACKEND_URL/api/:path*" },
-    { "source": "/ws", "destination": "https://YOUR_BACKEND_URL/ws" },
-    { "source": "/admin/:path*", "destination": "https://YOUR_BACKEND_URL/admin/:path*" },
+    { "source": "/api/:path*", "destination": "https://syncnode-web-production.up.railway.app/api/:path*" },
+    { "source": "/ws", "destination": "https://syncnode-web-production.up.railway.app/ws" },
+    { "source": "/admin/:path*", "destination": "https://syncnode-web-production.up.railway.app/admin/:path*" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
