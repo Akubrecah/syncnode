@@ -556,58 +556,68 @@ export const App: React.FC = () => {
     }
   }, [activeTab, user, loadingUser]);
 
-  // Initialize data and process potential OAuth redirect callbacks
+  // Initialize data and synchronize Clerk authenticated sessions
   useEffect(() => {
     fetchMarkets();
+    fetchUserData();
 
-    const processOAuthRedirect = async () => {
-      if (typeof window === 'undefined') return;
-      const rawHash = window.location.hash.replace(/^#\/?/, '');
-      const rawSearch = window.location.search.replace(/^\?/, '');
-      const params = new URLSearchParams(rawHash.includes('id_token') ? rawHash : rawSearch);
-      const idToken = params.get('id_token');
-      const stateParam = params.get('state');
+    // Listen for Clerk authenticated session and sync with backend
+    const checkClerkSession = async () => {
+      const clerk = (window as any).Clerk;
+      if (!clerk) return;
 
-      if (idToken) {
+      const syncWithClerkUser = async (clerkUser: any) => {
+        if (!clerkUser) return;
+        const email = clerkUser.primaryEmailAddress?.emailAddress || clerkUser.emailAddresses?.[0]?.emailAddress;
+        if (!email) return;
+
+        const token = localStorage.getItem('syncnode_token');
+        if (token && user?.email === email) return;
+
         try {
-          setLoadingUser(true);
-          const res = await fetch('/api/v1/auth/google', {
+          const res = await fetch('/api/v1/auth/clerk', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ credential: idToken })
+            body: JSON.stringify({
+              clerkId: clerkUser.id,
+              email: email,
+              fullName: clerkUser.fullName || `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim() || email.split('@')[0],
+              avatarUrl: clerkUser.imageUrl,
+              provider: 'clerk'
+            })
           });
           const data = await res.json();
           if (data.success && data.token) {
             localStorage.setItem('syncnode_token', data.token);
             if (data.refreshToken) localStorage.setItem('syncnode_refresh_token', data.refreshToken);
             setUser(data.user);
-
-            // Restore targeted return page or default to dashboard
-            let targetHash = '#/dashboard';
-            if (stateParam) {
-              try {
-                const parsedState = JSON.parse(atob(stateParam));
-                if (parsedState.returnTo) targetHash = parsedState.returnTo;
-              } catch (_) {}
-            }
-            window.history.replaceState(null, '', targetHash);
-            const nextRoute = parseUrlHash();
-            setActiveTabState(nextRoute.tab);
             fetchUserData();
-            return;
           }
-        } catch (err) {
-          console.warn('OAuth redirect exchange failed:', err);
-        } finally {
-          setLoadingUser(false);
+        } catch (e) {
+          console.warn('Failed to sync Clerk session with backend:', e);
         }
+      };
+
+      if (clerk.loaded && clerk.user) {
+        syncWithClerkUser(clerk.user);
       }
 
-      fetchUserData();
+      clerk.addListener?.((emission: any) => {
+        if (emission.user) {
+          syncWithClerkUser(emission.user);
+        }
+      });
     };
 
-    processOAuthRedirect();
-  }, []);
+    const clerkInterval = setInterval(() => {
+      if ((window as any).Clerk?.loaded) {
+        checkClerkSession();
+        clearInterval(clerkInterval);
+      }
+    }, 400);
+
+    return () => clearInterval(clerkInterval);
+  }, [user?.email]);
 
   // Poll market state every 1.5 seconds
   useEffect(() => {
@@ -692,12 +702,17 @@ export const App: React.FC = () => {
 
 
   const handleLogout = () => {
+    try {
+      const clerk = (window as any).Clerk;
+      if (clerk && clerk.signOut) clerk.signOut();
+    } catch (_) {}
     localStorage.removeItem('syncnode_token');
     localStorage.removeItem('syncnode_refresh_token');
     setUser(null);
     setBalances([]);
     setOrders([]);
     setUserTrades([]);
+    setTransactions([]);
     setActiveTab('home');
   };
 
