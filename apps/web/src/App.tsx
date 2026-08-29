@@ -355,6 +355,17 @@ export const App: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  // Auto-redirect authenticated user from login/signup straight to dashboard
+  useEffect(() => {
+    const hasAuth = !!user || !!localStorage.getItem('syncnode_token');
+    if (hasAuth && (activeTab === 'login' || activeTab === 'signup')) {
+      setActiveTabState('dashboard');
+      if (window.location.pathname !== '/dashboard') {
+        window.history.replaceState(null, '', '/dashboard');
+      }
+    }
+  }, [user, activeTab]);
+
   // Synchronize on browser Back/Forward/PopState (No '#' hash)
   useEffect(() => {
     // If user lands with legacy hash, cleanly upgrade to HTML5 clean path
@@ -919,13 +930,41 @@ export const App: React.FC = () => {
         </Suspense>
       )}
 
-      {/* 6. SIGNUP & PERSONALIZATION FULL VIEW (Only for unauthenticated visitors) */}
-      {(activeTab === 'signup' || activeTab === 'login') && !user && (
-        <SignupView
-          initialMode={activeTab === 'login' ? 'login' : 'signup'}
-          onSuccess={handleAuthSuccess}
-          onNavigateHome={() => setActiveTab('home')}
-        />
+      {/* 6. SIGNUP & PERSONALIZATION FULL VIEW */}
+      {(activeTab === 'signup' || activeTab === 'login') && (
+        !user ? (
+          <SignupView
+            initialMode={activeTab === 'login' ? 'login' : 'signup'}
+            onSuccess={handleAuthSuccess}
+            onNavigateHome={() => setActiveTab('home')}
+          />
+        ) : (
+          <DashboardView
+            user={user}
+            balances={balances}
+            orders={orders}
+            userTrades={userTrades}
+            initialSidebarTab="dashboard"
+            initialWalletSubTab="overview"
+            initialSecuritySubTab="2fa"
+            onRefreshUser={fetchUserData}
+            onNavigateToTrade={(sym) => {
+              if (sym) {
+                setSymbol(sym);
+                setActiveTab('spot', sym);
+              } else {
+                setActiveTab('spot');
+              }
+            }}
+            onNavigateToStock={(sym) => {
+              setStockSymbol(sym);
+              setActiveTab('stock', sym);
+            }}
+            onNavigateToTab={(tab, sym) => {
+              setActiveTab(tab as any, sym);
+            }}
+          />
+        )
       )}
 
       {/* 6.5 MARKETS OVERVIEW INSTITUTIONAL PAGE */}
