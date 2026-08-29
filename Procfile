@@ -1,1 +1,1 @@
-web: sh -c 'uvicorn syncnode.server:app --host 0.0.0.0 --port ${PORT:-4000}'
+web: sh -c 'uvicorn syncnode.server:app --host 0.0.0.0 --port ${PORT:-5050}'
