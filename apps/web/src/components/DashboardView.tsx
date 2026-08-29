@@ -36,11 +36,12 @@ import {
   FileText,
   UserCheck,
   Key,
-  Smartphone,
   Mail,
   RefreshCw,
   Sliders,
-  DollarSign
+  DollarSign,
+  Menu,
+  X
 } from 'lucide-react';
 import { TradingViewMarketQuotes } from './TradingViewMarketQuotes';
 import { TradingViewMiniChart } from './TradingViewMiniChart';
@@ -76,6 +77,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   onNavigateToTab
 }) => {
   const [hideBalances, setHideBalances] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [sidebarActiveTab, setSidebarActiveTab] = useState<string>('dashboard');
   const [expandedSidebarMenu, setExpandedSidebarMenu] = useState<{ [key: string]: boolean }>({
     assets: false,
@@ -148,6 +150,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   };
 
   const navigateTo = (tab: string, param?: string) => {
+    setIsMobileSidebarOpen(false);
     if (onNavigateToTab) {
       onNavigateToTab(tab, param);
     } else if (tab === 'spot' && onNavigateToTrade) {
@@ -245,39 +248,59 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     : displayEmail;
 
   return (
-    <div className="dashboard-layout-container" style={{ display: 'flex', minHeight: 'calc(100vh - 64px)', background: '#181a20', color: '#eaecef' }}>
-      {/* =========================================================================
-          1. LEFT SIDEBAR NAVIGATION (Binance User Center Sidebar)
-          ========================================================================= */}
-      <aside
-        className="dashboard-sidebar-nav"
-        style={{
-          width: '248px',
-          minWidth: '248px',
-          background: '#181a20',
-          borderRight: '1px solid #2b313a',
-          padding: '24px 12px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '6px'
-        }}
-      >
-        {/* Main Dashboard Link */}
-        <button
-          onClick={() => setSidebarActiveTab('dashboard')}
+    <div className="dashboard-layout-container" style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 64px)', background: '#181a20', color: '#eaecef' }}>
+      {/* Mobile Collapsible 3-Lines Header Bar */}
+      <div className="dashboard-mobile-header-bar">
+        <button 
+          onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
+          className="dashboard-mobile-toggle-btn"
+          aria-label="Toggle Dashboard Menu"
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {isMobileSidebarOpen ? <X size={20} color="#fcd535" /> : <Menu size={20} color="#fcd535" />}
+            <span style={{ fontWeight: 700, fontSize: '14px', color: '#eaecef' }}>
+              {isMobileSidebarOpen ? 'Close Menu' : 'Dashboard Menu'}
+            </span>
+          </div>
+          <span className="dashboard-current-tab-badge">
+            {sidebarActiveTab.charAt(0).toUpperCase() + sidebarActiveTab.slice(1)} ▾
+          </span>
+        </button>
+      </div>
+
+      <div style={{ display: 'flex', flex: 1, width: '100%', minHeight: 0 }} className="dashboard-body-row">
+        {/* =========================================================================
+            1. LEFT SIDEBAR NAVIGATION (Binance User Center Sidebar)
+            ========================================================================= */}
+        <aside
+          className={`dashboard-sidebar-nav ${isMobileSidebarOpen ? 'mobile-open' : 'mobile-closed'}`}
           style={{
+            width: '248px',
+            minWidth: '248px',
+            background: '#181a20',
+            borderRight: '1px solid #2b313a',
+            padding: '24px 12px',
             display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            width: '100%',
-            padding: '12px 16px',
-            borderRadius: '8px',
-            background: sidebarActiveTab === 'dashboard' ? 'rgba(252, 213, 53, 0.1)' : 'transparent',
-            color: sidebarActiveTab === 'dashboard' ? '#fcd535' : '#eaecef',
-            border: 'none',
-            fontSize: '14px',
-            fontWeight: 600,
-            cursor: 'pointer',
+            flexDirection: 'column',
+            gap: '6px'
+          }}
+        >
+          {/* Main Dashboard Link */}
+          <button
+            onClick={() => { setSidebarActiveTab('dashboard'); setIsMobileSidebarOpen(false); }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              width: '100%',
+              padding: '12px 16px',
+              borderRadius: '8px',
+              background: sidebarActiveTab === 'dashboard' ? 'rgba(252, 213, 53, 0.1)' : 'transparent',
+              color: sidebarActiveTab === 'dashboard' ? '#fcd535' : '#eaecef',
+              border: 'none',
+              fontSize: '14px',
+              fontWeight: 600,
+              cursor: 'pointer',
             textAlign: 'left'
           }}
         >
@@ -1665,6 +1688,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
         </div>
       </main>
+      </div>
 
       {/* =========================================================================
           DEPOSIT MODAL

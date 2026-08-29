@@ -5530,6 +5530,10 @@ a[href*="tradingview.com"] {
   to { transform: translateX(0); }
 }
 
+.dashboard-mobile-header-bar {
+  display: none;
+}
+
 /* Mobile Breakpoint Media Queries */
 @media (max-width: 992px) {
   .desktop-nav-links {
@@ -5619,42 +5623,79 @@ a[href*="tradingview.com"] {
     min-height: 380px !important;
   }
 
-  /* Dashboard / Assets Layout Responsive Reflow */
-  .dashboard-layout-container {
-    flex-direction: column !important;
-    min-height: auto !important;
+  /* Dashboard / Assets Layout Collapsible 3-Lines Header Bar */
+  .dashboard-mobile-header-bar {
+    display: block !important;
+    width: 100% !important;
+    background: #181a20 !important;
+    border-bottom: 1px solid #2b313a !important;
+    padding: 10px 14px !important;
+    position: sticky !important;
+    top: 54px !important;
+    z-index: 40 !important;
   }
 
-  .dashboard-sidebar-nav {
+  .dashboard-mobile-toggle-btn {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    background: #202630 !important;
+    border: 1px solid #2b313a !important;
+    border-radius: 10px !important;
+    padding: 10px 14px !important;
+    color: #eaecef !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .dashboard-current-tab-badge {
+    background: rgba(252, 213, 53, 0.15);
+    color: #fcd535;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+  }
+
+  .dashboard-sidebar-nav.mobile-closed {
+    display: none !important;
+  }
+
+  .dashboard-sidebar-nav.mobile-open {
+    display: flex !important;
+    flex-direction: column !important;
     width: 100% !important;
     min-width: 0 !important;
+    background: #181a20 !important;
     border-right: none !important;
     border-bottom: 1px solid #2b313a !important;
-    padding: 10px 12px !important;
-    display: flex !important;
-    flex-direction: row !important;
-    overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch;
-    gap: 8px !important;
-    background: #181a20 !important;
+    padding: 14px !important;
+    gap: 6px !important;
+    animation: slideDownFade 0.2s ease-out !important;
   }
 
-  .dashboard-sidebar-nav button,
-  .dashboard-sidebar-nav > div {
-    white-space: nowrap !important;
-    flex-shrink: 0 !important;
-    width: auto !important;
-  }
-
-  .dashboard-sidebar-nav button {
-    padding: 8px 14px !important;
-    font-size: 13px !important;
+  .dashboard-sidebar-nav.mobile-open button,
+  .dashboard-sidebar-nav.mobile-open > div {
+    width: 100% !important;
+    text-align: left !important;
   }
 
   .dashboard-main-content {
-    padding: 18px 14px !important;
+    padding: 16px 12px !important;
     width: 100% !important;
     max-width: 100% !important;
+  }
+}
+
+@keyframes slideDownFade {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
