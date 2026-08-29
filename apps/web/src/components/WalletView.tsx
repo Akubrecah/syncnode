@@ -4994,7 +4994,7 @@ export const WalletView: React.FC<WalletViewProps> = ({
               </div>
 
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', background: '#181a20', padding: '12px 16px', borderRadius: '8px', marginBottom: '20px', border: '1px solid #333b47', fontSize: '12.5px', color: '#929aa5' }}>
-                <Info size={18} color="#fcd535" style={{ shrink: 0, marginTop: '2px' }} />
+                <Info size={18} color="#fcd535" style={{ flexShrink: 0, marginTop: '2px' }} />
                 <span>
                   Balances valued under <strong>$10 USD</strong> can be instantly consolidated into BNB with <strong>0% fee</strong> once every 6 hours.
                 </span>

@@ -54,6 +54,9 @@ interface DashboardViewProps {
   onNavigateToTrade?: (sym?: string) => void;
   onNavigateToStock?: (sym: string) => void;
   onNavigateToTab?: (tab: string, sym?: string) => void;
+  initialSidebarTab?: string;
+  initialWalletSubTab?: string;
+  initialSecuritySubTab?: string;
 }
 
 interface AssetPriceInfo {

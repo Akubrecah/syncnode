@@ -49,7 +49,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              clerkId: res.createdUserId || `usr_${Date.now()}`,
+              clerkId: (res as any).createdUserId || `usr_${Date.now()}`,
               email: email.trim().toLowerCase(),
               fullName: email.split('@')[0],
               provider: 'clerk_password'
@@ -63,20 +63,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             return;
           }
         }
-      } catch (clerkErr: any) {
-        if (clerkErr?.errors?.[0]?.message) {
-          setError(clerkErr.errors[0].message);
-          setLoading(false);
-          return;
-        }
-        console.warn('Clerk login modal fallback:', clerkErr);
+      } catch (err: any) {
+        console.warn('Clerk login notice:', err);
       }
     } else if (mode === 'register' && isSignUpLoaded && signUp) {
       try {
         const res = await signUp.create({
           emailAddress: email.trim().toLowerCase(),
-          password: password,
-          firstName: fullName.trim() || undefined
+          password
         });
         if (res.status === 'complete') {
           if (setActive) {
@@ -86,9 +80,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              clerkId: res.createdUserId || `usr_${Date.now()}`,
+              clerkId: (res as any).createdUserId || `usr_${Date.now()}`,
               email: email.trim().toLowerCase(),
-              fullName: fullName.trim(),
+              fullName: fullName || email.split('@')[0],
               provider: 'clerk_password'
             })
           });
@@ -100,55 +94,30 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             return;
           }
         }
-      } catch (clerkErr: any) {
-        if (clerkErr?.errors?.[0]?.message) {
-          setError(clerkErr.errors[0].message);
-          setLoading(false);
-          return;
-        }
-        console.warn('Clerk register modal fallback:', clerkErr);
+      } catch (err: any) {
+        console.warn('Clerk register notice:', err);
       }
     }
 
-    const endpoint = mode === 'login' ? '/api/v1/auth/login' : '/api/v1/auth/register';
-
     try {
+      const endpoint = mode === 'login' ? '/api/v1/auth/login' : '/api/v1/auth/register';
+      const body = mode === 'login'
+        ? { email: email.trim().toLowerCase(), password }
+        : { email: email.trim().toLowerCase(), password, full_name: fullName };
+
       const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email,
-          password,
-          fullName: fullName || undefined,
-          totpCode: totpCode || undefined
-        })
+        body: JSON.stringify(body)
       });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || data.error || 'Authentication failed');
 
-      let json: any;
-      try {
-        const text = await res.text();
-        json = text ? JSON.parse(text) : null;
-      } catch {
-        throw new Error(
-          res.ok
-            ? 'Invalid response received from server'
-            : `API Gateway unreachable or returned HTTP ${res.status}. Ensure the backend server is running.`
-        );
-      }
-
-      if (!json || !json.success) {
-        if (json?.requires2FA) {
-          setRequires2fa(true);
-          throw new Error('Please provide your 6-digit TOTP code');
-        }
-        throw new Error(json?.error || `Authentication failed (HTTP ${res.status})`);
-      }
-
-      localStorage.setItem('syncnode_token', json.token);
-      onSuccess(json.user, json.token);
+      localStorage.setItem('syncnode_token', data.token);
+      onSuccess(data.user, data.token);
       onClose();
     } catch (err: any) {
-      setError(err.message || 'Authentication error');
+      setError(err.message || 'Authentication failed');
     } finally {
       setLoading(false);
     }
@@ -157,29 +126,27 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const handleSocialSignIn = async (provider: 'google' | 'github' | 'apple') => {
     setLoading(true);
     setError(null);
-
-    const strategyMap: Record<string, 'oauth_google' | 'oauth_github' | 'oauth_apple'> = {
-      google: 'oauth_google',
-      github: 'oauth_github',
-      apple: 'oauth_apple'
-    };
-    const strategy = strategyMap[provider] || 'oauth_google';
-
     try {
-      if (signIn) {
+      const strategy = provider === 'google'
+        ? 'oauth_google'
+        : provider === 'github'
+        ? 'oauth_github'
+        : 'oauth_apple';
+
+      if (signIn && signIn.authenticateWithRedirect) {
         await signIn.authenticateWithRedirect({
           strategy,
           redirectUrl: `${window.location.origin}/`,
-          redirectUrlComplete: `${window.location.origin}/#/dashboard`
+          redirectUrlComplete: `${window.location.origin}/dashboard`
         });
         return;
       }
 
-      if (clerk && clerk.authenticateWithRedirect) {
-        await clerk.authenticateWithRedirect({
+      if ((clerk as any)?.authenticateWithRedirect) {
+        await (clerk as any).authenticateWithRedirect({
           strategy,
           redirectUrl: `${window.location.origin}/`,
-          redirectUrlComplete: `${window.location.origin}/#/dashboard`
+          redirectUrlComplete: `${window.location.origin}/dashboard`
         });
         return;
       }

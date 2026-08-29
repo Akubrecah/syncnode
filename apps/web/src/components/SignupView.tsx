@@ -451,20 +451,20 @@ export const SignupView: React.FC<SignupViewProps> = ({
     const strategy = strategyMap[provider] || 'oauth_google';
 
     try {
-      if (signIn) {
+      if (signIn && signIn.authenticateWithRedirect) {
         await signIn.authenticateWithRedirect({
           strategy,
           redirectUrl: `${window.location.origin}/`,
-          redirectUrlComplete: `${window.location.origin}/#/dashboard`
+          redirectUrlComplete: `${window.location.origin}/dashboard`
         });
         return;
       }
 
-      if (clerk && clerk.authenticateWithRedirect) {
-        await clerk.authenticateWithRedirect({
+      if ((clerk as any)?.authenticateWithRedirect) {
+        await (clerk as any).authenticateWithRedirect({
           strategy,
           redirectUrl: `${window.location.origin}/`,
-          redirectUrlComplete: `${window.location.origin}/#/dashboard`
+          redirectUrlComplete: `${window.location.origin}/dashboard`
         });
         return;
       }

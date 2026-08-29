@@ -400,13 +400,13 @@ export const App: React.FC = () => {
       }
     };
 
-    window.addEventListener('hashchange', handleHashChange);
-    window.addEventListener('popstate', handleHashChange);
+    window.addEventListener('hashchange', handlePopState);
+    window.addEventListener('popstate', handlePopState);
     document.addEventListener('click', handleGlobalClick, true);
 
     return () => {
-      window.removeEventListener('hashchange', handleHashChange);
-      window.removeEventListener('popstate', handleHashChange);
+      window.removeEventListener('hashchange', handlePopState);
+      window.removeEventListener('popstate', handlePopState);
       document.removeEventListener('click', handleGlobalClick, true);
     };
   }, []);
