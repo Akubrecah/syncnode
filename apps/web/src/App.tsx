@@ -197,7 +197,6 @@ const PROTECTED_TABS: Set<TabType> = new Set([
   'wallet',
   'assets',
   'margin',
-  'futures',
   'funding',
   'deposit',
   'withdraw',
@@ -1006,8 +1005,8 @@ export const App: React.FC = () => {
         />
       )}
 
-      {/* 8. SPOT TRADING TERMINAL */}
-      {activeTab === 'spot' && (
+      {/* 8. SPOT & FUTURES TRADING TERMINAL */}
+      {(activeTab === 'spot' || activeTab === 'futures') && (
         <SpotTradeView
           symbol={symbol}
           onSelectSymbol={setSymbol}
@@ -1025,6 +1024,7 @@ export const App: React.FC = () => {
           }}
           user={user}
           onOpenAuth={() => setActiveTab('signup')}
+          isFutures={activeTab === 'futures'}
         />
       )}
 

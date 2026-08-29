@@ -74,11 +74,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   onRefreshUser,
   onNavigateToTrade,
   onNavigateToStock,
-  onNavigateToTab
+  onNavigateToTab,
+  initialSidebarTab = 'dashboard'
 }) => {
   const [hideBalances, setHideBalances] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
-  const [sidebarActiveTab, setSidebarActiveTab] = useState<string>('dashboard');
+  const [sidebarActiveTab, setSidebarActiveTab] = useState<string>(initialSidebarTab || 'dashboard');
   const [expandedSidebarMenu, setExpandedSidebarMenu] = useState<{ [key: string]: boolean }>({
     assets: false,
     orders: false,

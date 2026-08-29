@@ -19,6 +19,7 @@ interface SpotTradeViewProps {
   onOrderSubmitted: () => void;
   user: any;
   onOpenAuth: () => void;
+  isFutures?: boolean;
 }
 
 export const SpotTradeView: React.FC<SpotTradeViewProps> = ({
@@ -33,7 +34,8 @@ export const SpotTradeView: React.FC<SpotTradeViewProps> = ({
   userTrades,
   onOrderSubmitted,
   user,
-  onOpenAuth
+  onOpenAuth,
+  isFutures = false
 }) => {
   const [baseAsset, quoteAsset] = symbol.includes('/') ? symbol.split('/') : ['BTC', 'USDT'];
   const [tradeTab, setTradeTab] = useState<'BUY' | 'SELL'>('BUY');
@@ -46,11 +48,17 @@ export const SpotTradeView: React.FC<SpotTradeViewProps> = ({
   const [orderError, setOrderError] = useState<string | null>(null);
   const [orderSuccess, setOrderSuccess] = useState<string | null>(null);
 
+  // Futures specific states
+  const [leverage, setLeverage] = useState<number>(20);
+  const [marginMode, setMarginMode] = useState<'Cross' | 'Isolated'>('Cross');
+  const [isLeverageModalOpen, setIsLeverageModalOpen] = useState(false);
+  const [tempLeverage, setTempLeverage] = useState<number>(20);
+
   // Right sidebar tab
   const [rightPanelTab, setRightPanelTab] = useState<'MARKET_TRADES' | 'MY_TRADES'>('MARKET_TRADES');
 
   // Bottom table tab
-  const [bottomTab, setBottomTab] = useState<'OPEN_ORDERS' | 'ORDER_HISTORY' | 'TRADE_HISTORY' | 'FUNDS'>('OPEN_ORDERS');
+  const [bottomTab, setBottomTab] = useState<'POSITIONS' | 'OPEN_ORDERS' | 'ORDER_HISTORY' | 'TRADE_HISTORY' | 'FUNDS'>(isFutures ? 'POSITIONS' : 'OPEN_ORDERS');
 
   // Mobile Trading Sub-Navigation Tab
   const [mobileTradeTab, setMobileTradeTab] = useState<'trade' | 'chart' | 'orderbook' | 'trades'>('trade');
