@@ -1,0 +1,15 @@
+# Remediation Tracker & Verification Matrix — Syncnode
+
+| Issue ID | Severity | Area | Component | Description | Status | Verification Proof |
+|---|---|---|---|---|---|---|
+| **AUTH-P0-001** | P0 | Frontend | `apps/web/src/App.tsx` | Protected routes (`DashboardView`, `Wallet`, `Orders`, etc.) mounted when `user === null`. | **VERIFIED FIXED** | Central `PROTECTED_TABS` & `ADMIN_TABS` guards implemented. Unauthenticated access redirects cleanly to signup/login. Vite compilation 100% clean. |
+| **CORS-P0-002** | P0 | Backend | `syncnode/server.py` | Illegal `allow_origins=["*"]` with `allow_credentials=True` caused browser failures. | **VERIFIED FIXED** | Environment-parsed `ALLOWED_ORIGINS` with explicit allowed headers. Verified in `tests/test_security.py::test_cors_preflight`. |
+| **AUTH-P0-003** | P0 | Backend / Security | `syncnode/security/crypto.py`, `server.py` | 24h static JWT tokens with no refresh/rotation endpoint. | **VERIFIED FIXED** | Dual-token lifecycle (1h access + 7d refresh token) + `/api/v1/auth/refresh` endpoint. Verified in `tests/test_security.py::test_token_refresh_lifecycle`. |
+| **SEC-P0-004** | P0 | Backend / Auth | `syncnode/server.py` | Hardcoded default admin credentials seeded in production. | **VERIFIED FIXED** | Explicit environment check (`ENVIRONMENT == "production"`) preventing insecure bootstrap defaults. |
+| **AUTH-P1-001** | P1 | Frontend | `apps/web/src/components/Navbar.tsx` | Admin link unconditionally rendered in header for anonymous users. | **VERIFIED FIXED** | Gated behind `user?.admin_roles && user.admin_roles.length > 0`. |
+| **SEC-P1-002** | P1 | Templates / Web | `syncnode/web/templates.py` | Static HTML navbar rendered admin and private tabs to unauthenticated visitors. | **VERIFIED FIXED** | Added `data-requires-auth` and `data-requires-admin` tags; updated `updateUserBadge()` and `handleLogout()`. |
+| **SEC-P1-003** | P1 | Backend | `syncnode/server.py` | Missing rate limiting on auth & OTP endpoints (`/login`, `/send-otp`, `/verify-otp`, `/register`). | **VERIFIED FIXED** | Sliding-window in-memory rate limiter implemented. Verified in `tests/test_security.py::test_rate_limiting_on_login`. |
+| **AUTH-P1-004** | P1 | Frontend | `apps/web/src/App.tsx` | `EmailTemplatesView` accessible without admin role. | **VERIFIED FIXED** | Gated strictly behind `user?.admin_roles && user.admin_roles.length > 0`. |
+| **FIX-P2-001** | P2 | Frontend | `StockDetailView.tsx` / `App.tsx` | Stock route hash parity and symbol selection synchronization. | **VERIFIED FIXED** | Clean URL hash synchronization (`#/stock/<symbol>`) and bidirectional state updates. |
+| **SEC-P2-002** | P2 | Backend | `syncnode/server.py` | Missing standard security headers (HSTS, nosniff, DENY, X-XSS). | **VERIFIED FIXED** | Added `security_headers_middleware`. Verified in `tests/test_security.py::test_security_headers`. |
+| **UI-P2-001** | P2 | Frontend | `TradingViewWidget.tsx` | Resilience against widget script loading failures and network anomalies. | **VERIFIED FIXED** | Fallback container structure, clean cleanup in `useEffect`, and sanitized symbol resolver. |

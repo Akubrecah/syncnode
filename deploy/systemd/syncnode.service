@@ -1,0 +1,19 @@
+[Unit]
+Description=Syncnode Cryptocurrency Exchange Backend & Client Server
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/opt/syncnode
+Environment="PATH=/opt/syncnode/.venv/bin:/usr/local/bin:/usr/bin"
+Environment="PORT=4000"
+Environment="HOST=0.0.0.0"
+Environment="PYTHONUNBUFFERED=1"
+ExecStart=/opt/syncnode/.venv/bin/uvicorn syncnode.server:app --host 0.0.0.0 --port 4000 --workers 2 --loop uvloop --http httptools
+Restart=always
+RestartSec=3
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target

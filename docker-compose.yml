@@ -1,68 +1,27 @@
 version: '3.8'
 
 services:
-  postgres:
-    image: postgres:16-alpine
-    container_name: syncnode-postgres
-    restart: always
-    environment:
-      POSTGRES_DB: syncnode
-      POSTGRES_USER: syncnode_admin
-      POSTGRES_PASSWORD: syncnode_secure_password_2026
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U syncnode_admin -d syncnode"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-  redis:
-    image: redis:7-alpine
-    container_name: syncnode-redis
-    restart: always
-    ports:
-      - "6379:6379"
-    volumes:
-      - redisdata:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-  api-gateway:
+  syncnode:
     build:
       context: .
-      dockerfile: infrastructure/docker/Dockerfile.server
-    container_name: syncnode-api
-    restart: always
-    environment:
-      PORT: 4000
-      JWT_SECRET: syncnode-enterprise-cex-jwt-secret-key-32chars!
-      DATABASE_URL: postgresql://syncnode_admin:syncnode_secure_password_2026@postgres:5432/syncnode
-      REDIS_URL: redis://redis:6379
+      dockerfile: Dockerfile
+    container_name: syncnode-app
+    restart: unless-stopped
     ports:
       - "4000:4000"
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-
-  web-terminal:
-    build:
-      context: .
-      dockerfile: infrastructure/docker/Dockerfile.web
-    container_name: syncnode-web
-    restart: always
-    ports:
-      - "3000:3000"
-    depends_on:
-      - api-gateway
-
-volumes:
-  pgdata:
-  redisdata:
+    environment:
+      - PORT=4000
+      - HOST=0.0.0.0
+      - JWT_SECRET=${JWT_SECRET:-syncnode-production-master-secret-key-change-me-on-vps}
+      - CORS_ORIGINS=*
+      - RATE_LIMIT_ENABLED=true
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"
