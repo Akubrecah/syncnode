@@ -54,5 +54,5 @@ EXPOSE 4000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:4000/api/v1/health || exit 1
 
-# Start production server using uvicorn with multi-workers & standard loops
-CMD ["uvicorn", "syncnode.server:app", "--host", "0.0.0.0", "--port", "4000", "--workers", "2", "--loop", "uvloop", "--http", "httptools"]
+# Start production server using uvicorn with dynamic cloud port injection
+CMD ["sh", "-c", "uvicorn syncnode.server:app --host 0.0.0.0 --port ${PORT:-4000}"]
