@@ -167,32 +167,33 @@ export const SpotTradeView: React.FC<SpotTradeViewProps> = ({
   }, [depth.bids]);
 
   return (
-    <div className="spot-trade-layout" style={{ background: '#0b0e11', minHeight: 'calc(100vh - 64px)', display: 'flex', flexDirection: 'column', color: '#eaecef', fontFamily: 'BinanceNova, -apple-system, sans-serif' }}>
+    <div className="spot-trade-layout" style={{ background: '#0b0e11', minHeight: 'calc(100vh - 64px)', display: 'flex', flexDirection: 'column', color: '#eaecef', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
       
-      {/* 1. TOP SUBHEADER TICKER BAR */}
-      <div id="subHeader" style={{
+      {/* 1. TOP 24H TICKER & PAIR HEADER */}
+      <div className="spot-ticker-header" style={{
         background: '#181a20',
         borderBottom: '1px solid #2b313a',
-        padding: '10px 20px',
+        padding: '10px 16px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         flexWrap: 'wrap',
-        gap: '16px'
+        gap: '12px'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
+        <div className="spot-ticker-left" style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
           {/* Symbol Picker */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <select
               value={symbol}
               onChange={(e) => onSelectSymbol(e.target.value)}
+              className="spot-symbol-select"
               style={{
                 background: '#202630',
                 color: '#eaecef',
                 border: '1px solid #2b313a',
                 borderRadius: '6px',
                 padding: '6px 12px',
-                fontSize: '16px',
+                fontSize: '15px',
                 fontWeight: 800,
                 cursor: 'pointer',
                 outline: 'none',
@@ -208,9 +209,9 @@ export const SpotTradeView: React.FC<SpotTradeViewProps> = ({
           </div>
 
           {/* Last Price & Change */}
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px' }}>
+          <div className="spot-price-block" style={{ display: 'flex', alignItems: 'baseline', gap: '10px' }}>
             <span style={{
-              fontSize: '22px',
+              fontSize: '20px',
               fontWeight: 900,
               color: isPositive ? '#0ecb81' : '#f6465d',
               fontFamily: 'monospace'
@@ -218,7 +219,7 @@ export const SpotTradeView: React.FC<SpotTradeViewProps> = ({
               ${ticker?.lastPrice ? parseFloat(ticker.lastPrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 6 }) : '95,450.00'}
             </span>
             <span style={{
-              fontSize: '13px',
+              fontSize: '12px',
               fontWeight: 700,
               color: isPositive ? '#0ecb81' : '#f6465d',
               background: isPositive ? 'rgba(14, 203, 129, 0.15)' : 'rgba(246, 70, 93, 0.15)',
@@ -230,28 +231,28 @@ export const SpotTradeView: React.FC<SpotTradeViewProps> = ({
           </div>
 
           {/* 24h Stats */}
-          <div style={{ display: 'flex', gap: '24px', fontSize: '12px' }}>
+          <div className="spot-stats-row" style={{ display: 'flex', gap: '16px', fontSize: '11px' }}>
             <div>
-              <div style={{ color: '#848e9c', fontSize: '11px' }}>24h High</div>
-              <div style={{ fontWeight: 700, fontFamily: 'monospace' }}>
+              <div style={{ color: '#848e9c', fontSize: '10px' }}>24h High</div>
+              <div style={{ fontWeight: 700, fontFamily: 'monospace', color: '#eaecef' }}>
                 ${ticker?.high24h ? parseFloat(ticker.high24h).toLocaleString() : '96,200.00'}
               </div>
             </div>
             <div>
-              <div style={{ color: '#848e9c', fontSize: '11px' }}>24h Low</div>
-              <div style={{ fontWeight: 700, fontFamily: 'monospace' }}>
+              <div style={{ color: '#848e9c', fontSize: '10px' }}>24h Low</div>
+              <div style={{ fontWeight: 700, fontFamily: 'monospace', color: '#eaecef' }}>
                 ${ticker?.low24h ? parseFloat(ticker.low24h).toLocaleString() : '93,800.00'}
               </div>
             </div>
-            <div>
-              <div style={{ color: '#848e9c', fontSize: '11px' }}>24h Volume ({baseAsset})</div>
-              <div style={{ fontWeight: 700, fontFamily: 'monospace' }}>
+            <div className="desktop-only">
+              <div style={{ color: '#848e9c', fontSize: '10px' }}>24h Vol ({baseAsset})</div>
+              <div style={{ fontWeight: 700, fontFamily: 'monospace', color: '#eaecef' }}>
                 {ticker?.volume24h ? parseFloat(ticker.volume24h).toLocaleString() : '24,180.45'}
               </div>
             </div>
-            <div>
-              <div style={{ color: '#848e9c', fontSize: '11px' }}>24h Turnover ({quoteAsset})</div>
-              <div style={{ fontWeight: 700, fontFamily: 'monospace' }}>
+            <div className="desktop-only">
+              <div style={{ color: '#848e9c', fontSize: '10px' }}>24h Turnover ({quoteAsset})</div>
+              <div style={{ fontWeight: 700, fontFamily: 'monospace', color: '#eaecef' }}>
                 ${ticker?.quoteVolume24h ? parseFloat(ticker.quoteVolume24h).toLocaleString() : '2,308,450,120.00'}
               </div>
             </div>
@@ -259,13 +260,13 @@ export const SpotTradeView: React.FC<SpotTradeViewProps> = ({
         </div>
 
         {/* Right tags */}
-        <div className="spot-header-tags" style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '12px' }}>
+        <div className="spot-header-tags desktop-only" style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '12px' }}>
           <span style={{ color: '#848e9c' }}>Spread:</span>
           <span style={{ color: '#0ecb81', fontWeight: 700, fontFamily: 'monospace' }}>
             {ticker?.spread ? `$${parseFloat(ticker.spread).toFixed(2)}` : '$0.50'}
           </span>
           <span style={{ background: 'rgba(252, 213, 53, 0.15)', color: '#fcd535', padding: '2px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 700 }}>
-            Standard 0.1% Fee
+            0.1% Fee
           </span>
         </div>
       </div>
@@ -983,26 +984,28 @@ export const SpotTradeView: React.FC<SpotTradeViewProps> = ({
       </div>
 
       {/* 4. FIXED BOTTOM STATUS FOOTER BAR */}
-      <div style={{
+      <div className="spot-bottom-status-bar" style={{
         background: '#12161c',
         borderTop: '1px solid #2b313a',
-        padding: '6px 20px',
+        padding: '6px 16px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         fontSize: '11px',
-        color: '#848e9c'
+        color: '#848e9c',
+        flexWrap: 'wrap',
+        gap: '8px'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#0ecb81' }} />
+            <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#0ecb81' }} />
             <span style={{ color: '#0ecb81', fontWeight: 600 }}>Operational (24ms)</span>
           </div>
-          <span>Announcements: Binance Institutional Yield Pools Live</span>
+          <span className="desktop-only">Announcements: CryptoBridge Institutional Staking &amp; Yield Pools Live</span>
         </div>
 
-        <div style={{ display: 'flex', gap: '16px' }}>
-          <span style={{ cursor: 'pointer' }}>Cookie Preferences</span>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <span style={{ cursor: 'pointer' }} className="desktop-only">Cookie Preferences</span>
           <span style={{ cursor: 'pointer' }}>Online Support</span>
         </div>
       </div>
