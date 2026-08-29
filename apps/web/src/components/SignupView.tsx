@@ -185,6 +185,34 @@ export const SignupView: React.FC<SignupViewProps> = ({
       return;
     }
 
+    // Step 1: Initiate signup via Clerk or Backend
+    const clerk = (window as any).Clerk;
+    if (clerk && clerk.loaded && clerk.client?.signUp) {
+      try {
+        await clerk.client.signUp.create({
+          emailAddress: email.trim().toLowerCase(),
+          password: password,
+          firstName: fullName.trim() || undefined
+        });
+        await clerk.client.signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
+
+        setStep('VERIFY_OTP');
+        setOtpCooldown(45);
+        setSuccessMessage(`Clerk verification code dispatched to ${email.trim()}.`);
+        setTimeout(() => {
+          otpInputRefs.current[0]?.focus();
+        }, 100);
+        return;
+      } catch (clerkErr: any) {
+        if (clerkErr?.errors?.[0]?.message) {
+          setError(clerkErr.errors[0].message);
+          setLoading(false);
+          return;
+        }
+        console.warn('Clerk signup fallback to internal engine:', clerkErr);
+      }
+    }
+
     try {
       const target = otpChannel === 'sms' ? getFullPhoneNumber() : email.trim().toLowerCase();
       const res = await fetch('/api/v1/auth/send-otp', {
@@ -208,9 +236,8 @@ export const SignupView: React.FC<SignupViewProps> = ({
       if (json.otp) {
         setDevOtpNotice(json.otp);
       }
-      setSuccessMessage(`Verification code dispatched via open-source ${otpChannel.toUpperCase()} engine.`);
-      
-      // Auto focus first OTP input digit
+      setSuccessMessage(`Verification code dispatched to ${target}.`);
+
       setTimeout(() => {
         otpInputRefs.current[0]?.focus();
       }, 100);
@@ -227,6 +254,19 @@ export const SignupView: React.FC<SignupViewProps> = ({
     setLoading(true);
     setError(null);
     setSuccessMessage(null);
+
+    const clerk = (window as any).Clerk;
+    if (clerk && clerk.loaded && clerk.client?.signUp) {
+      try {
+        await clerk.client.signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
+        setOtpCooldown(45);
+        setSuccessMessage(`New verification code sent to ${email.trim()}.`);
+        setLoading(false);
+        return;
+      } catch (clerkErr: any) {
+        console.warn('Clerk resend fallback:', clerkErr);
+      }
+    }
 
     const activeChannel = channelOverride || otpChannel;
     if (channelOverride) {
@@ -276,6 +316,41 @@ export const SignupView: React.FC<SignupViewProps> = ({
       return;
     }
 
+    const clerk = (window as any).Clerk;
+    if (clerk && clerk.loaded && clerk.client?.signUp) {
+      try {
+        const completeSignUp = await clerk.client.signUp.attemptEmailAddressVerification({ code: combinedCode });
+        if (completeSignUp.status === 'complete') {
+          if (clerk.setActive) {
+            await clerk.setActive({ session: completeSignUp.createdSessionId });
+          }
+          const syncRes = await fetch('/api/v1/auth/clerk', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              clerkId: completeSignUp.createdUserId || `usr_${Date.now()}`,
+              email: email.trim().toLowerCase(),
+              fullName: fullName.trim() || email.split('@')[0],
+              provider: 'clerk_email'
+            })
+          });
+          const syncJson = await syncRes.json();
+          if (syncJson.success && syncJson.token) {
+            localStorage.setItem('syncnode_token', syncJson.token);
+            onSuccess(syncJson.user, syncJson.token);
+            return;
+          }
+        }
+      } catch (clerkErr: any) {
+        if (clerkErr?.errors?.[0]?.message) {
+          setError(clerkErr.errors[0].message);
+          setLoading(false);
+          return;
+        }
+        console.warn('Clerk OTP verification fallback to internal engine:', clerkErr);
+      }
+    }
+
     const payload = {
       email: email.trim().toLowerCase(),
       password,
@@ -312,6 +387,44 @@ export const SignupView: React.FC<SignupViewProps> = ({
 
   // Login handler
   const executeLogin = async () => {
+    const clerk = (window as any).Clerk;
+    if (clerk && clerk.loaded && clerk.client?.signIn) {
+      try {
+        const res = await clerk.client.signIn.create({
+          identifier: email.trim().toLowerCase(),
+          password
+        });
+        if (res.status === 'complete') {
+          if (clerk.setActive) {
+            await clerk.setActive({ session: res.createdSessionId });
+          }
+          const syncRes = await fetch('/api/v1/auth/clerk', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              clerkId: res.createdUserId || `usr_${Date.now()}`,
+              email: email.trim().toLowerCase(),
+              fullName: email.split('@')[0],
+              provider: 'clerk_password'
+            })
+          });
+          const syncJson = await syncRes.json();
+          if (syncJson.success && syncJson.token) {
+            localStorage.setItem('syncnode_token', syncJson.token);
+            onSuccess(syncJson.user, syncJson.token);
+            return;
+          }
+        }
+      } catch (clerkErr: any) {
+        if (clerkErr?.errors?.[0]?.message) {
+          setError(clerkErr.errors[0].message);
+          setLoading(false);
+          return;
+        }
+        console.warn('Clerk password login fallback:', clerkErr);
+      }
+    }
+
     try {
       const res = await fetch('/api/v1/auth/login', {
         method: 'POST',

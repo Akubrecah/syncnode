@@ -30,6 +30,84 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setLoading(true);
     setError(null);
 
+    const clerk = (window as any).Clerk;
+    if (clerk && clerk.loaded) {
+      if (mode === 'login' && clerk.client?.signIn) {
+        try {
+          const res = await clerk.client.signIn.create({
+            identifier: email.trim().toLowerCase(),
+            password
+          });
+          if (res.status === 'complete') {
+            if (clerk.setActive) {
+              await clerk.setActive({ session: res.createdSessionId });
+            }
+            const syncRes = await fetch('/api/v1/auth/clerk', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                clerkId: res.createdUserId || `usr_${Date.now()}`,
+                email: email.trim().toLowerCase(),
+                fullName: email.split('@')[0],
+                provider: 'clerk_password'
+              })
+            });
+            const syncJson = await syncRes.json();
+            if (syncJson.success && syncJson.token) {
+              localStorage.setItem('syncnode_token', syncJson.token);
+              onSuccess(syncJson.user, syncJson.token);
+              onClose();
+              return;
+            }
+          }
+        } catch (clerkErr: any) {
+          if (clerkErr?.errors?.[0]?.message) {
+            setError(clerkErr.errors[0].message);
+            setLoading(false);
+            return;
+          }
+          console.warn('Clerk login modal fallback:', clerkErr);
+        }
+      } else if (mode === 'register' && clerk.client?.signUp) {
+        try {
+          const res = await clerk.client.signUp.create({
+            emailAddress: email.trim().toLowerCase(),
+            password: password,
+            firstName: fullName.trim() || undefined
+          });
+          if (res.status === 'complete') {
+            if (clerk.setActive) {
+              await clerk.setActive({ session: res.createdSessionId });
+            }
+            const syncRes = await fetch('/api/v1/auth/clerk', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                clerkId: res.createdUserId || `usr_${Date.now()}`,
+                email: email.trim().toLowerCase(),
+                fullName: fullName.trim(),
+                provider: 'clerk_password'
+              })
+            });
+            const syncJson = await syncRes.json();
+            if (syncJson.success && syncJson.token) {
+              localStorage.setItem('syncnode_token', syncJson.token);
+              onSuccess(syncJson.user, syncJson.token);
+              onClose();
+              return;
+            }
+          }
+        } catch (clerkErr: any) {
+          if (clerkErr?.errors?.[0]?.message) {
+            setError(clerkErr.errors[0].message);
+            setLoading(false);
+            return;
+          }
+          console.warn('Clerk register modal fallback:', clerkErr);
+        }
+      }
+    }
+
     const endpoint = mode === 'login' ? '/api/v1/auth/login' : '/api/v1/auth/register';
 
     try {
