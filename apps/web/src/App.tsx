@@ -494,14 +494,7 @@ export const App: React.FC = () => {
           }
         }
 
-        // Stale token cleanup
-        localStorage.removeItem('syncnode_token');
-        localStorage.removeItem('syncnode_refresh_token');
-        setUser(null);
-        setBalances([]);
-        setOrders([]);
-        setUserTrades([]);
-        setTransactions([]);
+        // Preserve active user profile
         setLoadingUser(false);
         return;
       }
@@ -773,6 +766,7 @@ export const App: React.FC = () => {
   const handleAuthSuccess = (newUser: any, token: string) => {
     setUser(newUser);
     localStorage.setItem('syncnode_token', token);
+    localStorage.setItem('syncnode_user', JSON.stringify(newUser));
     localStorage.setItem('syncnode_active_tab', 'dashboard');
     setActiveTabState('dashboard');
     if (window.location.pathname !== '/dashboard') {

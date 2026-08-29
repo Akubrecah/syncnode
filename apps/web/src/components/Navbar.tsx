@@ -100,6 +100,15 @@ export const Navbar: React.FC<NavbarProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const currentUser = user || (() => {
+    try {
+      const s = typeof localStorage !== 'undefined' ? localStorage.getItem('syncnode_user') : null;
+      return s ? JSON.parse(s) : null;
+    } catch {
+      return null;
+    }
+  })();
+
   const isTradeActive = ['spot', 'p2p'].includes(activeTab);
   const isOrdersActive = ['orders', 'history'].includes(activeTab);
 
@@ -191,7 +200,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
 
           {/* 3. Orders Dropdown (Assets History, Spot, Futures, P2P, Convert, Payment) - Only visible when logged in */}
-          {user && (
+          {currentUser && (
             <div className="nav-dropdown-wrapper" ref={ordersRef}>
               <button
                 className={`nav-item nav-dropdown-btn ${isOrdersActive ? 'active' : ''}`}
@@ -345,33 +354,28 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
 
           {/* 7. Admin Console */}
-          {user?.admin_roles && user.admin_roles.length > 0 && (
+          {currentUser?.admin_roles && currentUser.admin_roles.length > 0 && (
             <a
               href="/admin"
               target="_blank"
               rel="noopener noreferrer"
               className="nav-item"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '5px',
-                color: '#fcd535',
-                fontWeight: 700,
-                textDecoration: 'none'
-              }}
+              style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#fcd535', fontWeight: 700 }}
             >
-              <ShieldCheck size={14} color="#fcd535" />
+              <ShieldCheck size={14} />
               <span>Admin</span>
             </a>
           )}
         </nav>
       </div>
 
-      {/* RIGHT CONTROLS: Quick Search + Watchlist + Live Status + User Auth */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-        {/* Quick Search Shortcut Pill */}
+      {/* RIGHT UTILITIES & AUTH */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        
+        {/* Global Search Bar */}
         <button
-          onClick={() => onOpenSearch && onOpenSearch()}
+          onClick={onOpenSearch}
+          className="search-trigger-btn"
           style={{
             background: '#202630',
             border: '1px solid #2b313a',
@@ -455,21 +459,21 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
 
         {/* User Profile / Dropdown - Strictly rendered for authenticated users */}
-        {user ? (
+        {currentUser ? (
           <div className="nav-profile-wrapper" ref={profileRef}>
             <div
               className="nav-profile-pill"
               onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
             >
               <div className="nav-avatar-icon">
-                {user.fullName && user.fullName.trim()
-                  ? (user.fullName.trim().split(/\s+/).length >= 2
-                      ? `${user.fullName.trim().split(/\s+/)[0][0]}${user.fullName.trim().split(/\s+/)[1][0]}`.toUpperCase()
-                      : user.fullName.slice(0, 2).toUpperCase())
-                  : (user.email ? user.email.slice(0, 2).toUpperCase() : '')}
+                {currentUser.fullName && currentUser.fullName.trim()
+                  ? (currentUser.fullName.trim().split(/\s+/).length >= 2
+                      ? `${currentUser.fullName.trim().split(/\s+/)[0][0]}${currentUser.fullName.trim().split(/\s+/)[1][0]}`.toUpperCase()
+                      : currentUser.fullName.slice(0, 2).toUpperCase())
+                  : (currentUser.email ? currentUser.email.slice(0, 2).toUpperCase() : 'U')}
               </div>
               <span className="nav-profile-name">
-                {user.fullName || (user.email ? user.email.split('@')[0] : '')}
+                {currentUser.fullName || (currentUser.email ? currentUser.email.split('@')[0] : 'Trader')}
               </span>
               <ChevronDown size={13} color="#848e9c" style={{ transform: isProfileMenuOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }} />
             </div>
@@ -479,15 +483,15 @@ export const Navbar: React.FC<NavbarProps> = ({
               <div className="nav-profile-menu">
                 <div className="profile-menu-header">
                   <div className="profile-menu-avatar">
-                    {user.fullName && user.fullName.trim()
-                      ? (user.fullName.trim().split(/\s+/).length >= 2
-                          ? `${user.fullName.trim().split(/\s+/)[0][0]}${user.fullName.trim().split(/\s+/)[1][0]}`.toUpperCase()
-                          : user.fullName.slice(0, 2).toUpperCase())
-                      : (user.email ? user.email.slice(0, 2).toUpperCase() : '')}
+                    {currentUser.fullName && currentUser.fullName.trim()
+                      ? (currentUser.fullName.trim().split(/\s+/).length >= 2
+                          ? `${currentUser.fullName.trim().split(/\s+/)[0][0]}${currentUser.fullName.trim().split(/\s+/)[1][0]}`.toUpperCase()
+                          : currentUser.fullName.slice(0, 2).toUpperCase())
+                      : (currentUser.email ? currentUser.email.slice(0, 2).toUpperCase() : 'U')}
                   </div>
                   <div>
-                    <div className="profile-menu-name">{user.fullName || (user.email ? user.email.split('@')[0] : '')}</div>
-                    <div className="profile-menu-email">{user.email || ''}</div>
+                    <div className="profile-menu-name">{currentUser.fullName || (currentUser.email ? currentUser.email.split('@')[0] : 'Trader')}</div>
+                    <div className="profile-menu-email">{currentUser.email || ''}</div>
                   </div>
                 </div>
 
@@ -525,7 +529,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     <span>Account &amp; 2FA Security</span>
                   </button>
 
-                  {user.admin_roles && user.admin_roles.length > 0 && (
+                  {currentUser.admin_roles && currentUser.admin_roles.length > 0 && (
                     <button
                       className="profile-menu-item"
                       onClick={() => {
