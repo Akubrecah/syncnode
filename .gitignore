@@ -72,3 +72,13 @@ Thumbs.db
 *.db
 tmp/
 temp/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.venv/
+venv/
+ENV/
+
