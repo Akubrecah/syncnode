@@ -212,9 +212,7 @@ export const SignupView: React.FC<SignupViewProps> = ({
       }
 
       setSuccessMessage('Authentication successful. Launching terminal...');
-      setTimeout(() => {
-        onSuccess(userObj, userTok);
-      }, 300);
+      onSuccess(userObj, userTok);
       return;
     }
 
@@ -259,9 +257,7 @@ export const SignupView: React.FC<SignupViewProps> = ({
     }
 
     setSuccessMessage('Account created and verified successfully! Entering dashboard...');
-    setTimeout(() => {
-      onSuccess(newUserObj, userTok);
-    }, 400);
+    onSuccess(newUserObj, userTok);
   };
 
   // Social Sign In (Google / GitHub / Apple)
