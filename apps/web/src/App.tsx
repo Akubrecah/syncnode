@@ -550,13 +550,31 @@ export const App: React.FC = () => {
       const email = clerkUser.primaryEmailAddress?.emailAddress || clerkUser.emailAddresses?.[0]?.emailAddress;
       if (!email) return;
 
-      const token = localStorage.getItem('syncnode_token');
-      if (user && user.email === email && token) {
-        return;
+      const userProfile = {
+        id: clerkUser.id,
+        email: email,
+        fullName: clerkUser.fullName || `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim() || email.split('@')[0],
+        avatarUrl: clerkUser.imageUrl,
+        kyc_tier: 1,
+        kyc_status: 'UNVERIFIED',
+        created_at: Date.now()
+      };
+
+      const existingToken = localStorage.getItem('syncnode_token');
+      if (!existingToken) {
+        localStorage.setItem('syncnode_token', `clerk_tok_${clerkUser.id}`);
+      }
+      localStorage.setItem('syncnode_user', JSON.stringify(userProfile));
+      setUser(userProfile);
+
+      if (activeTab === 'signup' || activeTab === 'login') {
+        setActiveTabState('dashboard');
+        if (window.location.pathname !== '/dashboard') {
+          window.history.pushState(null, '', '/dashboard');
+        }
       }
 
       const syncWithBackend = async () => {
-        setLoadingUser(true);
         try {
           const res = await fetch('/api/v1/auth/clerk', {
             method: 'POST',
@@ -564,7 +582,7 @@ export const App: React.FC = () => {
             body: JSON.stringify({
               clerkId: clerkUser.id,
               email: email,
-              fullName: clerkUser.fullName || `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim() || email.split('@')[0],
+              fullName: userProfile.fullName,
               avatarUrl: clerkUser.imageUrl,
               provider: 'clerk'
             })
@@ -573,18 +591,19 @@ export const App: React.FC = () => {
           if (data.success && data.token) {
             localStorage.setItem('syncnode_token', data.token);
             if (data.refreshToken) localStorage.setItem('syncnode_refresh_token', data.refreshToken);
-            setUser(data.user);
+            if (data.user) {
+              localStorage.setItem('syncnode_user', JSON.stringify(data.user));
+              setUser(data.user);
+            }
             fetchUserData();
           }
         } catch (e) {
-          console.warn('Failed to sync Clerk session with backend:', e);
-        } finally {
-          setLoadingUser(false);
+          console.warn('Background clerk sync notice:', e);
         }
       };
       syncWithBackend();
     }
-  }, [isClerkLoaded, isClerkSignedIn, clerkUser?.id, user?.email]);
+  }, [isClerkLoaded, isClerkSignedIn, clerkUser?.id]);
 
   // Poll market state every 1.5 seconds
   useEffect(() => {
