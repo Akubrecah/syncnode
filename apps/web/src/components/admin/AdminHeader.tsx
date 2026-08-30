@@ -91,16 +91,19 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
     <header className="nex-header" style={{
       background: '#181a20',
       borderBottom: '1px solid #2b313a',
-      padding: '0 20px',
+      padding: '0 24px',
       height: '64px',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
-      position: 'relative',
-      zIndex: 100
+      position: 'sticky',
+      top: 0,
+      zIndex: 100,
+      width: '100%',
+      boxSizing: 'border-box'
     }}>
       {/* LEFT: Sidebar Toggler + Search Bar + KPI Badge */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flex: 1, minWidth: 0 }}>
         <button
           onClick={onToggleSidebar}
           aria-label="Toggle navigation"
@@ -114,14 +117,15 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             alignItems: 'center',
             justifyContent: 'center',
             color: '#eaecef',
-            cursor: 'pointer'
+            cursor: 'pointer',
+            flexShrink: 0
           }}
         >
           <Menu size={18} />
         </button>
 
         {/* NexLink Search Input */}
-        <div style={{ position: 'relative', width: '240px' }} className="admin-header-search">
+        <div style={{ position: 'relative', width: '260px', flexShrink: 0 }} className="admin-header-search">
           <Search size={14} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#848e9c' }} />
           <input
             type="text"
@@ -136,7 +140,8 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
               padding: '8px 40px 8px 34px',
               fontSize: '13px',
               color: '#eaecef',
-              outline: 'none'
+              outline: 'none',
+              boxSizing: 'border-box'
             }}
           />
           <span style={{
@@ -166,7 +171,9 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
           borderRadius: '20px',
           padding: '4px 12px',
           fontSize: '12px',
-          color: '#eaecef'
+          color: '#eaecef',
+          whiteSpace: 'nowrap',
+          flexShrink: 0
         }}>
           <span style={{ color: '#848e9c' }}>Today Trades:</span>
           <span style={{ fontWeight: 800, color: '#fcd535' }}>1,482</span>
@@ -184,7 +191,9 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             fontWeight: 800,
             padding: '4px 10px',
             borderRadius: '6px',
-            animation: 'admin-pulse 2s infinite'
+            animation: 'admin-pulse 2s infinite',
+            whiteSpace: 'nowrap',
+            flexShrink: 0
           }}>
             {alerts.join(' · ')}
           </span>
@@ -192,7 +201,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
       </div>
 
       {/* RIGHT: Quick Action + RTL Toggle + Theme + Notifications + Profile */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
         {/* RTL / LTR Mode Toggle Button */}
         <button
           onClick={onToggleRTL}

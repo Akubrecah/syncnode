@@ -339,7 +339,12 @@ export const AdminConsole: React.FC = () => {
             zIndex: 1100,
             boxShadow: isMobileOpen ? '0 0 32px rgba(0, 0, 0, 0.8)' : 'none',
             transform: isMobileOpen ? 'translateX(0)' : (isRTL ? 'translateX(100%)' : 'translateX(-100%)')
-          } : {})
+          } : {
+            position: 'sticky',
+            top: 0,
+            height: '100vh',
+            flexShrink: 0
+          })
         }}
       >
         <div>

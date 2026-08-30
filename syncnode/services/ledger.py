@@ -14,6 +14,7 @@ from syncnode.common.decimal_util import (
     eq_decimal
 )
 from syncnode.database.db import db
+from syncnode.database.supabase_client import supabase_client
 from syncnode.common.logger import Logger
 
 logger = Logger("LedgerService")
@@ -23,15 +24,17 @@ class LedgerService:
     def get_or_create_account(self, account_type: AccountType, asset: AssetSymbol, user_id: Optional[str] = None) -> Dict[str, Any]:
         acc_id = f"acc_{user_id or 'sys'}_{account_type.value}_{asset.value}"
         if acc_id not in db.accounts:
-            db.accounts[acc_id] = {
+            acc_data = {
                 "id": acc_id,
                 "user_id": user_id,
-                "type": account_type,
-                "asset": asset,
+                "type": account_type.value if hasattr(account_type, "value") else str(account_type),
+                "asset": asset.value if hasattr(asset, "value") else str(asset),
                 "balance": "0.00000000",
                 "created_at": int(time.time() * 1000),
                 "updated_at": int(time.time() * 1000)
             }
+            db.accounts[acc_id] = acc_data
+            supabase_client.queue_upsert("accounts", acc_data)
         return db.accounts[acc_id]
 
     def record_transaction(self, idempotency_key: str, description: str, entries: List[Dict[str, Any]], metadata: Dict[str, Any] = None) -> Dict[str, Any]:
@@ -94,18 +97,32 @@ class LedgerService:
             account["balance"] = format_decimal(new_bal)
             account["updated_at"] = int(time.time() * 1000)
 
+            # Persist updated balance to Supabase PostgreSQL table
+            acc_type_val = account["type"].value if hasattr(account["type"], "value") else str(account["type"])
+            acc_asset_val = account["asset"].value if hasattr(account["asset"], "value") else str(account["asset"])
+            supabase_client.queue_upsert("accounts", {
+                "id": acc_id,
+                "user_id": account.get("user_id"),
+                "type": acc_type_val,
+                "asset": acc_asset_val,
+                "balance": format_decimal(new_bal),
+                "created_at": account.get("created_at", int(time.time() * 1000)),
+                "updated_at": account["updated_at"]
+            })
+
             j_id = f"je_{uuid.uuid4().hex[:12]}"
             journal_entry = {
                 "id": j_id,
                 "transaction_id": tx_id,
                 "account_id": acc_id,
-                "asset": entry["asset"],
+                "asset": entry["asset"].value if hasattr(entry["asset"], "value") else str(entry["asset"]),
                 "debit": format_decimal(debit_amt),
                 "credit": format_decimal(credit_amt),
                 "created_at": int(time.time() * 1000)
             }
             db.journal_entries[j_id] = journal_entry
             recorded_entries.append(journal_entry)
+            supabase_client.queue_upsert("journal_entries", journal_entry)
 
         tx_record = {
             "id": tx_id,
@@ -117,6 +134,7 @@ class LedgerService:
         }
         db.ledger_transactions[tx_id] = tx_record
         db.idempotency_keys.add(idempotency_key)
+        supabase_client.queue_upsert("ledger_transactions", tx_record)
         return tx_record
 
     def get_user_asset_balance(self, user_id: str, asset: AssetSymbol) -> Dict[str, str]:

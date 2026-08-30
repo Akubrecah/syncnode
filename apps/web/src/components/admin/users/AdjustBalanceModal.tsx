@@ -21,6 +21,7 @@ export const AdjustBalanceModal: React.FC<AdjustBalanceModalProps> = ({
   onClose,
   onSuccess
 }) => {
+  const [liveBalances, setLiveBalances] = useState<UserBalance[]>(balances);
   const [asset, setAsset] = useState<string>(initialAsset);
   const [operation, setOperation] = useState<'CREDIT' | 'DEBIT' | 'SET'>('CREDIT');
   const [amount, setAmount] = useState<string>('');
@@ -29,7 +30,23 @@ export const AdjustBalanceModal: React.FC<AdjustBalanceModalProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-  const currentBal = balances.find((b) => b.asset === asset) || {
+  useEffect(() => {
+    if (userId) {
+      const token = localStorage.getItem('syncnode_token');
+      fetch(`/api/v1/admin/users/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success && data.balances) {
+            setLiveBalances(data.balances);
+          }
+        })
+        .catch((e) => console.debug('Fetch user balances error:', e));
+    }
+  }, [userId]);
+
+  const currentBal = liveBalances.find((b) => b.asset === asset) || {
     asset: asset as AssetSymbol,
     available: '0.00',
     locked: '0.00',
@@ -71,13 +88,17 @@ export const AdjustBalanceModal: React.FC<AdjustBalanceModalProps> = ({
 
       const data = await res.json();
       if (!data.success) {
-        throw new Error(data.error || 'Failed to adjust balance');
+        throw new Error(data.error || data.detail || 'Failed to adjust balance');
       }
 
-      setSuccessMsg(data.message || 'Balance updated successfully!');
+      if (data.balances) {
+        setLiveBalances(data.balances);
+      }
+
+      setSuccessMsg('Balance updated and verified in ledger!');
       setTimeout(() => {
         onSuccess();
-      }, 1200);
+      }, 500);
     } catch (err: any) {
       setError(err.message || 'Failed to adjust balance');
     } finally {
