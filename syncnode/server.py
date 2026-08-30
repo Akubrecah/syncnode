@@ -81,7 +81,9 @@ def get_client_ip(request: Request) -> str:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Connect MongoDB
+    # Connect Supabase Cloud PostgreSQL
+    await db.connect_supabase()
+    # Connect MongoDB (fallback)
     await db.connect_mongo()
 
     # Seed Admin User if not exists
@@ -191,6 +193,7 @@ async def health_check():
         "status": "HEALTHY",
         "service": "syncnode-python-core",
         "timestamp": int(time.time() * 1000),
+        "supabase_connected": db._is_supabase_connected,
         "mongo_connected": db._is_connected
     }
 

@@ -50,6 +50,7 @@ class Database:
         self.mongo_client = None
         self.mongo_db = None
         self._is_connected = False
+        self._is_supabase_connected = False
 
     def bootstrap_admin(self):
         from syncnode.security.crypto import hash_password
@@ -247,6 +248,21 @@ class Database:
         except Exception as e:
             logger.warn(f"MongoDB connection optional fallback (in-memory mode active): {str(e)}")
             self._is_connected = False
+
+    async def connect_supabase(self, url: str = None, key: str = None):
+        """Initializes Supabase connection and hydrates engine memory state from PostgreSQL tables."""
+        from syncnode.database.supabase_client import supabase_client
+        if supabase_client.initialize(url=url, key=key):
+            is_alive = await supabase_client.test_connection()
+            if is_alive:
+                self._is_supabase_connected = True
+                await supabase_client.hydrate_all(self)
+                logger.info("Supabase PostgreSQL cloud storage active and synchronized.")
+            else:
+                self._is_supabase_connected = False
+                logger.warning("Supabase configured but ping check failed. Falling back to local memory persistence.")
+        else:
+            self._is_supabase_connected = False
 
 
 db = Database.get_instance()

@@ -1,5 +1,6 @@
 from typing import Optional, List, Dict, Any
 from syncnode.database.db import db
+from syncnode.database.supabase_client import supabase_client
 
 
 class UserRepository:
@@ -17,6 +18,7 @@ class UserRepository:
         email = user["email"].lower()
         db.users[user_id] = user
         db.users_by_email[email] = user_id
+        supabase_client.queue_upsert("users", user)
         return user
 
 
@@ -32,6 +34,7 @@ class OrderRepository:
 
     def save(self, order: Dict[str, Any]) -> Dict[str, Any]:
         db.orders[order["id"]] = order
+        supabase_client.queue_upsert("orders", order)
         return order
 
 
@@ -49,6 +52,7 @@ class TradeRepository:
 
     def save(self, trade: Dict[str, Any]) -> Dict[str, Any]:
         db.trades[trade["id"]] = trade
+        supabase_client.queue_upsert("trades", trade)
         return trade
 
 
