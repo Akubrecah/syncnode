@@ -320,7 +320,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
 
         {/* RIGHT ACTION CONTROLS */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div className="nav-right-actions">
           
           {/* Quick Search Shortcut */}
           <button
@@ -343,29 +343,13 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Live WebSocket Engine Status Indicator */}
           <div
+            className="nav-ws-status"
             title={isWsConnected ? 'Matching Engine & OrderBook WebSocket: Connected' : 'Matching Engine: Reconnecting...'}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              fontSize: '12px',
-              color: isWsConnected ? '#00e599' : '#ff3b69',
-              background: isWsConnected ? 'rgba(0, 229, 153, 0.08)' : 'rgba(255, 59, 105, 0.08)',
-              padding: '4px 8px',
-              borderRadius: '6px',
-              border: `1px solid ${isWsConnected ? 'rgba(0, 229, 153, 0.25)' : 'rgba(255, 59, 105, 0.25)'}`
-            }}
           >
             <div
-              style={{
-                width: '7px',
-                height: '7px',
-                borderRadius: '50%',
-                background: isWsConnected ? '#00e599' : '#ff3b69',
-                boxShadow: isWsConnected ? '0 0 6px #00e599' : 'none'
-              }}
+              className={`nav-ws-dot ${isWsConnected ? 'connected' : 'disconnected'}`}
             />
-            <span style={{ display: 'inline-block' }}>{isWsConnected ? 'Live' : 'Offline'}</span>
+            <span className="nav-ws-text">{isWsConnected ? 'Live' : 'Offline'}</span>
           </div>
 
           {/* User Profile / Dropdown */}
@@ -470,26 +454,15 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
           ) : (
             /* Auth Buttons for Unauthenticated Users */
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div className="nav-auth-buttons">
               <button
-                className="btn btn-secondary"
-                style={{ padding: '6px 12px', fontSize: '12px' }}
+                className="btn btn-secondary nav-auth-login-btn"
                 onClick={() => setActiveTab('login')}
               >
                 Log In
               </button>
               <button
-                className="btn btn-primary"
-                style={{
-                  padding: '6px 14px',
-                  fontSize: '12px',
-                  background: '#fcd535',
-                  color: '#181a20',
-                  fontWeight: 700,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '5px'
-                }}
+                className="btn btn-primary nav-auth-signup-btn"
                 onClick={() => setActiveTab('signup')}
               >
                 <UserPlus size={13} />

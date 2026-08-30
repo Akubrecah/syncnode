@@ -142,6 +142,70 @@ body {
   background: #2b313a;
 }
 
+/* Header Right Actions */
+.nav-right-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.nav-ws-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 229, 153, 0.25);
+  background: rgba(0, 229, 153, 0.08);
+  color: #00e599;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.nav-ws-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.nav-ws-dot.connected {
+  background: #00e599;
+  box-shadow: 0 0 6px #00e599;
+}
+
+.nav-ws-dot.disconnected {
+  background: #ff3b69;
+  box-shadow: none;
+}
+
+.nav-auth-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.nav-auth-login-btn {
+  padding: 6px 12px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.nav-auth-signup-btn {
+  padding: 6px 14px;
+  font-size: 12px;
+  background: #fcd535;
+  color: #181a20;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
 /* Trading Terminal Grid */
 .terminal-grid {
   display: grid;
@@ -5918,6 +5982,31 @@ a[href*="tradingview.com"] {
   .header-nav {
     padding: 0 12px !important;
     height: 54px !important;
+    gap: 8px !important;
+  }
+
+  .nav-right-actions {
+    gap: 6px !important;
+  }
+
+  .nav-ws-status {
+    padding: 3px 6px !important;
+    font-size: 11px !important;
+    gap: 4px !important;
+  }
+
+  .nav-auth-buttons {
+    gap: 6px !important;
+  }
+
+  .nav-auth-login-btn {
+    padding: 5px 9px !important;
+    font-size: 11.5px !important;
+  }
+
+  .nav-auth-signup-btn {
+    padding: 5px 11px !important;
+    font-size: 11.5px !important;
   }
   
   /* Tables horizontal scroll container */
@@ -6104,8 +6193,31 @@ a[href*="tradingview.com"] {
 }
 
 @media (max-width: 480px) {
+  .header-nav {
+    padding: 0 10px !important;
+  }
   .brand-logo span {
-    font-size: 15px !important;
+    font-size: 14.5px !important;
+  }
+  .nav-right-actions {
+    gap: 5px !important;
+  }
+  .nav-ws-status {
+    padding: 4px 6px !important;
+  }
+  .nav-ws-text {
+    display: none !important;
+  }
+  .nav-auth-buttons {
+    gap: 5px !important;
+  }
+  .nav-auth-login-btn {
+    padding: 5px 8px !important;
+    font-size: 11px !important;
+  }
+  .nav-auth-signup-btn {
+    padding: 5px 9px !important;
+    font-size: 11px !important;
   }
   .mobile-bottom-nav {
     height: calc(52px + env(safe-area-inset-bottom, 0px)) !important;
