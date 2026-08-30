@@ -1154,7 +1154,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           >
             <div>
               <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#eaecef', margin: '0 0 4px 0' }}>Assets &amp; Holdings</h2>
-              <span style={{ fontSize: '13px', color: '#848e9c' }}>Live valuations calculated with real-time Binance order books</span>
+              <span style={{ fontSize: '13px', color: '#848e9c' }}>Live valuations calculated with real-time institutional order books</span>
             </div>
 
             {/* Search Input */}
@@ -1922,7 +1922,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                       <option value="Spot Account">Spot Account</option>
                       <option value="Funding Account">Funding Account</option>
                       <option value="Futures USDⓈ-M">Futures USDⓈ-M</option>
-                      <option value="Earn Account">Binance Earn</option>
+                      <option value="Earn Account">CryptoBridge Earn</option>
                     </select>
                   </div>
 
@@ -1968,7 +1968,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                       <option value="Futures USDⓈ-M">Futures USDⓈ-M</option>
                       <option value="Spot Account">Spot Account</option>
                       <option value="Funding Account">Funding Account</option>
-                      <option value="Earn Account">Binance Earn</option>
+                      <option value="Earn Account">CryptoBridge Earn</option>
                     </select>
                   </div>
                 </div>

@@ -159,7 +159,7 @@ export const IngestTransactionModal: React.FC<IngestTransactionModalProps> = ({
                 style={{ width: '100%', padding: '10px 12px', background: '#202630', border: '1px solid #2b313a', color: '#eaecef', borderRadius: '8px', outline: 'none' }}
               >
                 <option value="DEPOSIT">Direct Deposit</option>
-                <option value="BINANCE_PAY">Binance Pay Transfer</option>
+                <option value="INSTANT_PAY">CryptoBridge Instant Pay</option>
                 <option value="INVESTMENT_PAYOUT">Investment ROI Yield</option>
                 <option value="BONUS">Promotional Bonus</option>
                 <option value="REBATE">Trading Fee Rebate</option>
