@@ -35,5 +35,5 @@ EXPOSE 5050
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:${PORT:-5050}/api/v1/health || exit 1
 
-# Start production server using uvicorn
-CMD uvicorn syncnode.server:app --host 0.0.0.0 --port ${PORT:-5050}
+# Start production server using uvicorn with dynamic port binding
+CMD ["sh", "-c", "exec uvicorn syncnode.server:app --host 0.0.0.0 --port ${PORT:-5050}"]

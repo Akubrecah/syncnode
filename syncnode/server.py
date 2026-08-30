@@ -183,7 +183,9 @@ async def get_current_user(authorization: Optional[str] = Header(None)) -> Dict[
 # REST ROUTES
 # -------------------------------------------------------------
 
+@app.get("/")
 @app.get("/health")
+@app.get("/api/v1/health")
 async def health_check():
     return {
         "status": "HEALTHY",
