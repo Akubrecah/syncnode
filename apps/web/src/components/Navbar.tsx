@@ -109,33 +109,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const currentUser = user || (() => {
-    try {
-      const s = typeof localStorage !== 'undefined' ? localStorage.getItem('syncnode_user') : null;
-      if (s) return JSON.parse(s);
-    } catch {}
-    if (isClerkSignedIn && clerkUser) {
-      const email = clerkUser.primaryEmailAddress?.emailAddress || clerkUser.emailAddresses?.[0]?.emailAddress || '';
-      return {
-        id: clerkUser.id,
-        email,
-        fullName: clerkUser.fullName || `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim() || email.split('@')[0] || 'Trader',
-        avatarUrl: clerkUser.imageUrl
-      };
-    }
-    try {
-      const token = typeof localStorage !== 'undefined' ? localStorage.getItem('syncnode_token') : null;
-      if (token) {
-        return {
-          id: 'usr_trader',
-          email: '',
-          fullName: 'Trader',
-          kyc_tier: 1
-        };
-      }
-    } catch {}
-    return null;
-  })();
+  const currentUser = user;
 
   const isTradeActive = ['spot', 'p2p'].includes(activeTab);
   const isOrdersActive = ['orders', 'history'].includes(activeTab);

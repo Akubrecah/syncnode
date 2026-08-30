@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
-import { useUser } from '@clerk/clerk-react';
-import { supabase, syncSupabaseUserWithBackend } from './lib/supabase';
+import { useUser, useClerk } from '@clerk/clerk-react';
+import { supabase, syncSupabaseUserWithBackend, signOutSupabase } from './lib/supabase';
 import { Navbar, TabType } from './components/Navbar';
 import { DashboardView } from './components/DashboardView';
 import { NewsView } from './components/NewsView';
@@ -237,6 +237,7 @@ export const App: React.FC = () => {
   const [recentTrades, setRecentTrades] = useState<any[]>([]);
   const [selectedPrice, setSelectedPrice] = useState<string | undefined>(undefined);
 
+  const clerk = useClerk();
   const { user: clerkUser, isLoaded: isClerkLoaded, isSignedIn: isClerkSignedIn } = useUser();
 
   // User and Auth State
@@ -805,10 +806,34 @@ export const App: React.FC = () => {
   }, []);
 
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     localStorage.removeItem('syncnode_token');
+    localStorage.removeItem('syncnode_refresh_token');
     localStorage.removeItem('syncnode_user');
+    try {
+      sessionStorage.clear();
+    } catch {}
+
     setUser(null);
+    setBalances([]);
+    setOrders([]);
+    setUserTrades([]);
+    setTransactions([]);
+
+    try {
+      await signOutSupabase();
+    } catch (e) {
+      console.debug('Supabase signout notice:', e);
+    }
+
+    try {
+      if (clerk && clerk.signOut) {
+        await clerk.signOut();
+      }
+    } catch (e) {
+      console.debug('Clerk signout notice:', e);
+    }
+
     setActiveTab('home');
   };
 
@@ -889,7 +914,7 @@ export const App: React.FC = () => {
       {/* 1. DASHBOARD / ASSETS / DEPOSIT / WITHDRAW / TRANSFERS / ORDERS / SECURITY / KYC / API KEYS / SESSIONS / SETTINGS */}
       {PROTECTED_TABS.has(activeTab) && (
         <DashboardView
-          user={user || { id: 'usr_active', email: '', fullName: 'Trader', kyc_tier: 1 }}
+          user={user}
           balances={balances}
           orders={orders}
           userTrades={userTrades}

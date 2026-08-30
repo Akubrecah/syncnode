@@ -121,7 +121,7 @@ const renderSection = (
 };
 
 const AdminInlineLogin: React.FC<{ onLoggedIn: () => void }> = ({ onLoggedIn }) => {
-  const [email, setEmail] = useState('poweldayck@gmail.com');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
