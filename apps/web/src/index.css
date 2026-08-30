@@ -5888,6 +5888,51 @@ a[href*="tradingview.com"] {
   .p-responsive {
     padding: 12px !important;
   }
+
+  /* Homepage Mobile Enhancements */
+  .home-page-container {
+    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .trending-mobile-tabs-bar {
+    display: flex !important;
+  }
+
+  .trending-card.mobile-hidden {
+    display: none !important;
+  }
+
+  .markets-mobile-list-view {
+    display: flex !important;
+  }
+
+  .markets-desktop-table-view {
+    display: none !important;
+  }
+
+  .hero-minicards-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  .hero-metrics-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  .ecosystem-products-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  .convert-card-surface {
+    padding: 18px 14px !important;
+    border-radius: 16px !important;
+  }
+
+  .markets-search-container {
+    width: 100% !important;
+  }
 }
 
 @media (max-width: 480px) {
@@ -5903,6 +5948,29 @@ a[href*="tradingview.com"] {
   .mobile-tab-btn svg {
     width: 18px !important;
     height: 18px !important;
+  }
+
+  .hero-section-card {
+    padding: 18px 14px !important;
+  }
+
+  .hero-signup-box {
+    width: 100% !important;
+    padding: 4px 4px 4px 10px !important;
+  }
+
+  .hero-signup-box input {
+    font-size: 13px !important;
+  }
+
+  .hero-signup-box button {
+    padding: 8px 14px !important;
+    font-size: 12px !important;
+  }
+
+  .ecosystem-products-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
   }
 }
 

@@ -209,8 +209,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
     }
   ];
 
+  const [activeTrendingTab, setActiveTrendingTab] = useState<'hot' | 'gainers' | 'vault'>('hot');
+
   return (
-    <div style={{ background: '#181a20', color: '#eaecef', minHeight: '100vh' }}>
+    <div className="home-page-container" style={{ background: '#181a20', color: '#eaecef', minHeight: '100vh' }}>
       {/* Real-time Ticker Tape Banner */}
       <div style={{ borderBottom: '1px solid #2b313a', background: '#12141a' }}>
         <TradingViewTickerTape theme="dark" />
@@ -226,14 +228,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
             background: '#181a20',
             borderRadius: '20px',
             border: '1px solid #2b313a',
-            padding: '44px 40px',
+            padding: '36px 32px',
             marginBottom: '28px',
             position: 'relative'
           }}
         >
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: '36px', alignItems: 'center' }}>
+          <div className="hero-grid-layout" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))', gap: '32px', alignItems: 'center' }}>
             {/* Hero Left Content */}
-            <div>
+            <div className="hero-left-content">
               <div
                 style={{
                   display: 'inline-flex',
@@ -246,16 +248,20 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   fontSize: '11px',
                   fontWeight: 700,
                   color: '#fcd535',
-                  marginBottom: '18px',
-                  letterSpacing: '0.5px'
+                  marginBottom: '16px',
+                  letterSpacing: '0.5px',
+                  maxWidth: '100%'
                 }}
               >
-                <span>CRYPTOBRIDGE INSTITUTIONAL SPOT &amp; P2P LIQUIDITY</span>
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  CRYPTOBRIDGE INSTITUTIONAL SPOT &amp; P2P
+                </span>
               </div>
 
               <h1
+                className="hero-title"
                 style={{
-                  fontSize: '40px',
+                  fontSize: 'clamp(28px, 6vw, 42px)',
                   fontWeight: 800,
                   lineHeight: '1.2',
                   color: '#ffffff',
@@ -269,7 +275,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 </span>
               </h1>
 
-              <p style={{ fontSize: '14px', color: '#848e9c', lineHeight: '1.6', margin: '0 0 24px 0', maxWidth: '520px' }}>
+              <p style={{ fontSize: 'clamp(13px, 3.5vw, 14px)', color: '#848e9c', lineHeight: '1.6', margin: '0 0 24px 0', maxWidth: '520px' }}>
                 High-throughput deterministic matching engine with 0.10% spot fees, double-entry ledger settlement, and cryptographic Proof-of-Reserves.
               </p>
 
@@ -285,7 +291,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                       color: '#181a20',
                       border: 'none',
                       borderRadius: '12px',
-                      padding: '14px 28px',
+                      padding: '12px 24px',
                       fontSize: '14px',
                       fontWeight: 700,
                       cursor: 'pointer',
@@ -306,7 +312,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                       color: '#eaecef',
                       border: '1px solid #2b313a',
                       borderRadius: '12px',
-                      padding: '14px 24px',
+                      padding: '12px 20px',
                       fontSize: '14px',
                       fontWeight: 600,
                       cursor: 'pointer',
@@ -321,15 +327,16 @@ export const HomeView: React.FC<HomeViewProps> = ({
               ) : (
                 <>
                   <div
+                    className="hero-signup-box"
                     style={{
                       background: '#181a20',
-                      borderRadius: '16px',
+                      borderRadius: '14px',
                       border: '1px solid #2b313a',
-                      padding: '8px 8px 8px 16px',
+                      padding: '6px 6px 6px 14px',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '12px',
-                      maxWidth: '480px',
+                      gap: '10px',
+                      maxWidth: '460px',
                       boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2)'
                     }}
                   >
@@ -344,7 +351,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
                         border: 'none',
                         outline: 'none',
                         color: '#eaecef',
-                        fontSize: '14px'
+                        fontSize: '14px',
+                        minWidth: 0
                       }}
                     />
                     <button
@@ -353,33 +361,34 @@ export const HomeView: React.FC<HomeViewProps> = ({
                         background: '#fcd535',
                         color: '#181a20',
                         border: 'none',
-                        borderRadius: '12px',
-                        padding: '12px 24px',
-                        fontSize: '14px',
+                        borderRadius: '10px',
+                        padding: '10px 20px',
+                        fontSize: '13px',
                         fontWeight: 700,
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '8px',
+                        gap: '6px',
                         transition: 'all 0.2s ease',
-                        whiteSpace: 'nowrap'
+                        whiteSpace: 'nowrap',
+                        flexShrink: 0
                       }}
                     >
                       <span>Sign Up</span>
-                      <ArrowRight size={16} />
+                      <ArrowRight size={15} />
                     </button>
                   </div>
 
                   {/* Social login pills */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '18px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '16px', flexWrap: 'wrap' }}>
                     <span style={{ fontSize: '12px', color: '#848e9c' }}>Or continue with:</span>
                     <button
                       onClick={onOpenAuth}
                       style={{
                         background: '#202630',
                         border: '1px solid #2b313a',
-                        borderRadius: '10px',
-                        padding: '6px 14px',
+                        borderRadius: '8px',
+                        padding: '5px 12px',
                         color: '#eaecef',
                         fontSize: '12px',
                         fontWeight: 600,
@@ -396,8 +405,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
                       style={{
                         background: '#202630',
                         border: '1px solid #2b313a',
-                        borderRadius: '10px',
-                        padding: '6px 14px',
+                        borderRadius: '8px',
+                        padding: '5px 12px',
                         color: '#eaecef',
                         fontSize: '12px',
                         fontWeight: 600,
@@ -415,7 +424,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
 
             {/* Hero Right: 4-Grid of Live Mini-Chart Rounded Cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
+            <div className="hero-minicards-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
               {[
                 { sym: 'BTCUSDT', pair: 'BTC/USDT', id: 'BTC', name: 'Bitcoin' },
                 { sym: 'ETHUSDT', pair: 'ETH/USDT', id: 'ETH', name: 'Ethereum' },
@@ -435,20 +444,20 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     }}
                     style={{
                       background: '#181a20',
-                      borderRadius: '16px',
+                      borderRadius: '14px',
                       border: '1px solid #2b313a',
-                      padding: '16px',
+                      padding: '12px 14px',
                       cursor: 'pointer',
                       transition: 'all 0.2s ease',
-                      boxShadow: '0 8px 20px rgba(0, 0, 0, 0.25)',
+                      boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)',
                       display: 'flex',
                       flexDirection: 'column',
                       justifyContent: 'space-between',
-                      minHeight: '170px'
+                      minHeight: '140px'
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.borderColor = '#fcd535';
-                      e.currentTarget.style.transform = 'translateY(-3px)';
+                      e.currentTarget.style.transform = 'translateY(-2px)';
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.borderColor = '#2b313a';
@@ -456,35 +465,37 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     }}
                   >
                     <div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                        <div>
-                          <span style={{ fontSize: '14px', fontWeight: 700, color: '#eaecef' }}>{item.pair}</span>
-                          <span style={{ fontSize: '11px', color: '#848e9c', marginLeft: '6px' }}>{item.name}</span>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px', gap: '4px' }}>
+                        <div style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          <span style={{ fontSize: '13px', fontWeight: 700, color: '#eaecef' }}>{item.id}</span>
+                          <span style={{ fontSize: '11px', color: '#848e9c', marginLeft: '4px' }}>{item.name}</span>
                         </div>
                         <span
                           style={{
-                            fontSize: '11px',
+                            fontSize: '10px',
                             fontWeight: 700,
                             color: isPos ? '#2ebd85' : '#f6465d',
                             background: isPos ? 'rgba(46, 189, 133, 0.15)' : 'rgba(246, 70, 93, 0.15)',
-                            padding: '3px 8px',
-                            borderRadius: '6px'
+                            padding: '2px 6px',
+                            borderRadius: '4px',
+                            whiteSpace: 'nowrap',
+                            flexShrink: 0
                           }}
                         >
                           {live ? (isPos ? `+${chg.toFixed(2)}%` : `${chg.toFixed(2)}%`) : '--'}
                         </span>
                       </div>
-                      <div style={{ fontSize: '18px', fontWeight: 800, color: '#eaecef', fontFamily: 'monospace', marginBottom: '4px' }}>
+                      <div style={{ fontSize: 'clamp(14px, 3.5vw, 17px)', fontWeight: 800, color: '#eaecef', fontFamily: 'monospace', marginBottom: '2px', whiteSpace: 'nowrap' }}>
                         {live ? `$${price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '$--'}
                       </div>
                       {live?.vol && (
-                        <div style={{ fontSize: '11px', color: '#848e9c', marginBottom: '8px' }}>
-                          24h Vol: <span style={{ color: '#eaecef' }}>{live.vol}</span>
+                        <div style={{ fontSize: '10px', color: '#848e9c', marginBottom: '6px', whiteSpace: 'nowrap' }}>
+                          Vol: <span style={{ color: '#eaecef' }}>{live.vol}</span>
                         </div>
                       )}
                     </div>
-                    <div style={{ height: '75px', width: '100%', borderRadius: '8px', overflow: 'hidden' }}>
-                      <TradingViewMiniChart symbol={item.sym} height={75} theme="dark" dateRange="1D" chartOnly={true} noTimeScale={true} />
+                    <div style={{ height: '56px', width: '100%', borderRadius: '6px', overflow: 'hidden' }}>
+                      <TradingViewMiniChart symbol={item.sym} height={56} theme="dark" dateRange="1D" chartOnly={true} noTimeScale={true} />
                     </div>
                   </div>
                 );
@@ -492,14 +503,15 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
           </div>
 
-          {/* 4 Horizontal Rounded Metric Cards on Hero Bottom */}
+          {/* 4 Metric Cards on Hero Bottom */}
           <div
+            className="hero-metrics-grid"
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 160px), 1fr))',
-              gap: '16px',
-              marginTop: '36px',
-              paddingTop: '28px',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 150px), 1fr))',
+              gap: '12px',
+              marginTop: '28px',
+              paddingTop: '20px',
               borderTop: '1px solid rgba(255, 255, 255, 0.08)'
             }}
           >
@@ -507,66 +519,138 @@ export const HomeView: React.FC<HomeViewProps> = ({
               {
                 label: '24h Global Volume',
                 val: Object.keys(livePrices).length > 0 ? '$78.4B' : 'Active',
-                sub: `Across ${liveMarketData.length * 35}+ verified markets`
+                sub: `Across 350+ markets`
               },
               {
-                label: 'Matching Engine Latency',
+                label: 'Engine Latency',
                 val: '< 50 µs',
-                sub: 'Deterministic ultra-low latency CLOB'
+                sub: 'Deterministic CLOB'
               },
               {
                 label: 'Proof of Reserves',
                 val: '100% Solvency',
-                sub: '1:1 Segregated cryptographic custody'
+                sub: '1:1 Segregated custody'
               },
               {
-                label: 'Institutional Fee Tier',
+                label: 'Fee Schedule',
                 val: '0.00% - 0.08%',
-                sub: 'Zero fee maker tiers available'
+                sub: 'Zero fee maker tiers'
               }
             ].map((stat) => (
               <div
                 key={stat.label}
                 style={{
                   background: '#181a20',
-                  borderRadius: '14px',
+                  borderRadius: '12px',
                   border: '1px solid #2b313a',
-                  padding: '16px 20px'
+                  padding: '12px 14px'
                 }}
               >
-                <div style={{ fontSize: '12px', color: '#848e9c', fontWeight: 500 }}>{stat.label}</div>
-                <div style={{ fontSize: '20px', fontWeight: 800, color: '#eaecef', margin: '4px 0 2px 0' }}>{stat.val}</div>
-                <div style={{ fontSize: '11px', color: '#fcd535' }}>{stat.sub}</div>
+                <div style={{ fontSize: '11px', color: '#848e9c', fontWeight: 500 }}>{stat.label}</div>
+                <div style={{ fontSize: '17px', fontWeight: 800, color: '#eaecef', margin: '3px 0 1px 0' }}>{stat.val}</div>
+                <div style={{ fontSize: '10.5px', color: '#fcd535' }}>{stat.sub}</div>
               </div>
             ))}
           </div>
         </section>
 
         {/* =========================================================================
-            2. TOP TRENDING & GAINERS (4 ROUNDED RECTANGLE SHOWCASE CARDS)
+            2. TOP TRENDING & GAINERS (RESPONSIVE SHOWCASE CARDS WITH MOBILE TABS)
             ========================================================================= */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '20px', marginBottom: '32px' }}>
+        <div className="trending-mobile-tabs-bar" style={{ display: 'none', gap: '8px', marginBottom: '14px', overflowX: 'auto', paddingBottom: '4px' }}>
+          <button
+            onClick={() => setActiveTrendingTab('hot')}
+            style={{
+              flex: 1,
+              background: activeTrendingTab === 'hot' ? '#fcd535' : '#202630',
+              color: activeTrendingTab === 'hot' ? '#181a20' : '#eaecef',
+              border: '1px solid #2b313a',
+              borderRadius: '10px',
+              padding: '8px 12px',
+              fontSize: '12px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '4px'
+            }}
+          >
+            <Flame size={14} />
+            <span>Hot Coins</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTrendingTab('gainers')}
+            style={{
+              flex: 1,
+              background: activeTrendingTab === 'gainers' ? '#2ebd85' : '#202630',
+              color: activeTrendingTab === 'gainers' ? '#ffffff' : '#eaecef',
+              border: '1px solid #2b313a',
+              borderRadius: '10px',
+              padding: '8px 12px',
+              fontSize: '12px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '4px'
+            }}
+          >
+            <TrendingUp size={14} />
+            <span>Top Gainers</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTrendingTab('vault')}
+            style={{
+              flex: 1,
+              background: activeTrendingTab === 'vault' ? '#3b82f6' : '#202630',
+              color: activeTrendingTab === 'vault' ? '#ffffff' : '#eaecef',
+              border: '1px solid #2b313a',
+              borderRadius: '10px',
+              padding: '8px 12px',
+              fontSize: '12px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '4px'
+            }}
+          >
+            <ShieldCheck size={14} />
+            <span>Vault</span>
+          </button>
+        </div>
+
+        <div className="home-trending-gainers-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '16px', marginBottom: '28px' }}>
           {/* Card 1: Hot Coins */}
           <div
+            className={`trending-card trending-card-hot ${activeTrendingTab !== 'hot' ? 'mobile-hidden' : ''}`}
             style={{
               background: '#202630',
-              borderRadius: '20px',
+              borderRadius: '16px',
               border: '1px solid #2b313a',
-              padding: '22px',
+              padding: '18px 16px',
               display: 'flex',
               flexDirection: 'column',
-              gap: '14px'
+              gap: '12px'
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Flame size={18} color="#fcd535" />
-                <h3 style={{ fontSize: '16px', fontWeight: 700, margin: 0 }}>Hot Coins</h3>
+                <Flame size={16} color="#fcd535" />
+                <h3 style={{ fontSize: '15px', fontWeight: 700, margin: 0 }}>Hot Coins</h3>
               </div>
-              <span style={{ fontSize: '12px', color: '#848e9c' }}>24h Volume</span>
+              <span style={{ fontSize: '11px', color: '#848e9c' }}>24h Volume</span>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {liveMarketData.slice(0, 3).map((c) => (
                 <div
                   key={c.id}
@@ -575,8 +659,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    padding: '10px 12px',
-                    borderRadius: '12px',
+                    padding: '8px 10px',
+                    borderRadius: '10px',
                     background: '#181a20',
                     border: '1px solid #2b313a',
                     cursor: 'pointer',
@@ -585,18 +669,18 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   onMouseEnter={(e) => (e.currentTarget.style.borderColor = '#fcd535')}
                   onMouseLeave={(e) => (e.currentTarget.style.borderColor = '#2b313a')}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#202630', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, color: c.color, fontSize: '13px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: '#202630', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, color: c.color, fontSize: '12px' }}>
                       {c.logo}
                     </div>
                     <div>
                       <div style={{ fontSize: '13px', fontWeight: 700, color: '#eaecef' }}>{c.id}</div>
-                      <div style={{ fontSize: '11px', color: '#848e9c' }}>{c.name}</div>
+                      <div style={{ fontSize: '10.5px', color: '#848e9c' }}>{c.name}</div>
                     </div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <div style={{ fontSize: '13px', fontWeight: 700, fontFamily: 'monospace' }}>{c.price}</div>
-                    <div style={{ fontSize: '11px', fontWeight: 600, color: c.isPositive ? '#2ebd85' : '#f6465d' }}>{c.change24h}</div>
+                    <div style={{ fontSize: '10.5px', fontWeight: 600, color: c.isPositive ? '#2ebd85' : '#f6465d' }}>{c.change24h}</div>
                   </div>
                 </div>
               ))}
@@ -605,25 +689,26 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
           {/* Card 2: Top Gainers */}
           <div
+            className={`trending-card trending-card-gainers ${activeTrendingTab !== 'gainers' ? 'mobile-hidden' : ''}`}
             style={{
               background: '#202630',
-              borderRadius: '20px',
+              borderRadius: '16px',
               border: '1px solid #2b313a',
-              padding: '22px',
+              padding: '18px 16px',
               display: 'flex',
               flexDirection: 'column',
-              gap: '14px'
+              gap: '12px'
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <TrendingUp size={18} color="#2ebd85" />
-                <h3 style={{ fontSize: '16px', fontWeight: 700, margin: 0 }}>Top Gainers</h3>
+                <TrendingUp size={16} color="#2ebd85" />
+                <h3 style={{ fontSize: '15px', fontWeight: 700, margin: 0 }}>Top Gainers</h3>
               </div>
-              <span style={{ fontSize: '12px', color: '#2ebd85', fontWeight: 600 }}>Highest 24h ROI</span>
+              <span style={{ fontSize: '11px', color: '#2ebd85', fontWeight: 600 }}>Highest 24h ROI</span>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {[...liveMarketData].sort((a, b) => b.changeNum - a.changeNum).slice(0, 3).map((c) => (
                 <div
                   key={c.id}
@@ -632,8 +717,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    padding: '10px 12px',
-                    borderRadius: '12px',
+                    padding: '8px 10px',
+                    borderRadius: '10px',
                     background: '#181a20',
                     border: '1px solid #2b313a',
                     cursor: 'pointer',
@@ -642,18 +727,18 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   onMouseEnter={(e) => (e.currentTarget.style.borderColor = '#2ebd85')}
                   onMouseLeave={(e) => (e.currentTarget.style.borderColor = '#2b313a')}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#202630', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, color: c.color, fontSize: '13px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: '#202630', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, color: c.color, fontSize: '12px' }}>
                       {c.logo}
                     </div>
                     <div>
                       <div style={{ fontSize: '13px', fontWeight: 700, color: '#eaecef' }}>{c.id}</div>
-                      <div style={{ fontSize: '11px', color: '#848e9c' }}>{c.name}</div>
+                      <div style={{ fontSize: '10.5px', color: '#848e9c' }}>{c.name}</div>
                     </div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <div style={{ fontSize: '13px', fontWeight: 700, fontFamily: 'monospace' }}>{c.price}</div>
-                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#2ebd85' }}>{c.change24h}</div>
+                    <div style={{ fontSize: '10.5px', fontWeight: 700, color: '#2ebd85' }}>{c.change24h}</div>
                   </div>
                 </div>
               ))}
@@ -662,27 +747,28 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
           {/* Card 3: Top Yield Staking */}
           <div
+            className={`trending-card trending-card-vault ${activeTrendingTab !== 'vault' ? 'mobile-hidden' : ''}`}
             style={{
               background: '#202630',
-              borderRadius: '20px',
+              borderRadius: '16px',
               border: '1px solid #2b313a',
-              padding: '22px',
+              padding: '18px 16px',
               display: 'flex',
               flexDirection: 'column',
-              gap: '14px'
+              gap: '12px'
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <ShieldCheck size={18} color="#2ebd85" />
-                <h3 style={{ fontSize: '16px', fontWeight: 700, margin: 0 }}>CryptoBridge Vault &amp; Transfers</h3>
+                <ShieldCheck size={16} color="#2ebd85" />
+                <h3 style={{ fontSize: '15px', fontWeight: 700, margin: 0 }}>Vault &amp; Transfers</h3>
               </div>
-              <a href="#/wallet" style={{ fontSize: '12px', color: '#fcd535', textDecoration: 'none', fontWeight: 600 }}>
-                Transfer
+              <a href="#/wallet" style={{ fontSize: '11px', color: '#fcd535', textDecoration: 'none', fontWeight: 600 }}>
+                Transfer →
               </a>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {[
                 { label: 'Instant Transfers', desc: 'Zero Network Fees', val: '0.00% FEE', color: '#2ebd85' },
                 { label: 'Proof of Reserves', desc: 'Full 1:1 Solvency', val: '100% BACKED', color: '#fcd535' },
@@ -695,25 +781,25 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    padding: '10px 12px',
-                    borderRadius: '12px',
+                    padding: '8px 10px',
+                    borderRadius: '10px',
                     background: '#181a20',
                     border: '1px solid #2b313a',
                     cursor: 'pointer'
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#202630', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, color: e.color, fontSize: '12px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: '#202630', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, color: e.color, fontSize: '12px' }}>
                       ✓
                     </div>
                     <div>
                       <div style={{ fontSize: '13px', fontWeight: 700, color: '#eaecef' }}>{e.label}</div>
-                      <div style={{ fontSize: '11px', color: '#848e9c' }}>{e.desc}</div>
+                      <div style={{ fontSize: '10.5px', color: '#848e9c' }}>{e.desc}</div>
                     </div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '12px', fontWeight: 800, color: e.color }}>{e.val}</div>
-                    <div style={{ fontSize: '11px', color: '#848e9c' }}>Verified</div>
+                    <div style={{ fontSize: '11.5px', fontWeight: 800, color: e.color }}>{e.val}</div>
+                    <div style={{ fontSize: '10px', color: '#848e9c' }}>Verified</div>
                   </div>
                 </div>
               ))}
@@ -722,31 +808,32 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </div>
 
         {/* =========================================================================
-            3. POPULAR CRYPTOCURRENCIES (ROUNDED RECTANGLE CARD TABLE)
+            3. POPULAR CRYPTOCURRENCIES (DESKTOP TABLE + MOBILE FINANCIAL LIST)
             ========================================================================= */}
         <section
+          className="markets-section-card"
           style={{
             background: '#202630',
-            borderRadius: '24px',
+            borderRadius: '20px',
             border: '1px solid #2b313a',
-            padding: '32px',
-            marginBottom: '32px'
+            padding: '24px 20px',
+            marginBottom: '28px'
           }}
         >
           {/* Header & Filter Bar */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', marginBottom: '24px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px', marginBottom: '20px' }}>
             <div>
-              <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#eaecef', margin: '0 0 6px 0' }}>
+              <h2 style={{ fontSize: 'clamp(18px, 4.5vw, 22px)', fontWeight: 800, color: '#eaecef', margin: '0 0 4px 0' }}>
                 Popular Markets &amp; Real-Time Prices
               </h2>
-              <p style={{ fontSize: '13px', color: '#848e9c', margin: 0 }}>
-                Trade 350+ digital assets with microsecond deterministic matching and live L2 liquidity.
+              <p style={{ fontSize: '12.5px', color: '#848e9c', margin: 0 }}>
+                Trade 350+ digital assets with microsecond deterministic matching.
               </p>
             </div>
 
             {/* Search Input */}
-            <div style={{ position: 'relative', width: '260px' }}>
-              <Search size={16} color="#848e9c" style={{ position: 'absolute', left: '12px', top: '10px' }} />
+            <div className="markets-search-container" style={{ position: 'relative', width: '240px', minWidth: '180px' }}>
+              <Search size={15} color="#848e9c" style={{ position: 'absolute', left: '12px', top: '9px' }} />
               <input
                 type="text"
                 placeholder="Search symbol..."
@@ -756,24 +843,35 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   width: '100%',
                   background: '#181a20',
                   border: '1px solid #2b313a',
-                  borderRadius: '12px',
-                  padding: '8px 12px 8px 36px',
+                  borderRadius: '10px',
+                  padding: '7px 10px 7px 34px',
                   color: '#eaecef',
-                  fontSize: '13px',
+                  fontSize: '12.5px',
                   outline: 'none'
                 }}
               />
             </div>
           </div>
 
-          {/* Category Tabs */}
-          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '20px' }}>
+          {/* Category Tabs (Scrollable on Mobile) */}
+          <div
+            className="markets-filter-tabs-row"
+            style={{
+              display: 'flex',
+              gap: '8px',
+              overflowX: 'auto',
+              whiteSpace: 'nowrap',
+              paddingBottom: '6px',
+              marginBottom: '16px',
+              WebkitOverflowScrolling: 'touch'
+            }}
+          >
             {[
               { id: 'hot', label: 'Hot Markets' },
               { id: 'gainers', label: 'Top Gainers' },
               { id: 'volume', label: '24h Volume' },
               { id: 'new', label: 'New Listings' },
-              { id: 'tradingview', label: 'TradingView Screener' }
+              { id: 'tradingview', label: 'TradingView' }
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -782,12 +880,13 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   background: activeMarketTab === tab.id ? '#fcd535' : '#181a20',
                   color: activeMarketTab === tab.id ? '#181a20' : '#848e9c',
                   border: '1px solid #2b313a',
-                  borderRadius: '12px',
-                  padding: '8px 18px',
-                  fontSize: '13px',
+                  borderRadius: '10px',
+                  padding: '7px 14px',
+                  fontSize: '12.5px',
                   fontWeight: 700,
                   cursor: 'pointer',
-                  transition: 'all 0.15s ease'
+                  transition: 'all 0.15s ease',
+                  flexShrink: 0
                 }}
               >
                 {tab.label}
@@ -795,116 +894,196 @@ export const HomeView: React.FC<HomeViewProps> = ({
             ))}
           </div>
 
-          {/* Market Table */}
+          {/* Market Display: Desktop Table + Dedicated Mobile List */}
           {activeMarketTab === 'tradingview' ? (
-            <div style={{ background: '#181a20', border: '1px solid #2b313a', borderRadius: '16px', padding: '16px', overflow: 'hidden', minHeight: '580px' }}>
-              <TradingViewMarketOverview height={560} theme="dark" />
+            <div style={{ background: '#181a20', border: '1px solid #2b313a', borderRadius: '14px', padding: '12px', overflow: 'hidden', minHeight: '520px' }}>
+              <TradingViewMarketOverview height={500} theme="dark" />
             </div>
           ) : (
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '14px' }}>
-                <thead>
-                  <tr style={{ color: '#848e9c', borderBottom: '1px solid #2b313a' }}>
-                    <th style={{ padding: '14px 16px', fontWeight: 500 }}>Pair</th>
-                    <th style={{ padding: '14px 16px', fontWeight: 500 }}>Last Price</th>
-                    <th style={{ padding: '14px 16px', fontWeight: 500 }}>24h Change</th>
-                    <th style={{ padding: '14px 16px', fontWeight: 500 }}>24h Volume</th>
-                    <th style={{ padding: '14px 16px', fontWeight: 500 }}>Market Cap</th>
-                    <th style={{ padding: '14px 16px', fontWeight: 500, textAlign: 'right' }}>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentDisplayMarkets.map((coin) => (
-                    <tr
-                      key={coin.id}
-                      onClick={() => {
-                        onSelectSymbol(coin.symbol);
-                        onNavigateToTrade(coin.symbol);
-                      }}
-                      style={{
-                        borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
-                        cursor: 'pointer',
-                        transition: 'background 0.15s ease'
-                      }}
-                      onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255, 255, 255, 0.02)')}
-                      onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-                    >
-                      <td style={{ padding: '16px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                          <div
+            <>
+              {/* Mobile View: High-End Crypto List Row (No Horizontal Overflow) */}
+              <div className="markets-mobile-list-view" style={{ display: 'none', flexDirection: 'column', gap: '8px' }}>
+                {currentDisplayMarkets.map((coin) => (
+                  <div
+                    key={coin.id}
+                    onClick={() => {
+                      onSelectSymbol(coin.symbol);
+                      onNavigateToTrade(coin.symbol);
+                    }}
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      padding: '12px 10px',
+                      background: '#181a20',
+                      border: '1px solid #2b313a',
+                      borderRadius: '12px',
+                      cursor: 'pointer',
+                      transition: 'border-color 0.15s ease'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <div
+                        style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '50%',
+                          background: '#202630',
+                          border: `1px solid ${coin.color}`,
+                          color: coin.color,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontWeight: 800,
+                          fontSize: '13px',
+                          flexShrink: 0
+                        }}
+                      >
+                        {coin.logo}
+                      </div>
+                      <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span style={{ fontWeight: 800, color: '#eaecef', fontSize: '14px' }}>{coin.id}</span>
+                          <span style={{ fontSize: '11px', color: '#848e9c' }}>/USDT</span>
+                        </div>
+                        <div style={{ fontSize: '11px', color: '#848e9c' }}>
+                          Vol {coin.volume24h}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ fontFamily: 'monospace', fontWeight: 800, color: '#eaecef', fontSize: '14px', marginBottom: '2px' }}>
+                        {coin.price}
+                      </div>
+                      <span
+                        style={{
+                          display: 'inline-block',
+                          background: coin.isPositive ? 'rgba(46, 189, 133, 0.2)' : 'rgba(246, 70, 93, 0.2)',
+                          color: coin.isPositive ? '#2ebd85' : '#f6465d',
+                          padding: '2px 8px',
+                          borderRadius: '6px',
+                          fontFamily: 'monospace',
+                          fontWeight: 700,
+                          fontSize: '11.5px',
+                          whiteSpace: 'nowrap'
+                        }}
+                      >
+                        {coin.change24h}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Desktop View: Full 6-Column Data Table */}
+              <div className="markets-desktop-table-view" style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '13.5px' }}>
+                  <thead>
+                    <tr style={{ color: '#848e9c', borderBottom: '1px solid #2b313a' }}>
+                      <th style={{ padding: '12px 14px', fontWeight: 500 }}>Pair</th>
+                      <th style={{ padding: '12px 14px', fontWeight: 500 }}>Last Price</th>
+                      <th style={{ padding: '12px 14px', fontWeight: 500 }}>24h Change</th>
+                      <th style={{ padding: '12px 14px', fontWeight: 500 }}>24h Volume</th>
+                      <th style={{ padding: '12px 14px', fontWeight: 500 }}>Market Cap</th>
+                      <th style={{ padding: '12px 14px', fontWeight: 500, textAlign: 'right' }}>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {currentDisplayMarkets.map((coin) => (
+                      <tr
+                        key={coin.id}
+                        onClick={() => {
+                          onSelectSymbol(coin.symbol);
+                          onNavigateToTrade(coin.symbol);
+                        }}
+                        style={{
+                          borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
+                          cursor: 'pointer',
+                          transition: 'background 0.15s ease'
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255, 255, 255, 0.02)')}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                      >
+                        <td style={{ padding: '14px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <div
+                              style={{
+                                width: '32px',
+                                height: '32px',
+                                borderRadius: '50%',
+                                background: '#181a20',
+                                border: `1px solid ${coin.color}`,
+                                color: coin.color,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontWeight: 800,
+                                fontSize: '14px',
+                                flexShrink: 0
+                              }}
+                            >
+                              {coin.logo}
+                            </div>
+                            <div>
+                              <div style={{ fontWeight: 700, color: '#eaecef' }}>{coin.id}</div>
+                              <div style={{ fontSize: '11px', color: '#848e9c' }}>{coin.name}</div>
+                            </div>
+                          </div>
+                        </td>
+
+                        <td style={{ padding: '14px', fontFamily: 'monospace', fontWeight: 700, color: '#eaecef' }}>
+                          {coin.price}
+                        </td>
+
+                        <td style={{ padding: '14px' }}>
+                          <span
                             style={{
-                              width: '36px',
-                              height: '36px',
-                              borderRadius: '50%',
-                              background: '#181a20',
-                              border: `1px solid ${coin.color}`,
-                              color: coin.color,
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              fontWeight: 800,
-                              fontSize: '15px'
+                              display: 'inline-block',
+                              background: coin.isPositive ? 'rgba(46, 189, 133, 0.15)' : 'rgba(246, 70, 93, 0.15)',
+                              color: coin.isPositive ? '#2ebd85' : '#f6465d',
+                              padding: '3px 8px',
+                              borderRadius: '6px',
+                              fontFamily: 'monospace',
+                              fontWeight: 700,
+                              fontSize: '12px',
+                              whiteSpace: 'nowrap'
                             }}
                           >
-                            {coin.logo}
-                          </div>
-                          <div>
-                            <div style={{ fontWeight: 700, color: '#eaecef' }}>{coin.id}</div>
-                            <div style={{ fontSize: '12px', color: '#848e9c' }}>{coin.name}</div>
-                          </div>
-                        </div>
-                      </td>
+                            {coin.change24h}
+                          </span>
+                        </td>
 
-                      <td style={{ padding: '16px', fontFamily: 'monospace', fontWeight: 700, color: '#eaecef' }}>
-                        {coin.price}
-                      </td>
+                        <td style={{ padding: '14px', color: '#848e9c', fontFamily: 'monospace' }}>{coin.volume24h}</td>
+                        <td style={{ padding: '14px', color: '#848e9c', fontFamily: 'monospace' }}>{coin.marketCap}</td>
 
-                      <td style={{ padding: '16px' }}>
-                        <span
-                          style={{
-                            display: 'inline-block',
-                            background: coin.isPositive ? 'rgba(46, 189, 133, 0.15)' : 'rgba(246, 70, 93, 0.15)',
-                            color: coin.isPositive ? '#2ebd85' : '#f6465d',
-                            padding: '4px 10px',
-                            borderRadius: '6px',
-                            fontFamily: 'monospace',
-                            fontWeight: 700,
-                            fontSize: '13px'
-                          }}
-                        >
-                          {coin.change24h}
-                        </span>
-                      </td>
-
-                      <td style={{ padding: '16px', color: '#848e9c', fontFamily: 'monospace' }}>{coin.volume24h}</td>
-                      <td style={{ padding: '16px', color: '#848e9c', fontFamily: 'monospace' }}>{coin.marketCap}</td>
-
-                      <td style={{ padding: '16px', textAlign: 'right' }}>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onSelectSymbol(coin.symbol);
-                            onNavigateToTrade(coin.symbol);
-                          }}
-                          style={{
-                            background: '#fcd535',
-                            color: '#181a20',
-                            border: 'none',
-                            borderRadius: '8px',
-                            padding: '8px 18px',
-                            fontSize: '13px',
-                            fontWeight: 700,
-                            cursor: 'pointer'
-                          }}
-                        >
-                          Trade
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                        <td style={{ padding: '14px', textAlign: 'right' }}>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onSelectSymbol(coin.symbol);
+                              onNavigateToTrade(coin.symbol);
+                            }}
+                            style={{
+                              background: '#fcd535',
+                              color: '#181a20',
+                              border: 'none',
+                              borderRadius: '8px',
+                              padding: '6px 14px',
+                              fontSize: '12px',
+                              fontWeight: 700,
+                              cursor: 'pointer'
+                            }}
+                          >
+                            Trade
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
         </section>
 
@@ -912,23 +1091,26 @@ export const HomeView: React.FC<HomeViewProps> = ({
             4. INSTANT BUY / CONVERT CALCULATOR (SIDE-BY-SIDE ROUNDED CARDS)
             ========================================================================= */}
         <section
+          className="convert-section-container"
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))',
-            gap: '24px',
-            marginBottom: '32px'
+            gap: '20px',
+            marginBottom: '28px'
           }}
         >
           {/* Card Left: Payment Features */}
           <div
+            className="convert-card-surface"
             style={{
               background: '#202630',
-              borderRadius: '24px',
+              borderRadius: '20px',
               border: '1px solid #2b313a',
-              padding: '36px',
+              padding: '28px 24px',
               display: 'flex',
               flexDirection: 'column',
-              justifyContent: 'space-between'
+              justifyContent: 'space-between',
+              gap: '20px'
             }}
           >
             <div>
@@ -936,9 +1118,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 style={{
                   background: 'rgba(252, 213, 53, 0.15)',
                   color: '#fcd535',
-                  padding: '4px 10px',
+                  padding: '3px 8px',
                   borderRadius: '6px',
-                  fontSize: '11px',
+                  fontSize: '10.5px',
                   fontWeight: 800,
                   letterSpacing: '0.5px'
                 }}
@@ -946,21 +1128,21 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 ZERO-FEE CONVERSION &amp; ON-RAMPS
               </span>
 
-              <h2 style={{ fontSize: '28px', fontWeight: 800, color: '#eaecef', margin: '16px 0 12px 0', lineHeight: '1.3' }}>
+              <h2 style={{ fontSize: 'clamp(20px, 5vw, 26px)', fontWeight: 800, color: '#eaecef', margin: '14px 0 10px 0', lineHeight: '1.3' }}>
                 Buy Crypto in Seconds with Card, Bank or P2P
               </h2>
 
-              <p style={{ fontSize: '14px', color: '#848e9c', lineHeight: '1.6', margin: '0 0 24px 0' }}>
+              <p style={{ fontSize: '13px', color: '#848e9c', lineHeight: '1.6', margin: 0 }}>
                 Instant fiat settlement supporting USD, EUR, GBP, AUD, and 50+ sovereign currencies with 0% deposit fees.
               </p>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
               {[
-                { icon: CreditCard, title: 'Visa & Mastercard', sub: 'Instant card payment' },
-                { icon: Building2, title: 'SEPA & Wire', sub: '0% bank deposit fee' },
-                { icon: Users, title: 'P2P Escrow', sub: '100+ local methods' },
-                { icon: DollarSign, title: 'Apple & Google Pay', sub: 'One-tap checkout' }
+                { icon: CreditCard, title: 'Visa & Mastercard', sub: 'Instant card' },
+                { icon: Building2, title: 'SEPA & Wire', sub: '0% bank fee' },
+                { icon: Users, title: 'P2P Escrow', sub: '100+ methods' },
+                { icon: DollarSign, title: 'Apple & Google Pay', sub: 'One-tap' }
               ].map((p) => {
                 const Icon = p.icon;
                 return (
@@ -968,14 +1150,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     key={p.title}
                     style={{
                       background: '#181a20',
-                      borderRadius: '14px',
+                      borderRadius: '12px',
                       border: '1px solid #2b313a',
-                      padding: '14px'
+                      padding: '12px 10px'
                     }}
                   >
-                    <Icon size={20} color="#fcd535" style={{ marginBottom: '6px' }} />
-                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#eaecef' }}>{p.title}</div>
-                    <div style={{ fontSize: '11px', color: '#848e9c' }}>{p.sub}</div>
+                    <Icon size={18} color="#fcd535" style={{ marginBottom: '4px' }} />
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: '#eaecef', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.title}</div>
+                    <div style={{ fontSize: '10.5px', color: '#848e9c', whiteSpace: 'nowrap' }}>{p.sub}</div>
                   </div>
                 );
               })}
@@ -984,27 +1166,28 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
           {/* Card Right: Interactive Converter */}
           <div
+            className="convert-card-surface"
             style={{
               background: '#202630',
-              borderRadius: '24px',
+              borderRadius: '20px',
               border: '1px solid #2b313a',
-              padding: '36px',
+              padding: '28px 24px',
               display: 'flex',
               flexDirection: 'column',
-              gap: '20px'
+              gap: '16px'
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '18px', fontWeight: 700, color: '#eaecef' }}>Quick Convert / Buy</span>
-              <span style={{ background: 'rgba(46, 189, 133, 0.15)', color: '#2ebd85', fontSize: '11px', fontWeight: 700, padding: '3px 8px', borderRadius: '4px' }}>
+              <span style={{ fontSize: '16px', fontWeight: 700, color: '#eaecef' }}>Quick Convert / Buy</span>
+              <span style={{ background: 'rgba(46, 189, 133, 0.15)', color: '#2ebd85', fontSize: '10.5px', fontWeight: 700, padding: '3px 8px', borderRadius: '4px' }}>
                 Instant Settlement
               </span>
             </div>
 
             {/* You Pay Input */}
-            <div style={{ background: '#181a20', borderRadius: '16px', border: '1px solid #2b313a', padding: '14px 18px' }}>
-              <label style={{ fontSize: '12px', color: '#848e9c', display: 'block', marginBottom: '6px' }}>You Pay</label>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ background: '#181a20', borderRadius: '14px', border: '1px solid #2b313a', padding: '12px 14px' }}>
+              <label style={{ fontSize: '11.5px', color: '#848e9c', display: 'block', marginBottom: '4px' }}>You Pay</label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <input
                   type="number"
                   value={convertAmount}
@@ -1014,10 +1197,11 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     background: 'transparent',
                     border: 'none',
                     outline: 'none',
-                    fontSize: '22px',
+                    fontSize: 'clamp(18px, 4.5vw, 22px)',
                     fontWeight: 700,
                     color: '#eaecef',
-                    fontFamily: 'monospace'
+                    fontFamily: 'monospace',
+                    minWidth: 0
                   }}
                 />
                 <select
@@ -1026,10 +1210,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   style={{
                     background: '#202630',
                     border: '1px solid #2b313a',
-                    borderRadius: '10px',
-                    padding: '8px 12px',
+                    borderRadius: '8px',
+                    padding: '6px 10px',
                     color: '#eaecef',
-                    fontSize: '14px',
+                    fontSize: '13px',
                     fontWeight: 700,
                     outline: 'none'
                   }}
@@ -1044,15 +1228,15 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
             {/* Swap Divider */}
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#181a20', border: '1px solid #2b313a', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fcd535' }}>
-                <Zap size={18} />
+              <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#181a20', border: '1px solid #2b313a', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fcd535' }}>
+                <Zap size={16} />
               </div>
             </div>
 
             {/* You Receive Input */}
-            <div style={{ background: '#181a20', borderRadius: '16px', border: '1px solid #2b313a', padding: '14px 18px' }}>
-              <label style={{ fontSize: '12px', color: '#848e9c', display: 'block', marginBottom: '6px' }}>You Receive (Estimated)</label>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ background: '#181a20', borderRadius: '14px', border: '1px solid #2b313a', padding: '12px 14px' }}>
+              <label style={{ fontSize: '11.5px', color: '#848e9c', display: 'block', marginBottom: '4px' }}>You Receive (Estimated)</label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <input
                   type="text"
                   readOnly
@@ -1062,10 +1246,11 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     background: 'transparent',
                     border: 'none',
                     outline: 'none',
-                    fontSize: '22px',
+                    fontSize: 'clamp(18px, 4.5vw, 22px)',
                     fontWeight: 700,
                     color: '#2ebd85',
-                    fontFamily: 'monospace'
+                    fontFamily: 'monospace',
+                    minWidth: 0
                   }}
                 />
                 <select
@@ -1074,10 +1259,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   style={{
                     background: '#202630',
                     border: '1px solid #2b313a',
-                    borderRadius: '10px',
-                    padding: '8px 12px',
+                    borderRadius: '8px',
+                    padding: '6px 10px',
                     color: '#eaecef',
-                    fontSize: '14px',
+                    fontSize: '13px',
                     fontWeight: 700,
                     outline: 'none'
                   }}
@@ -1099,12 +1284,13 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 background: '#fcd535',
                 color: '#181a20',
                 border: 'none',
-                borderRadius: '14px',
-                padding: '16px',
-                fontSize: '15px',
+                borderRadius: '12px',
+                padding: '14px',
+                fontSize: '14px',
                 fontWeight: 800,
                 cursor: 'pointer',
-                transition: 'all 0.2s ease'
+                transition: 'all 0.2s ease',
+                minHeight: '46px'
               }}
             >
               {user ? `Buy ${convertTo} Now` : 'Sign Up to Buy Crypto'}
@@ -1113,78 +1299,79 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </section>
 
         {/* =========================================================================
-            5. ECOSYSTEM & CORE PRODUCTS (ROUNDED RECTANGLE 8-CARD GRID)
+            5. ECOSYSTEM & CORE PRODUCTS (COMPACT RESPONSIVE GRID)
             ========================================================================= */}
-        <section style={{ marginBottom: '40px' }}>
-          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-            <h2 style={{ fontSize: '28px', fontWeight: 800, color: '#eaecef', margin: '0 0 8px 0' }}>
+        <section style={{ marginBottom: '32px' }}>
+          <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+            <h2 style={{ fontSize: 'clamp(20px, 5vw, 26px)', fontWeight: 800, color: '#eaecef', margin: '0 0 6px 0' }}>
               Explore the CryptoBridge Ecosystem
             </h2>
-            <p style={{ fontSize: '14px', color: '#848e9c', margin: 0 }}>
-              Institutional-grade products engineered for high performance, deep liquidity, and maximum security.
+            <p style={{ fontSize: '13px', color: '#848e9c', margin: 0 }}>
+              Institutional-grade products engineered for high performance, deep liquidity, and security.
             </p>
           </div>
 
           <div
+            className="ecosystem-products-grid"
             style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))',
-              gap: '20px'
+              gap: '14px'
             }}
           >
             {[
               {
                 title: 'Spot Exchange',
-                desc: 'Trade 350+ digital assets with microsecond deterministic matching and L2 order books.',
+                desc: 'Trade 350+ digital assets with microsecond matching and L2 books.',
                 icon: BarChart3,
                 color: '#fcd535',
                 action: () => onNavigateToTrade('BTC/USDT')
               },
               {
                 title: 'Instant Internal Transfers',
-                desc: 'Zero network fees and sub-millisecond instant balance settlement between CryptoBridge accounts.',
+                desc: 'Zero network fees and instant balance settlement between accounts.',
                 icon: Send,
                 color: '#2ebd85',
                 action: () => (window.location.hash = '#/wallet')
               },
               {
                 title: 'P2P Escrow Market',
-                desc: 'Zero platform fees with 100+ local payment methods backed by cryptographic escrow.',
+                desc: 'Zero platform fees with 100+ local payment methods.',
                 icon: Users,
                 color: '#3b82f6',
                 action: onNavigateToP2P
               },
               {
                 title: 'Stock Intelligence',
-                desc: 'Live technicals, financials, and symbol intelligence for NASDAQ:NVDA, AAPL & TSLA.',
+                desc: 'Live technicals, financials, and symbol intelligence for tech equities.',
                 icon: Activity,
                 color: '#0284c7',
                 action: () => (window.location.hash = '#/stock/NVDA')
               },
               {
                 title: 'Proof of Reserves',
-                desc: '100% full-reserve backing on all customer assets audited on-chain in real time.',
+                desc: '100% full-reserve backing audited on-chain in real time.',
                 icon: ShieldCheck,
                 color: '#2ebd85',
                 action: () => (window.location.hash = '#/dashboard')
               },
               {
                 title: 'SAFU Vault Custody',
-                desc: 'Segregated cold storage, multi-sig pipelines, and $1 Billion SAFU user protection.',
+                desc: 'Segregated cold storage, multi-sig, and $1 Billion user protection.',
                 icon: Lock,
                 color: '#ef4444',
                 action: () => (window.location.hash = '#/security')
               },
               {
-                title: 'Executive Admin Console',
-                desc: 'Live risk governance, circuit breakers, user fund credit controls, and compliance queue.',
+                title: 'Admin Console',
+                desc: 'Live risk governance, circuit breakers, and compliance controls.',
                 icon: Sliders,
                 color: '#f59e0b',
                 action: () => window.open('/admin', '_blank')
               },
               {
-                title: 'Live Market News',
-                desc: 'Real-time breaking financial news, macroeconomic updates, and institutional flow intelligence.',
+                title: 'Market News',
+                desc: 'Real-time breaking financial news and institutional updates.',
                 icon: Newspaper,
                 color: '#8b5cf6',
                 action: () => (window.location.hash = '#/news')
@@ -1197,20 +1384,20 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   onClick={prod.action}
                   style={{
                     background: '#202630',
-                    borderRadius: '20px',
+                    borderRadius: '16px',
                     border: '1px solid #2b313a',
-                    padding: '24px',
+                    padding: '18px 16px',
                     cursor: 'pointer',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between',
-                    gap: '16px',
+                    gap: '12px',
                     transition: 'all 0.2s ease',
-                    boxShadow: '0 8px 20px rgba(0, 0, 0, 0.2)'
+                    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.borderColor = prod.color;
-                    e.currentTarget.style.transform = 'translateY(-4px)';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.borderColor = '#2b313a';
@@ -1220,25 +1407,25 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   <div>
                     <div
                       style={{
-                        width: '44px',
-                        height: '44px',
-                        borderRadius: '12px',
+                        width: '36px',
+                        height: '36px',
+                        borderRadius: '10px',
                         background: `rgba(${prod.color === '#fcd535' ? '252, 213, 53' : prod.color === '#2ebd85' ? '46, 189, 133' : '59, 130, 246'}, 0.15)`,
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        marginBottom: '16px'
+                        marginBottom: '12px'
                       }}
                     >
-                      <Icon size={24} color={prod.color} />
+                      <Icon size={20} color={prod.color} />
                     </div>
-                    <h3 style={{ fontSize: '17px', fontWeight: 700, color: '#eaecef', margin: '0 0 6px 0' }}>{prod.title}</h3>
-                    <p style={{ fontSize: '13px', color: '#848e9c', lineHeight: '1.5', margin: 0 }}>{prod.desc}</p>
+                    <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#eaecef', margin: '0 0 4px 0' }}>{prod.title}</h3>
+                    <p style={{ fontSize: '12px', color: '#848e9c', lineHeight: '1.45', margin: 0 }}>{prod.desc}</p>
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: prod.color, fontSize: '13px', fontWeight: 700 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: prod.color, fontSize: '12px', fontWeight: 700 }}>
                     <span>Launch</span>
-                    <ChevronRight size={16} />
+                    <ChevronRight size={14} />
                   </div>
                 </div>
               );
@@ -1252,51 +1439,52 @@ export const HomeView: React.FC<HomeViewProps> = ({
         <section
           style={{
             background: 'linear-gradient(135deg, #1c222b 0%, #15181f 100%)',
-            borderRadius: '24px',
+            borderRadius: '20px',
             border: '1px solid #2b313a',
-            padding: '40px',
-            marginBottom: '32px'
+            padding: '28px 24px',
+            marginBottom: '28px'
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '28px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px', flexWrap: 'wrap' }}>
             <div
               style={{
-                width: '60px',
-                height: '60px',
-                borderRadius: '16px',
+                width: '48px',
+                height: '48px',
+                borderRadius: '12px',
                 background: 'rgba(252, 213, 53, 0.12)',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                flexShrink: 0
               }}
             >
-              <Shield size={32} color="#fcd535" />
+              <Shield size={26} color="#fcd535" />
             </div>
             <div>
-              <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#eaecef', margin: '0 0 4px 0' }}>Your Funds are SAFU</h2>
-              <p style={{ fontSize: '14px', color: '#848e9c', margin: 0 }}>
-                CryptoBridge protects user assets with an institutional $1 Billion Secure Asset Fund for Users (SAFU) and ISO 27001 certified zero-trust infrastructure.
+              <h2 style={{ fontSize: 'clamp(18px, 4.5vw, 22px)', fontWeight: 800, color: '#eaecef', margin: '0 0 2px 0' }}>Your Funds are SAFU</h2>
+              <p style={{ fontSize: '13px', color: '#848e9c', margin: 0 }}>
+                Protected with an institutional $1 Billion SAFU fund and ISO 27001 zero-trust security.
               </p>
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))', gap: '12px' }}>
             {[
-              { title: 'Cold Vault Segregation', desc: 'Over 95% of digital assets are stored in air-gapped, geographically distributed cold hardware vaults.' },
-              { title: '1:1 Proof of Reserves', desc: 'Cryptographically verified on-chain reserve backing ensures all customer balances are available on demand.' },
-              { title: 'Multi-Factor 2FA & AML', desc: 'RFC 6238 TOTP authenticators, anti-phishing codes, automated velocity limits, and global AML screening.' }
+              { title: 'Cold Vault Segregation', desc: 'Over 95% of digital assets are stored in air-gapped cold hardware vaults.' },
+              { title: '1:1 Proof of Reserves', desc: 'Cryptographically verified reserve backing ensures 100% solvency on demand.' },
+              { title: 'Multi-Factor 2FA & AML', desc: 'RFC 6238 TOTP authenticators, anti-phishing codes, and automated AML screening.' }
             ].map((p) => (
               <div
                 key={p.title}
                 style={{
                   background: '#202630',
-                  borderRadius: '16px',
+                  borderRadius: '12px',
                   border: '1px solid #2b313a',
-                  padding: '20px'
+                  padding: '14px'
                 }}
               >
-                <h4 style={{ fontSize: '15px', fontWeight: 700, color: '#fcd535', margin: '0 0 6px 0' }}>{p.title}</h4>
-                <p style={{ fontSize: '12px', color: '#848e9c', lineHeight: '1.5', margin: 0 }}>{p.desc}</p>
+                <h4 style={{ fontSize: '13.5px', fontWeight: 700, color: '#fcd535', margin: '0 0 4px 0' }}>{p.title}</h4>
+                <p style={{ fontSize: '11.5px', color: '#848e9c', lineHeight: '1.5', margin: 0 }}>{p.desc}</p>
               </div>
             ))}
           </div>
@@ -1305,17 +1493,17 @@ export const HomeView: React.FC<HomeViewProps> = ({
         {/* =========================================================================
             7. FAQ ACCORDION CARDS (ROUNDED RECTANGLES)
             ========================================================================= */}
-        <section style={{ marginBottom: '40px' }}>
-          <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-            <h2 style={{ fontSize: '26px', fontWeight: 800, color: '#eaecef', margin: '0 0 6px 0' }}>
+        <section style={{ marginBottom: '32px' }}>
+          <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+            <h2 style={{ fontSize: 'clamp(20px, 5vw, 24px)', fontWeight: 800, color: '#eaecef', margin: '0 0 4px 0' }}>
               Frequently Asked Questions
             </h2>
-            <p style={{ fontSize: '13px', color: '#848e9c', margin: 0 }}>
+            <p style={{ fontSize: '12.5px', color: '#848e9c', margin: 0 }}>
               Got questions about trading, safety, or fees on CryptoBridge? Find your answers below.
             </p>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxWidth: '900px', margin: '0 auto' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '900px', margin: '0 auto' }}>
             {faqs.map((faq, index) => {
               const isOpen = openFaqIndex === index;
               return (
@@ -1324,20 +1512,20 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   onClick={() => setOpenFaqIndex(isOpen ? null : index)}
                   style={{
                     background: '#202630',
-                    borderRadius: '16px',
+                    borderRadius: '14px',
                     border: '1px solid #2b313a',
-                    padding: '18px 24px',
+                    padding: '14px 18px',
                     cursor: 'pointer',
                     transition: 'all 0.15s ease'
                   }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px' }}>
-                    <span style={{ fontSize: '15px', fontWeight: 700, color: '#eaecef' }}>{faq.q}</span>
-                    {isOpen ? <ChevronUp size={20} color="#fcd535" /> : <ChevronDown size={20} color="#848e9c" />}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
+                    <span style={{ fontSize: '13.5px', fontWeight: 700, color: '#eaecef' }}>{faq.q}</span>
+                    {isOpen ? <ChevronUp size={18} color="#fcd535" style={{ flexShrink: 0 }} /> : <ChevronDown size={18} color="#848e9c" style={{ flexShrink: 0 }} />}
                   </div>
                   {isOpen && (
-                    <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid rgba(255, 255, 255, 0.06)' }}>
-                      <p style={{ fontSize: '13px', color: '#848e9c', lineHeight: '1.6', margin: 0 }}>{faq.a}</p>
+                    <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid rgba(255, 255, 255, 0.06)' }}>
+                      <p style={{ fontSize: '12.5px', color: '#848e9c', lineHeight: '1.6', margin: 0 }}>{faq.a}</p>
                     </div>
                   )}
                 </div>
@@ -1352,22 +1540,22 @@ export const HomeView: React.FC<HomeViewProps> = ({
         <section
           style={{
             background: '#181a20',
-            borderRadius: '20px',
+            borderRadius: '16px',
             border: '1px solid #2b313a',
-            padding: '44px 36px',
+            padding: '32px 20px',
             textAlign: 'center',
             color: '#eaecef',
-            marginBottom: '32px'
+            marginBottom: '28px'
           }}
         >
-          <h2 style={{ fontSize: '28px', fontWeight: 800, color: '#ffffff', margin: '0 0 10px 0', letterSpacing: '-0.5px' }}>
+          <h2 style={{ fontSize: 'clamp(20px, 5vw, 26px)', fontWeight: 800, color: '#ffffff', margin: '0 0 8px 0', letterSpacing: '-0.5px' }}>
             Start Trading on CryptoBridge
           </h2>
-          <p style={{ fontSize: '14px', color: '#848e9c', margin: '0 0 24px 0' }}>
-            Deterministic matching engine. 0.10% standard spot fee tier. Instant zero-fee internal transfers.
+          <p style={{ fontSize: '13px', color: '#848e9c', margin: '0 0 20px 0' }}>
+            Deterministic matching engine. 0.10% spot fee tier. Instant zero-fee internal transfers.
           </p>
 
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '14px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', flexWrap: 'wrap' }}>
             <button
               onClick={() => {
                 if (user) onNavigateToTrade('BTC/USDT');
@@ -1378,8 +1566,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 color: '#181a20',
                 border: 'none',
                 borderRadius: '8px',
-                padding: '12px 28px',
-                fontSize: '14px',
+                padding: '12px 24px',
+                fontSize: '13.5px',
                 fontWeight: 700,
                 cursor: 'pointer',
                 display: 'flex',
@@ -1388,7 +1576,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               }}
             >
               <span>{user ? 'Open Trading Terminal' : 'Sign Up Free'}</span>
-              <ArrowRight size={16} />
+              <ArrowRight size={15} />
             </button>
 
             <button
@@ -1398,8 +1586,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 color: '#eaecef',
                 border: '1px solid #2b313a',
                 borderRadius: '8px',
-                padding: '12px 28px',
-                fontSize: '14px',
+                padding: '12px 20px',
+                fontSize: '13.5px',
                 fontWeight: 600,
                 cursor: 'pointer'
               }}
