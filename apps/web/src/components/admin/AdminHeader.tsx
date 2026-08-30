@@ -121,7 +121,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
         </button>
 
         {/* NexLink Search Input */}
-        <div style={{ position: 'relative', width: '260px' }} className="d-none d-md-block">
+        <div style={{ position: 'relative', width: '240px' }} className="admin-header-search">
           <Search size={14} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#848e9c' }} />
           <input
             type="text"
@@ -157,7 +157,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
         </div>
 
         {/* NexLink KPI Badge Pill */}
-        <div style={{
+        <div className="admin-header-kpi" style={{
           display: 'flex',
           alignItems: 'center',
           gap: '8px',
@@ -192,7 +192,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
       </div>
 
       {/* RIGHT: Quick Action + RTL Toggle + Theme + Notifications + Profile */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
         {/* RTL / LTR Mode Toggle Button */}
         <button
           onClick={onToggleRTL}
@@ -202,7 +202,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
             color: isRTL ? '#181a20' : '#eaecef',
             border: '1px solid #2b313a',
             borderRadius: '8px',
-            padding: '6px 12px',
+            padding: '6px 10px',
             fontSize: '12px',
             fontWeight: 700,
             display: 'flex',
@@ -213,7 +213,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
           }}
         >
           <Globe size={13} />
-          <span>{isRTL ? 'RTL Mode' : 'LTR Mode'}</span>
+          <span className="admin-header-btn-text">{isRTL ? 'RTL' : 'LTR'}</span>
         </button>
 
         {/* Theme Toggle Pill */}

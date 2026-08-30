@@ -204,6 +204,8 @@ export const AdminConsole: React.FC = () => {
     return parts[1] || 'dashboard';
   });
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' ? window.innerWidth < 1024 : false);
   const [isRTL, setIsRTL] = useState(() => {
     return localStorage.getItem('syncnode_admin_rtl') === 'true';
   });
@@ -217,9 +219,24 @@ export const AdminConsole: React.FC = () => {
   };
 
   useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 1024;
+      setIsMobile(mobile);
+      if (!mobile) {
+        setIsMobileOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
     const onHashChange = () => {
       const parts = window.location.hash.replace(/^#\/?/, '').split('/');
-      if (parts[0] === 'admin') setSection(parts[1] || 'dashboard');
+      if (parts[0] === 'admin') {
+        setSection(parts[1] || 'dashboard');
+        setIsMobileOpen(false);
+      }
     };
     window.addEventListener('hashchange', onHashChange);
     return () => window.removeEventListener('hashchange', onHashChange);
@@ -238,6 +255,7 @@ export const AdminConsole: React.FC = () => {
   const navigate = (id: string) => {
     window.location.hash = `#/admin/${id}`;
     setSection(id);
+    setIsMobileOpen(false);
   };
 
   if (loading) {
@@ -252,7 +270,7 @@ export const AdminConsole: React.FC = () => {
 
   if (!isAuthorized || !session) {
     return (
-      <div style={{ maxWidth: '440px', margin: '60px auto', background: '#1e2329', border: '1px solid #2b313a', borderRadius: '16px', padding: '32px', boxShadow: '0 12px 32px rgba(0, 0, 0, 0.4)' }}>
+      <div style={{ maxWidth: '440px', margin: '40px 16px', background: '#1e2329', border: '1px solid #2b313a', borderRadius: '16px', padding: '24px 20px', boxShadow: '0 12px 32px rgba(0, 0, 0, 0.4)' }}>
         <div style={{ textAlign: 'center', marginBottom: '24px' }}>
           <div style={{ width: '52px', height: '52px', borderRadius: '12px', background: 'rgba(252, 213, 53, 0.15)', border: '1px solid #fcd535', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
             <PanelLeftOpen size={26} color="#fcd535" />
@@ -274,22 +292,54 @@ export const AdminConsole: React.FC = () => {
     <div
       className={classNames('admin-console', isRTL && 'rtl-mode')}
       dir={isRTL ? 'rtl' : 'ltr'}
-      style={{ minHeight: '100vh', background: '#0b0e11' }}
+      style={{ minHeight: '100vh', background: '#0b0e11', position: 'relative', display: 'flex' }}
     >
-      {/* NEXLINK SIDEBAR */}
+      {/* MOBILE BACKDROP OVERLAY */}
+      {isMobile && isMobileOpen && (
+        <div
+          onClick={() => setIsMobileOpen(false)}
+          className="admin-mobile-backdrop"
+          aria-hidden="true"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.72)',
+            backdropFilter: 'blur(4px)',
+            zIndex: 1090,
+            transition: 'opacity 0.2s ease'
+          }}
+        />
+      )}
+
+      {/* NEXLINK SIDEBAR (Desktop Sticky / Mobile Drawer) */}
       <aside
-        className={classNames('admin-sidebar', sidebarCollapsed && 'collapsed')}
+        className={classNames(
+          'admin-sidebar',
+          sidebarCollapsed && !isMobile && 'collapsed',
+          isMobile && 'mobile-drawer',
+          isMobile && isMobileOpen && 'open'
+        )}
         aria-label="Administrator navigation"
         style={{
-          width: sidebarCollapsed ? '72px' : '260px',
+          width: isMobile ? '280px' : (sidebarCollapsed ? '72px' : '260px'),
           background: '#12161c',
           borderRight: isRTL ? 'none' : '1px solid #2b313a',
           borderLeft: isRTL ? '1px solid #2b313a' : 'none',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          transition: 'width 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-          overflowX: 'hidden'
+          transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+          overflowX: 'hidden',
+          overflowY: 'auto',
+          ...(isMobile ? {
+            position: 'fixed',
+            top: 0,
+            bottom: 0,
+            [isRTL ? 'right' : 'left']: 0,
+            zIndex: 1100,
+            boxShadow: isMobileOpen ? '0 0 32px rgba(0, 0, 0, 0.8)' : 'none',
+            transform: isMobileOpen ? 'translateX(0)' : (isRTL ? 'translateX(100%)' : 'translateX(-100%)')
+          } : {})
         }}
       >
         <div>
@@ -299,38 +349,62 @@ export const AdminConsole: React.FC = () => {
             borderBottom: '1px solid #23272e',
             display: 'flex',
             alignItems: 'center',
+            justifyContent: 'space-between',
             gap: '12px'
           }}>
-            <div style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: '10px',
-              background: 'linear-gradient(135deg, #fcd535 0%, #f0b90b 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(252, 213, 53, 0.3)',
-              flexShrink: 0
-            }}>
-              <Zap size={20} color="#181a20" />
-            </div>
-            {!sidebarCollapsed && (
-              <div style={{ lineHeight: 1.2 }}>
-                <div style={{ fontSize: '16px', fontWeight: 900, color: '#eaecef', letterSpacing: '-0.02em' }}>
-                  SyncNode
-                </div>
-                <div style={{ fontSize: '10px', fontWeight: 800, color: '#fcd535', letterSpacing: '0.08em', textTransform: 'uppercase', marginTop: '2px' }}>
-                  Enterprise CRM
-                </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '10px',
+                background: 'linear-gradient(135deg, #fcd535 0%, #f0b90b 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 4px 12px rgba(252, 213, 53, 0.3)',
+                flexShrink: 0
+              }}>
+                <Zap size={20} color="#181a20" />
               </div>
+              {(!sidebarCollapsed || isMobile) && (
+                <div style={{ lineHeight: 1.2 }}>
+                  <div style={{ fontSize: '16px', fontWeight: 900, color: '#eaecef', letterSpacing: '-0.02em' }}>
+                    SyncNode
+                  </div>
+                  <div style={{ fontSize: '10px', fontWeight: 800, color: '#fcd535', letterSpacing: '0.08em', textTransform: 'uppercase', marginTop: '2px' }}>
+                    Enterprise CRM
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {isMobile && (
+              <button
+                type="button"
+                onClick={() => setIsMobileOpen(false)}
+                aria-label="Close menu"
+                style={{
+                  background: '#202630',
+                  border: '1px solid #2b313a',
+                  borderRadius: '8px',
+                  width: '32px',
+                  height: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#848e9c',
+                  cursor: 'pointer'
+                }}
+              >
+                <PanelLeftClose size={16} />
+              </button>
             )}
           </div>
-
           {/* Navigation Menu Groups */}
           <nav style={{ padding: '12px 10px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {navGroups.map((group) => (
               <div key={group.title} className="admin-nav-group">
-                {!sidebarCollapsed && (
+                {(!sidebarCollapsed || isMobile) && (
                   <div style={{
                     fontSize: '11px',
                     fontWeight: 800,
@@ -373,7 +447,7 @@ export const AdminConsole: React.FC = () => {
                         <span style={{ color: isActive ? '#fcd535' : '#848e9c', display: 'flex', alignItems: 'center' }}>
                           {item.icon}
                         </span>
-                        {!sidebarCollapsed && <span>{item.label}</span>}
+                        {(!sidebarCollapsed || isMobile) && <span>{item.label}</span>}
                       </button>
                     );
                   })}
@@ -384,7 +458,7 @@ export const AdminConsole: React.FC = () => {
         </div>
 
         {/* Sidebar Footer Widget: Server / Health Status */}
-        {!sidebarCollapsed && (
+        {(!sidebarCollapsed || isMobile) && (
           <div style={{
             margin: '12px',
             background: '#181a20',
@@ -416,13 +490,19 @@ export const AdminConsole: React.FC = () => {
             localStorage.removeItem('syncnode_token');
             window.location.hash = '#/home';
           }}
-          onToggleSidebar={() => setSidebarCollapsed((c) => !c)}
+          onToggleSidebar={() => {
+            if (isMobile) {
+              setIsMobileOpen((o) => !o);
+            } else {
+              setSidebarCollapsed((c) => !c);
+            }
+          }}
           isRTL={isRTL}
           onToggleRTL={toggleRTL}
           onNavigate={navigate}
         />
 
-        <div style={{ padding: '16px 24px 0' }}>
+        <div className="admin-breadcrumbs-wrap" style={{ padding: '16px 24px 0' }}>
           <AdminBreadcrumbs crumbs={[{ label: 'Admin' }, { label: currentLabel }]} />
         </div>
 
