@@ -520,6 +520,82 @@ async def clerk_auth(req: ClerkAuthRequest, request: Request):
     }
 
 
+class SupabaseAuthRequest(BaseModel):
+    supabaseId: str
+    email: str
+    fullName: Optional[str] = None
+    avatarUrl: Optional[str] = None
+    accessToken: Optional[str] = None
+    provider: Optional[str] = "supabase"
+
+
+@app.post("/api/v1/auth/supabase")
+async def supabase_auth(req: SupabaseAuthRequest, request: Request):
+    ip = get_client_ip(request)
+    check_rate_limit(f"supabase_auth_{ip}", max_requests=30, window_seconds=60)
+
+    email = req.email.strip().lower()
+    if not email:
+        raise ValidationError("Supabase authentication failed: missing email")
+
+    now = int(time.time() * 1000)
+    existing_user = user_repository.find_by_email(email)
+
+    if existing_user:
+        if not existing_user.get("supabase_id"):
+            existing_user["supabase_id"] = req.supabaseId
+            existing_user["auth_provider"] = req.provider or "supabase"
+            if req.avatarUrl and not existing_user.get("avatar_url"):
+                existing_user["avatar_url"] = req.avatarUrl
+            user_repository.save(existing_user)
+        user = existing_user
+        is_new = False
+    else:
+        user_id = f"usr_sb_{uuid.uuid4().hex[:10]}"
+        is_super = email in ["poweldayck@gmail.com"]
+        user = {
+            "id": user_id,
+            "email": email,
+            "full_name": req.fullName or (email.split("@")[0]),
+            "avatar_url": req.avatarUrl,
+            "auth_provider": req.provider or "supabase",
+            "supabase_id": req.supabaseId,
+            "password_hash": "",
+            "is_totp_enabled": False,
+            "kyc_tier": KycTier.TIER_1_BASIC.value,
+            "kyc_status": KycStatus.APPROVED.value,
+            "admin_roles": [AdminRole.SUPER_ADMIN.value] if is_super else [],
+            "is_suspended": False,
+            "is_withdrawal_suspended": False,
+            "created_at": now,
+            "updated_at": now
+        }
+        user_repository.save(user)
+        for asset in AssetSymbol:
+            ledger_service.get_or_create_account(
+                AccountType.USER_AVAILABLE,
+                asset,
+                user_id
+            )
+        is_new = True
+
+    if user.get("is_suspended"):
+        raise ForbiddenError("This account has been suspended by administration")
+
+    token = sign_token({"userId": user["id"], "email": email, "isTotpAuthenticated": True})
+    refresh_token = sign_refresh_token({"userId": user["id"], "email": email})
+    safe_user = {k: v for k, v in user.items() if k != "password_hash" and k != "totp_secret"}
+
+    return {
+        "success": True,
+        "token": token,
+        "refreshToken": refresh_token,
+        "user": safe_user,
+        "isNewUser": is_new
+    }
+
+
+
 
 class SendOtpRequest(BaseModel):
     email: Optional[str] = None

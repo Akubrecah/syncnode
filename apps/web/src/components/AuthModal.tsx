@@ -1,6 +1,14 @@
 import React, { useState } from 'react';
 import { Lock, Mail, ShieldAlert, Sparkles, ExternalLink } from 'lucide-react';
 import { useClerk, useSignIn, useSignUp } from '@clerk/clerk-react';
+import {
+  supabase,
+  signInWithGoogle,
+  signInWithGithub,
+  signInWithEmail,
+  signUpWithEmail,
+  syncSupabaseUserWithBackend
+} from '../lib/supabase';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -35,10 +43,40 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setLoading(true);
     setError(null);
 
+    const cleanEmail = email.trim().toLowerCase();
+
+    // 1. Try Supabase Auth First
+    try {
+      if (mode === 'login') {
+        const { data: supaData } = await signInWithEmail(cleanEmail, password);
+        if (supaData?.user) {
+          const syncResult = await syncSupabaseUserWithBackend(supaData.user, supaData.session?.access_token);
+          if (syncResult && syncResult.token) {
+            onSuccess(syncResult.user, syncResult.token);
+            onClose();
+            return;
+          }
+        }
+      } else {
+        const { data: supaData } = await signUpWithEmail(cleanEmail, password, fullName);
+        if (supaData?.user) {
+          const syncResult = await syncSupabaseUserWithBackend(supaData.user, supaData.session?.access_token);
+          if (syncResult && syncResult.token) {
+            onSuccess(syncResult.user, syncResult.token);
+            onClose();
+            return;
+          }
+        }
+      }
+    } catch (supaErr: any) {
+      console.debug('Supabase direct auth note:', supaErr?.message || supaErr);
+    }
+
+    // 2. Try Clerk Auth fallback
     if (mode === 'login' && isSignInLoaded && signIn) {
       try {
         const res = await signIn.create({
-          identifier: email.trim().toLowerCase(),
+          identifier: cleanEmail,
           password
         });
         if (res.status === 'complete') {
@@ -50,7 +88,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               clerkId: (res as any).createdUserId || `usr_${Date.now()}`,
-              email: email.trim().toLowerCase(),
+              email: cleanEmail,
               fullName: email.split('@')[0],
               provider: 'clerk_password'
             })
@@ -69,7 +107,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     } else if (mode === 'register' && isSignUpLoaded && signUp) {
       try {
         const res = await signUp.create({
-          emailAddress: email.trim().toLowerCase(),
+          emailAddress: cleanEmail,
           password
         });
         if (res.status === 'complete') {
@@ -81,7 +119,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               clerkId: (res as any).createdUserId || `usr_${Date.now()}`,
-              email: email.trim().toLowerCase(),
+              email: cleanEmail,
               fullName: fullName || email.split('@')[0],
               provider: 'clerk_password'
             })
@@ -99,11 +137,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       }
     }
 
+    // 3. Fallback to direct FastAPI backend endpoint
     try {
       const endpoint = mode === 'login' ? '/api/v1/auth/login' : '/api/v1/auth/register';
       const body = mode === 'login'
-        ? { email: email.trim().toLowerCase(), password }
-        : { email: email.trim().toLowerCase(), password, full_name: fullName };
+        ? { email: cleanEmail, password }
+        : { email: cleanEmail, password, full_name: fullName };
 
       const res = await fetch(endpoint, {
         method: 'POST',
@@ -126,6 +165,25 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const handleSocialSignIn = async (provider: 'google' | 'github' | 'apple') => {
     setLoading(true);
     setError(null);
+
+    // 1. Prioritize Supabase OAuth (with callback URL https://drxlsqhxgcihumvevxkl.supabase.co/auth/v1/callback)
+    if (provider === 'google') {
+      try {
+        await signInWithGoogle();
+        return;
+      } catch (supaOAuthErr: any) {
+        console.warn('Supabase Google OAuth initialization notice:', supaOAuthErr);
+      }
+    } else if (provider === 'github') {
+      try {
+        await signInWithGithub();
+        return;
+      } catch (supaOAuthErr: any) {
+        console.warn('Supabase GitHub OAuth initialization notice:', supaOAuthErr);
+      }
+    }
+
+    // 2. Clerk OAuth fallback
     try {
       const strategy = provider === 'google'
         ? 'oauth_google'
@@ -159,6 +217,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setError('Authentication system is initializing. Please try again.');
     setLoading(false);
   };
+
 
   return (
     <div className="modal-overlay" onClick={onClose}>
