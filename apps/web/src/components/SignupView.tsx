@@ -76,7 +76,7 @@ export const SignupView: React.FC<SignupViewProps> = ({
   const { isLoaded: isSignInLoaded, signIn, setActive: setSignInActive } = useSignIn();
   const { isLoaded: isSignUpLoaded, signUp, setActive: setSignUpActive } = useSignUp();
 
-  const [authMethod, setAuthMethod] = useState<'direct' | 'clerk'>('direct');
+  const [authMethod, setAuthMethod] = useState<'direct' | 'clerk'>('clerk');
   const [mode, setMode] = useState<'signup' | 'login'>(initialMode);
 
   // Form input states

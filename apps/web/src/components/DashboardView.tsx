@@ -613,50 +613,25 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           ========================================================================= */}
       <main className="dashboard-main-content" style={{ flex: 1, minWidth: 0, padding: '32px 36px', maxWidth: '1400px', margin: '0 auto', overflowY: 'auto' }}>
         {/* TOP USER PROFILE & STATUS HEADER */}
-        <div
-          className="dashboard-user-header"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: '16px',
-            paddingBottom: '20px',
-            borderBottom: '1px solid #2b313a',
-            marginBottom: '20px'
-          }}
-        >
+        <div className="dashboard-user-header">
           {/* User Info Left */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <div
-              style={{
-                width: '56px',
-                height: '56px',
-                borderRadius: '50%',
-                background: 'linear-gradient(135deg, #fcd535 0%, #f0b90b 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#181a20',
-                fontSize: '22px',
-                fontWeight: 800,
-                boxShadow: '0 4px 12px rgba(252, 213, 53, 0.2)'
-              }}
-            >
+          <div className="dashboard-user-info-row">
+            <div className="dashboard-user-avatar">
               {displayEmail.charAt(0).toUpperCase()}
             </div>
 
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ fontSize: '20px', fontWeight: 700, color: '#eaecef' }}>{displayMaskedEmail}</span>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <span className="dashboard-user-email-text">{displayMaskedEmail}</span>
                 <span
                   style={{
                     background: 'rgba(252, 213, 53, 0.15)',
                     color: '#fcd535',
-                    fontSize: '11px',
+                    fontSize: '10.5px',
                     fontWeight: 700,
-                    padding: '2px 8px',
-                    borderRadius: '4px'
+                    padding: '2px 7px',
+                    borderRadius: '4px',
+                    whiteSpace: 'nowrap'
                   }}
                 >
                   VIP 0
@@ -665,47 +640,49 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '4px',
+                    gap: '3px',
                     background: 'rgba(46, 189, 133, 0.15)',
                     color: '#2ebd85',
-                    fontSize: '11px',
+                    fontSize: '10.5px',
                     fontWeight: 700,
-                    padding: '2px 8px',
-                    borderRadius: '4px'
+                    padding: '2px 7px',
+                    borderRadius: '4px',
+                    whiteSpace: 'nowrap'
                   }}
                 >
-                  <CheckCircle2 size={12} />
+                  <CheckCircle2 size={11} />
                   Verified
                 </span>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '6px', fontSize: '13px', color: '#848e9c' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span>User ID:</span>
-                  <span style={{ color: '#eaecef', fontFamily: 'monospace' }}>{displayUid}</span>
+              {/* Responsive Metadata Chips */}
+              <div className="dashboard-user-meta-chips">
+                <div className="dashboard-meta-chip">
+                  <span style={{ color: '#848e9c' }}>UID:</span>
+                  <span style={{ color: '#eaecef', fontFamily: 'monospace', fontWeight: 600 }}>{displayUid}</span>
                   <button
                     onClick={() => handleCopy(displayUid, 'uid')}
-                    style={{ background: 'none', border: 'none', color: '#848e9c', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center' }}
+                    className="dashboard-chip-copy-btn"
                     title="Copy UID"
                   >
-                    {copiedUid ? <Check size={14} color="#2ebd85" /> : <Copy size={14} />}
+                    {copiedUid ? <Check size={12} color="#2ebd85" /> : <Copy size={12} />}
                   </button>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <ShieldCheck size={15} color="#2ebd85" />
+                <div className="dashboard-meta-chip">
+                  <ShieldCheck size={13} color="#2ebd85" />
                   <span style={{ color: '#2ebd85', fontWeight: 600 }}>2FA Active</span>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span>Referral:</span>
-                  <span style={{ color: '#eaecef', fontFamily: 'monospace' }}>{referralCode}</span>
+                <div className="dashboard-meta-chip">
+                  <span style={{ color: '#848e9c' }}>Ref:</span>
+                  <span style={{ color: '#eaecef', fontFamily: 'monospace', fontWeight: 600 }}>{referralCode}</span>
                   <button
                     onClick={() => handleCopy(referralCode, 'referral')}
-                    style={{ background: 'none', border: 'none', color: '#848e9c', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center' }}
+                    className="dashboard-chip-copy-btn"
                     title="Copy Referral ID"
                   >
-                    {copiedReferral ? <Check size={14} color="#2ebd85" /> : <Copy size={14} />}
+                    {copiedReferral ? <Check size={12} color="#2ebd85" /> : <Copy size={12} />}
                   </button>
                 </div>
               </div>
@@ -713,85 +690,36 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
 
           {/* Quick Header Actions */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div className="dashboard-actions-grid">
             <button
               onClick={() => setIsDepositModalOpen(true)}
-              style={{
-                background: '#fcd535',
-                color: '#181a20',
-                border: 'none',
-                borderRadius: '8px',
-                padding: '10px 20px',
-                fontSize: '14px',
-                fontWeight: 700,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                transition: 'all 0.2s ease'
-              }}
+              className="dashboard-action-btn primary"
             >
-              <ArrowDownLeft size={16} />
+              <ArrowDownLeft size={15} />
               <span>Deposit</span>
             </button>
 
             <button
               onClick={() => navigateTo('wallet')}
-              style={{
-                background: '#2b313a',
-                color: '#eaecef',
-                border: 'none',
-                borderRadius: '8px',
-                padding: '10px 18px',
-                fontSize: '14px',
-                fontWeight: 600,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}
+              className="dashboard-action-btn secondary"
             >
-              <ArrowUpRight size={16} />
+              <ArrowUpRight size={15} />
               <span>Withdraw</span>
             </button>
 
             <button
               onClick={() => setIsTransferModalOpen(true)}
-              style={{
-                background: '#2b313a',
-                color: '#eaecef',
-                border: 'none',
-                borderRadius: '8px',
-                padding: '10px 18px',
-                fontSize: '14px',
-                fontWeight: 600,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}
+              className="dashboard-action-btn secondary"
             >
-              <ArrowRightLeft size={16} />
+              <ArrowRightLeft size={15} />
               <span>Transfer</span>
             </button>
 
             <button
               onClick={() => navigateTo('p2p')}
-              style={{
-                background: '#2b313a',
-                color: '#eaecef',
-                border: 'none',
-                borderRadius: '8px',
-                padding: '10px 18px',
-                fontSize: '14px',
-                fontWeight: 600,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}
+              className="dashboard-action-btn secondary"
             >
-              <CreditCard size={16} />
+              <CreditCard size={15} />
               <span>Buy Crypto</span>
             </button>
           </div>

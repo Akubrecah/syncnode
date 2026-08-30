@@ -5534,6 +5534,119 @@ a[href*="tradingview.com"] {
   display: none;
 }
 
+/* Institutional Dashboard User Header */
+.dashboard-user-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #2b313a;
+  margin-bottom: 20px;
+}
+
+.dashboard-user-info-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.dashboard-user-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fcd535 0%, #f0b90b 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #181a20;
+  font-size: 20px;
+  font-weight: 800;
+  box-shadow: 0 4px 12px rgba(252, 213, 53, 0.2);
+  flex-shrink: 0;
+}
+
+.dashboard-user-email-text {
+  font-size: 18px;
+  font-weight: 700;
+  color: #eaecef;
+}
+
+.dashboard-user-meta-chips {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.dashboard-meta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid #2b313a;
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.dashboard-chip-copy-btn {
+  background: none;
+  border: none;
+  color: #848e9c;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  transition: color 0.15s ease;
+}
+
+.dashboard-chip-copy-btn:hover {
+  color: #fcd535;
+}
+
+.dashboard-actions-grid {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dashboard-action-btn {
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  border: none;
+  white-space: nowrap;
+}
+
+.dashboard-action-btn.primary {
+  background: #fcd535;
+  color: #181a20;
+}
+
+.dashboard-action-btn.primary:hover {
+  background: #e5c02e;
+}
+
+.dashboard-action-btn.secondary {
+  background: #2b313a;
+  color: #eaecef;
+}
+
+.dashboard-action-btn.secondary:hover {
+  background: #363d47;
+}
+
 /* Markets Overview Top Navigation Tabs */
 .markets-top-nav-bar {
   padding: 0 24px;
@@ -5846,10 +5959,65 @@ a[href*="tradingview.com"] {
     border: 1px solid #2b313a !important;
   }
 
+  .dashboard-main-content {
+    padding: 16px 12px !important;
+  }
+
   .dashboard-user-header {
+    flex-direction: column !important;
+    align-items: stretch !important;
     padding-bottom: 14px !important;
     margin-bottom: 14px !important;
     gap: 12px !important;
+  }
+
+  .dashboard-user-info-row {
+    gap: 10px !important;
+  }
+
+  .dashboard-user-avatar {
+    width: 44px !important;
+    height: 44px !important;
+    font-size: 18px !important;
+  }
+
+  .dashboard-user-email-text {
+    font-size: 15px !important;
+    max-width: 170px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .dashboard-user-meta-chips {
+    gap: 6px !important;
+    margin-top: 6px !important;
+    flex-wrap: wrap !important;
+  }
+
+  .dashboard-meta-chip {
+    padding: 2px 6px !important;
+    font-size: 11px !important;
+  }
+
+  .dashboard-actions-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 6px !important;
+    width: 100% !important;
+  }
+
+  .dashboard-action-btn {
+    padding: 8px 4px !important;
+    font-size: 11.5px !important;
+    flex-direction: column !important;
+    gap: 3px !important;
+    border-radius: 8px !important;
+  }
+
+  .dashboard-action-btn svg {
+    width: 16px !important;
+    height: 16px !important;
   }
 
   /* Modals Full Screen / Bottom Sheet Adapt on Mobile */
