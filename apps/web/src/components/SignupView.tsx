@@ -1,13 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSignIn, useSignUp } from '@clerk/clerk-react';
 import {
-  signInWithGoogle,
-  signInWithGithub,
-  signInWithEmail,
-  signUpWithEmail,
-  syncSupabaseUserWithBackend
-} from '../lib/supabase';
-import {
   Zap,
   Mail,
   Lock,
@@ -17,8 +10,7 @@ import {
   ArrowRight,
   ShieldCheck,
   AlertCircle,
-  CheckCircle2,
-  Sparkles
+  CheckCircle2
 } from 'lucide-react';
 
 interface SignupViewProps {
@@ -77,156 +69,98 @@ export const SignupView: React.FC<SignupViewProps> = ({
 
     try {
       if (mode === 'signup') {
-        // --- 1. SUPABASE SIGN UP ---
-        let authedUser: any = null;
-        let authedToken: string = '';
-
-        try {
-          const supaRes = await signUpWithEmail(cleanEmail, password, fullName.trim());
-          if (supaRes?.user) {
-            const syncRes = await syncSupabaseUserWithBackend(supaRes.user, supaRes.session?.access_token);
-            if (syncRes && syncRes.token) {
-              authedUser = syncRes.user;
-              authedToken = syncRes.token;
-            }
-          }
-        } catch (supaErr: any) {
-          console.warn('Supabase signup notice:', supaErr?.message || supaErr);
-        }
-
-        // Clerk Fallback if active
-        if (!authedToken && signUp) {
+        // 1. Try Clerk Sign-Up
+        if (signUp) {
           try {
-            const clerkRes = await signUp.create({
+            const signUpAttempt = await signUp.create({
               emailAddress: cleanEmail,
-              password,
+              password: password,
               firstName: fullName.trim() || undefined
             });
-            if (clerkRes.status === 'complete' && setSignUpActive) {
-              await setSignUpActive({ session: clerkRes.createdSessionId });
+            if (signUpAttempt.status === 'complete' && setSignUpActive) {
+              await setSignUpActive({ session: signUpAttempt.createdSessionId });
             }
-          } catch (clerkErr) {
-            console.debug('Clerk signup note:', clerkErr);
+          } catch (clerkErr: any) {
+            console.debug('Clerk signup notice:', clerkErr?.errors?.[0]?.message || clerkErr);
           }
         }
 
-        // Direct Backend Register
-        if (!authedToken) {
-          try {
-            const res = await fetch('/api/v1/auth/register', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ email: cleanEmail, password, full_name: fullName.trim() })
-            });
-            const data = await res.json();
-            if (data.success && data.token) {
-              authedToken = data.token;
-              authedUser = data.user;
-            }
-          } catch (err) {
-            console.debug('Backend register note:', err);
-          }
+        // 2. Register with backend
+        const res = await fetch('/api/v1/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: cleanEmail, password, full_name: fullName.trim() })
+        });
+        const data = await res.json();
+        if (data.success && data.token) {
+          localStorage.setItem('syncnode_token', data.token);
+          if (data.refreshToken) localStorage.setItem('syncnode_refresh_token', data.refreshToken);
+          if (data.user) localStorage.setItem('syncnode_user', JSON.stringify(data.user));
+
+          setSuccessMessage('Account created successfully! Loading dashboard...');
+          setTimeout(() => {
+            onSuccess(data.user, data.token);
+          }, 300);
+          return;
+        } else {
+          throw new Error(data.detail || data.error || 'Failed to register account.');
         }
-
-        const userObj = authedUser || {
-          id: `usr_${Date.now().toString(36)}`,
-          email: cleanEmail,
-          fullName: fullName.trim(),
-          kyc_tier: 1,
-          kyc_status: 'VERIFIED',
-          email_verified: true,
-          created_at: Date.now()
-        };
-        const userTok = authedToken || `tok_${Date.now()}_${Math.random().toString(36).substring(2)}`;
-
-        localStorage.setItem('syncnode_token', userTok);
-        localStorage.setItem('syncnode_user', JSON.stringify(userObj));
-
-        setSuccessMessage('Account created and saved in Supabase! Redirecting...');
-        setTimeout(() => {
-          onSuccess(userObj, userTok);
-        }, 500);
 
       } else {
-        // --- 2. SIGN IN ---
-        let authedUser: any = null;
-        let authedToken: string = '';
-
-        // Try Supabase Sign In First
-        try {
-          const supaRes = await signInWithEmail(cleanEmail, password);
-          if (supaRes?.user) {
-            const syncRes = await syncSupabaseUserWithBackend(supaRes.user, supaRes.session?.access_token);
-            if (syncRes && syncRes.token) {
-              authedUser = syncRes.user;
-              authedToken = syncRes.token;
-            }
-          }
-        } catch (supaErr: any) {
-          console.debug('Supabase signin note:', supaErr?.message || supaErr);
-        }
-
-        // Try Clerk Sign In Fallback
-        if (!authedToken && signIn) {
+        // 1. Try Clerk Sign-In
+        if (signIn) {
           try {
-            const clerkRes = await signIn.create({
+            const signInAttempt = await signIn.create({
               identifier: cleanEmail,
-              password
+              password: password
             });
-            if (clerkRes.status === 'complete' && setSignInActive) {
-              await setSignInActive({ session: clerkRes.createdSessionId });
+            if (signInAttempt.status === 'complete' && setSignInActive) {
+              await setSignInActive({ session: signInAttempt.createdSessionId });
             }
-          } catch (clerkErr) {
-            console.debug('Clerk signin note:', clerkErr);
+          } catch (clerkErr: any) {
+            console.debug('Clerk signin notice:', clerkErr?.errors?.[0]?.message || clerkErr);
           }
         }
 
-        // Try Backend Login Fallback
-        if (!authedToken) {
-          const res = await fetch('/api/v1/auth/login', {
+        // 2. Sign in with backend
+        const res = await fetch('/api/v1/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: cleanEmail, password })
+        });
+        const data = await res.json();
+        if (data.success && data.token) {
+          localStorage.setItem('syncnode_token', data.token);
+          if (data.refreshToken) localStorage.setItem('syncnode_refresh_token', data.refreshToken);
+          if (data.user) localStorage.setItem('syncnode_user', JSON.stringify(data.user));
+
+          setSuccessMessage('Signed in successfully! Entering terminal...');
+          setTimeout(() => {
+            onSuccess(data.user, data.token);
+          }, 300);
+          return;
+        } else {
+          // If user doesn't exist, auto-register seamlessly
+          const autoReg = await fetch('/api/v1/auth/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: cleanEmail, password })
+            body: JSON.stringify({ email: cleanEmail, password, full_name: cleanEmail.split('@')[0] })
           });
-          const data = await res.json();
-          if (data.success && data.token) {
-            authedToken = data.token;
-            authedUser = data.user;
-          } else {
-            // Auto-fallback: If account is new, attempt automatic registration
-            const regRes = await fetch('/api/v1/auth/register', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ email: cleanEmail, password, full_name: cleanEmail.split('@')[0] })
-            });
-            const regData = await regRes.json();
-            if (regData.success && regData.token) {
-              authedToken = regData.token;
-              authedUser = regData.user;
-            } else {
-              throw new Error(data.detail || data.error || 'Invalid email or password.');
-            }
+          const autoData = await autoReg.json();
+          if (autoData.success && autoData.token) {
+            localStorage.setItem('syncnode_token', autoData.token);
+            if (autoData.refreshToken) localStorage.setItem('syncnode_refresh_token', autoData.refreshToken);
+            if (autoData.user) localStorage.setItem('syncnode_user', JSON.stringify(autoData.user));
+
+            setSuccessMessage('Signed in successfully! Entering terminal...');
+            setTimeout(() => {
+              onSuccess(autoData.user, autoData.token);
+            }, 300);
+            return;
           }
+
+          throw new Error(data.detail || data.error || 'Invalid email or password.');
         }
-
-        const userObj = authedUser || {
-          id: `usr_${Date.now().toString(36)}`,
-          email: cleanEmail,
-          fullName: cleanEmail.split('@')[0],
-          kyc_tier: 1,
-          kyc_status: 'VERIFIED',
-          email_verified: true,
-          created_at: Date.now()
-        };
-        const token = authedToken || `tok_${Date.now()}_${Math.random().toString(36).substring(2)}`;
-
-        localStorage.setItem('syncnode_token', token);
-        localStorage.setItem('syncnode_user', JSON.stringify(userObj));
-
-        setSuccessMessage('Logged in successfully! Entering terminal...');
-        setTimeout(() => {
-          onSuccess(userObj, token);
-        }, 400);
       }
     } catch (err: any) {
       setError(err?.message || 'Authentication error. Please check your credentials.');
@@ -239,23 +173,19 @@ export const SignupView: React.FC<SignupViewProps> = ({
     setLoading(true);
     setError(null);
     try {
-      await signInWithGoogle();
-    } catch (err: any) {
-      console.warn('Google OAuth error:', err);
-      // Fallback redirect if needed
-      try {
-        if (signIn && signIn.authenticateWithRedirect) {
-          await signIn.authenticateWithRedirect({
-            strategy: 'oauth_google',
-            redirectUrl: `${window.location.origin}/`,
-            redirectUrlComplete: `${window.location.origin}/dashboard`
-          });
-          return;
-        }
-      } catch (clerkErr) {
-        console.warn('Clerk OAuth note:', clerkErr);
+      const authObj = mode === 'signup' ? signUp : signIn;
+      if (authObj && authObj.authenticateWithRedirect) {
+        await authObj.authenticateWithRedirect({
+          strategy: 'oauth_google',
+          redirectUrl: `${window.location.origin}/`,
+          redirectUrlComplete: `${window.location.origin}/dashboard`
+        });
+        return;
       }
-      setError(err?.message || 'Unable to connect to Google OAuth.');
+      throw new Error('Clerk Google OAuth is initializing. Please try again.');
+    } catch (err: any) {
+      console.warn('Google sign in error:', err);
+      setError(err?.errors?.[0]?.message || err?.message || 'Unable to connect to Google OAuth.');
       setLoading(false);
     }
   };
@@ -388,7 +318,7 @@ export const SignupView: React.FC<SignupViewProps> = ({
           </button>
         </div>
 
-        {/* Big 1-Click Google OAuth Button */}
+        {/* 1-Click Google Login Button via Clerk */}
         <button
           type="button"
           onClick={handleGoogleSignIn}

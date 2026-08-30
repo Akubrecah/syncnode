@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
 import { useUser, useClerk } from '@clerk/clerk-react';
-import { supabase, syncSupabaseUserWithBackend, signOutSupabase } from './lib/supabase';
 import { Navbar, TabType } from './components/Navbar';
 import { DashboardView } from './components/DashboardView';
 import { NewsView } from './components/NewsView';
@@ -610,80 +609,6 @@ export const App: React.FC = () => {
     }
   }, [isClerkLoaded, isClerkSignedIn, clerkUser?.id]);
 
-  // Realtime Supabase User & Google OAuth Callback Synchronization
-  useEffect(() => {
-    const handleSupabaseSession = async (session: any) => {
-      if (!session?.user || !session.user.email) return;
-      const supaUser = session.user;
-      const email = supaUser.email;
-      const fullName =
-        supaUser.user_metadata?.full_name ||
-        supaUser.user_metadata?.name ||
-        email.split('@')[0];
-      const avatarUrl =
-        supaUser.user_metadata?.avatar_url ||
-        supaUser.user_metadata?.picture ||
-        null;
-
-      const userProfile = {
-        id: supaUser.id,
-        email: email,
-        fullName: fullName,
-        avatarUrl: avatarUrl,
-        kyc_tier: 1,
-        kyc_status: 'VERIFIED',
-        created_at: Date.now()
-      };
-
-      const existingToken = localStorage.getItem('syncnode_token');
-      if (!existingToken) {
-        localStorage.setItem('syncnode_token', session.access_token || `sb_tok_${supaUser.id}`);
-      }
-      localStorage.setItem('syncnode_user', JSON.stringify(userProfile));
-      setUser(userProfile);
-
-      if (activeTab === 'signup' || activeTab === 'login') {
-        setActiveTabState('dashboard');
-        if (window.location.pathname !== '/dashboard') {
-          window.history.pushState(null, '', '/dashboard');
-        }
-      }
-
-      try {
-        const syncRes = await syncSupabaseUserWithBackend(supaUser, session.access_token);
-        if (syncRes && syncRes.token) {
-          localStorage.setItem('syncnode_token', syncRes.token);
-          if (syncRes.refreshToken) localStorage.setItem('syncnode_refresh_token', syncRes.refreshToken);
-          if (syncRes.user) {
-            localStorage.setItem('syncnode_user', JSON.stringify(syncRes.user));
-            setUser(syncRes.user);
-          }
-          fetchUserData();
-        }
-      } catch (err) {
-        console.warn('Supabase backend sync error:', err);
-      }
-    };
-
-    // Check existing active Supabase session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        handleSupabaseSession(session);
-      }
-    });
-
-    // Listen for Auth changes (OAuth redirects from https://drxlsqhxgcihumvevxkl.supabase.co/auth/v1/callback)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session?.user && (event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'USER_UPDATED')) {
-        handleSupabaseSession(session);
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
-
   // Poll market state every 1.5 seconds
   useEffect(() => {
     fetchTicker();
@@ -819,12 +744,6 @@ export const App: React.FC = () => {
     setOrders([]);
     setUserTrades([]);
     setTransactions([]);
-
-    try {
-      await signOutSupabase();
-    } catch (e) {
-      console.debug('Supabase signout notice:', e);
-    }
 
     try {
       if (clerk && clerk.signOut) {
