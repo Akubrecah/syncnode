@@ -40,6 +40,7 @@ import {
   RefreshCw,
   Sliders,
   DollarSign,
+  Smartphone,
   Menu,
   X
 } from 'lucide-react';
@@ -1336,9 +1337,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           >
             <div style={{ display: 'flex', gap: '24px' }}>
               {[
-                { id: 'open_orders', label: `Open Orders (${orders.filter((o) => o.status === 'NEW' || o.status === 'PARTIALLY_FILLED').length})` },
+                { id: 'open_orders', label: `Open Orders (${(orders || []).filter((o) => o && (o.status === 'NEW' || o.status === 'PARTIALLY_FILLED')).length})` },
                 { id: 'order_history', label: 'Order History' },
-                { id: 'trade_history', label: `Trade History (${userTrades.length})` },
+                { id: 'trade_history', label: `Trade History (${(userTrades || []).length})` },
                 { id: 'assets', label: 'Asset Logs' }
               ].map((tab) => (
                 <button
@@ -1383,7 +1384,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           {/* Tab Contents */}
           {activeActivityTab === 'open_orders' && (
             <div>
-              {orders.filter((o) => o.status === 'NEW' || o.status === 'PARTIALLY_FILLED').length === 0 ? (
+              {(orders || []).filter((o) => o && (o.status === 'NEW' || o.status === 'PARTIALLY_FILLED')).length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '40px 20px', color: '#848e9c' }}>
                   <FileText size={36} color="#4f5867" style={{ marginBottom: '12px' }} />
                   <div style={{ fontSize: '14px', fontWeight: 600, color: '#eaecef' }}>No Open Orders</div>
@@ -1419,19 +1420,19 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     </tr>
                   </thead>
                   <tbody>
-                    {orders
-                      .filter((o) => o.status === 'NEW' || o.status === 'PARTIALLY_FILLED')
+                    {(orders || [])
+                      .filter((o) => o && (o.status === 'NEW' || o.status === 'PARTIALLY_FILLED'))
                       .map((o) => (
-                        <tr key={o.id} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.04)' }}>
-                          <td style={{ padding: '12px', fontWeight: 600 }}>{o.market}</td>
+                        <tr key={o.id || o.order_id || Math.random()} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.04)' }}>
+                          <td style={{ padding: '12px', fontWeight: 600 }}>{o.market || o.symbol || 'BTC/USDT'}</td>
                           <td style={{ padding: '12px', fontWeight: 700, color: o.side === 'BUY' ? '#2ebd85' : '#f6465d' }}>
-                            {o.side}
+                            {o.side || 'BUY'}
                           </td>
-                          <td style={{ padding: '12px', color: '#848e9c' }}>{o.type}</td>
-                          <td style={{ padding: '12px', textAlign: 'right', fontFamily: 'monospace' }}>${parseFloat(o.price).toFixed(2)}</td>
-                          <td style={{ padding: '12px', textAlign: 'right', fontFamily: 'monospace' }}>{parseFloat(o.quantity).toFixed(4)}</td>
+                          <td style={{ padding: '12px', color: '#848e9c' }}>{o.type || 'LIMIT'}</td>
+                          <td style={{ padding: '12px', textAlign: 'right', fontFamily: 'monospace' }}>${parseFloat(o.price || '0').toFixed(2)}</td>
+                          <td style={{ padding: '12px', textAlign: 'right', fontFamily: 'monospace' }}>{parseFloat(o.quantity || o.amount || '0').toFixed(4)}</td>
                           <td style={{ padding: '12px', textAlign: 'right', fontFamily: 'monospace' }}>
-                            {((parseFloat(o.executedQty || '0') / parseFloat(o.quantity)) * 100).toFixed(1)}%
+                            {((parseFloat(o.executedQty || '0') / Math.max(0.0001, parseFloat(o.quantity || o.amount || '1'))) * 100).toFixed(1)}%
                           </td>
                           <td style={{ padding: '12px', textAlign: 'right' }}>
                             <button
@@ -1459,7 +1460,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
           {activeActivityTab === 'trade_history' && (
             <div>
-              {userTrades.length === 0 ? (
+              {(userTrades || []).length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '40px 20px', color: '#848e9c' }}>
                   <Activity size={36} color="#4f5867" style={{ marginBottom: '12px' }} />
                   <div style={{ fontSize: '14px', fontWeight: 600, color: '#eaecef' }}>No Trade Executions</div>
@@ -1478,19 +1479,19 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     </tr>
                   </thead>
                   <tbody>
-                    {userTrades.slice(0, 10).map((t, idx) => (
-                      <tr key={t.id || idx} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.04)' }}>
+                    {(userTrades || []).slice(0, 10).map((t, idx) => (
+                      <tr key={t?.id || idx} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.04)' }}>
                         <td style={{ padding: '12px', color: '#848e9c', fontSize: '12px' }}>
-                          {new Date(t.timestamp || Date.now()).toLocaleTimeString()}
+                          {new Date(t?.timestamp || Date.now()).toLocaleTimeString()}
                         </td>
-                        <td style={{ padding: '12px', fontWeight: 600 }}>{t.market}</td>
-                        <td style={{ padding: '12px', fontWeight: 700, color: t.side === 'BUY' ? '#2ebd85' : '#f6465d' }}>
-                          {t.side}
+                        <td style={{ padding: '12px', fontWeight: 600 }}>{t?.market || t?.symbol || 'BTC/USDT'}</td>
+                        <td style={{ padding: '12px', fontWeight: 700, color: t?.side === 'BUY' ? '#2ebd85' : '#f6465d' }}>
+                          {t?.side || 'BUY'}
                         </td>
-                        <td style={{ padding: '12px', textAlign: 'right', fontFamily: 'monospace' }}>${parseFloat(t.price).toFixed(2)}</td>
-                        <td style={{ padding: '12px', textAlign: 'right', fontFamily: 'monospace' }}>{parseFloat(t.quantity).toFixed(4)}</td>
+                        <td style={{ padding: '12px', textAlign: 'right', fontFamily: 'monospace' }}>${parseFloat(t?.price || '0').toFixed(2)}</td>
+                        <td style={{ padding: '12px', textAlign: 'right', fontFamily: 'monospace' }}>{parseFloat(t?.quantity || t?.amount || '0').toFixed(4)}</td>
                         <td style={{ padding: '12px', textAlign: 'right', color: '#848e9c', fontFamily: 'monospace' }}>
-                          {t.fee || '0.001 USDT'}
+                          {t?.fee || '0.001 USDT'}
                         </td>
                       </tr>
                     ))}
